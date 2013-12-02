@@ -1,3 +1,5 @@
+package fi.paivola.foodmodel;
+
 /**
  * @version 0.1
  * @author Jaakko Hannikainen

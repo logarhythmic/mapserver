@@ -1,3 +1,6 @@
+package fi.paivola.foodmodel;
+
+import fi.paivola.mapserver.core.*;
 /**
  *
  * @version 0.1
@@ -18,18 +21,18 @@ public class Field extends PointModel {
      * 
      * @param id ID of the field
      */
-    public Food(int id) {
+    public Field(int id) {
         super(id);
-        this.settings.add(new Setting("area", "double", "1", setArea));
+        this.settings.add(new Setting("area", "double", "1"));
 
-        this.settings.add(new Setting("water minimum (cm/week)", "double", "0.5", setArea));
-        this.settings.add(new Setting("water maximum (cm/week)", "double", "1.5", setArea));
-        this.settings.add(new Setting("minimum average temperature (C)", "double", "1", setArea));
-        this.settings.add(new Setting("maximum average temperature (C)", "double", "1", setArea));
-        this.settings.add(new Setting("minimum sunlight (hours / day)", "double", "1", setArea));
-        this.settings.add(new Setting("maximum sunlight (hours / day)", "double", "1", setArea));
-        this.settings.add(new Setting("minimum nutrient content", "double", "1", setArea));
-        this.settings.add(new Setting("maximum nutrient content", "double", "1", setArea));
+        this.settings.add(new Setting("water minimum (cm/week)", "double", "0.5"));
+        this.settings.add(new Setting("water maximum (cm/week)", "double", "1.5"));
+        this.settings.add(new Setting("minimum average temperature (C)", "double", "1"));
+        this.settings.add(new Setting("maximum average temperature (C)", "double", "1"));
+        this.settings.add(new Setting("minimum sunlight (hours / day)", "double", "1"));
+        this.settings.add(new Setting("maximum sunlight (hours / day)", "double", "1"));
+        this.settings.add(new Setting("minimum nutrient content", "double", "1"));
+        this.settings.add(new Setting("maximum nutrient content", "double", "1"));
 
     }
 
@@ -46,7 +49,7 @@ public class Field extends PointModel {
     }
 
     private void setTemperatureIndex(double temperatureIndex) {
-        this.TemperatureIndex = temperatureIndex;
+        this.temperatureIndex = temperatureIndex;
     }
 
     public double getSunshineIndex() {
@@ -65,12 +68,12 @@ public class Field extends PointModel {
         this.nutrientIndex = nutrientIndex;
     }
 
-    public double getAreaIndex() {
-        return this.areaIndex;
+    public double getArea() {
+        return this.area;
     }
 
-    public void setAreaIndex(double areaIndex) {
-        this.areaIndex = areaIndex;
+    public void setArea(double area) {
+        this.area = area;
     }
 
     public double getMaxYield() {
@@ -99,13 +102,14 @@ public class Field extends PointModel {
     }
 
     @Override
-    public void onGenerateDefaults() {
+    public void onGenerateDefaults(DataFrame df) {
         this.setWaterIndex(0.5);
         this.setTemperatureIndex(0.5);
         this.setSunshineIndex(0.5);
         this.setNutrientIndex(0.5);
         this.setArea(1);
     }
+
 }
 
 

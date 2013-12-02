@@ -1,3 +1,5 @@
+package fi.paivola.foodmodel;
+
 /**
  * @version 0.1
  * @author Jaakko Hannikainen
@@ -6,7 +8,7 @@
 
 public class Maize extends Crop {
     public Maize() {
-        this.super();
+        super();
         this.waterMinimum = 1.01;
         this.waterOptimal = 2.07;
         this.waterMaximum = 3.01;
