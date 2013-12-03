@@ -1,5 +1,9 @@
 package fi.paivola.foodmodel;
 
+import fi.paivola.mapserver.core.DataFrame;
+import fi.paivola.mapserver.core.Setting;
+import java.util.List;
+
 /**
  * @version 0.1
  * @author Jaakko Hannikainen
@@ -7,9 +11,11 @@ package fi.paivola.foodmodel;
  */
 
 public abstract class Edible {
-    private double amount;
 
-    public Edible() {
-        
+    List<Setting> settings;
+    public Edible(List<Setting> settings) {
+        this.settings = settings;
     }
+    
+    abstract double onTick(DataFrame last);
 }
