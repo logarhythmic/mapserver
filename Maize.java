@@ -1,6 +1,6 @@
 package fi.paivola.foodmodel;
 
-import fi.paivola.mapserver.core.Setting;
+import fi.paivola.mapserver.core.setting.*;
 import java.util.List;
 
 /**

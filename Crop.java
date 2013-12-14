@@ -1,7 +1,7 @@
 package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
-import fi.paivola.mapserver.core.Setting;
+import fi.paivola.mapserver.core.setting.*;
 import java.util.List;
 /**
  * @version 0.1
@@ -27,18 +27,20 @@ public abstract class Crop extends Edible {
     
     public Crop(List<Setting> settings) {
         super(settings);
-        this.settings.add(new Setting("water minimum (cm/week)", "double", "0.5"));
-        this.settings.add(new Setting("water optimum (cm/week)", "double", "1"));
-        this.settings.add(new Setting("water maximum (cm/week)", "double", "1.5"));
-        this.settings.add(new Setting("minimum average temperature (C)", "double", "1"));
-        this.settings.add(new Setting("optimal average temperature (C)", "double", "1"));
-        this.settings.add(new Setting("maximum average temperature (C)", "double", "1"));
-        this.settings.add(new Setting("minimum sunlight (hours / day)", "double", "1"));
-        this.settings.add(new Setting("optimal sunlight (hours / day)", "double", "1"));
-        this.settings.add(new Setting("maximum sunlight (hours / day)", "double", "1"));
-        this.settings.add(new Setting("minimum nutrient content", "double", "1"));
-        this.settings.add(new Setting("optimal nutrient content", "double", "1"));
-        this.settings.add(new Setting("maximum nutrient content", "double", "1"));
+        
+        this.settings.add(new Setting("name", "string", cropName));
+        this.settings.add(new Setting("water minimum (cm/week)", "double", getWaterMinimum() + ""));
+        this.settings.add(new Setting("water optimum (cm/week)", "double", getWaterOptimal() + ""));
+        this.settings.add(new Setting("water maximum (cm/week)", "double", getWaterMaximum() + ""));
+        this.settings.add(new Setting("minimum average temperature (C)", "double", getTemperatureMinimum() + ""));
+        this.settings.add(new Setting("optimal average temperature (C)", "double", getTemperatureOptimal() + ""));
+        this.settings.add(new Setting("maximum average temperature (C)", "double", getTemperatureMaximum() + ""));
+        this.settings.add(new Setting("minimum sunlight (hours / day)", "double", getSunlightMinimum() + ""));
+        this.settings.add(new Setting("optimal sunlight (hours / day)", "double", getSunlightOptimal() + ""));
+        this.settings.add(new Setting("maximum sunlight (hours / day)", "double", getSunlightMaximum() + ""));
+        this.settings.add(new Setting("minimum nutrient content", "double", getNutrientMinimum() + ""));
+        this.settings.add(new Setting("optimal nutrient content", "double", getNutrientOptimal() + ""));
+        this.settings.add(new Setting("maximum nutrient content", "double", getNutrientMaximum() + ""));
     }
 
     public double onTick(DataFrame last) {
@@ -75,182 +77,182 @@ public abstract class Crop extends Edible {
     /**
      * @return the cropName
      */
-    public String getCropName() {
+    public final String getCropName() {
         return cropName;
     }
 
     /**
      * @param cropName the cropName to set
      */
-    public void setCropName(String cropName) {
+    public final void setCropName(String cropName) {
         this.cropName = cropName;
     }
     
     /**
      * @return the waterMinimum
      */
-    public double getWaterMinimum() {
+    public final double getWaterMinimum() {
         return waterMinimum;
     }
 
     /**
      * @param waterMinimum the waterMinimum to set
      */
-    public void setWaterMinimum(double waterMinimum) {
+    public final void setWaterMinimum(double waterMinimum) {
         this.waterMinimum = waterMinimum;
     }
 
     /**
      * @return the waterOptimal
      */
-    public double getWaterOptimal() {
+    public final double getWaterOptimal() {
         return waterOptimal;
     }
 
     /**
      * @param waterOptimal the waterOptimal to set
      */
-    public void setWaterOptimal(double waterOptimal) {
+    public final void setWaterOptimal(double waterOptimal) {
         this.waterOptimal = waterOptimal;
     }
 
     /**
      * @return the waterMaximum
      */
-    public double getWaterMaximum() {
+    public final double getWaterMaximum() {
         return waterMaximum;
     }
 
     /**
      * @param waterMaximum the waterMaximum to set
      */
-    public void setWaterMaximum(double waterMaximum) {
+    public final void setWaterMaximum(double waterMaximum) {
         this.waterMaximum = waterMaximum;
     }
 
     /**
      * @return the temperatureMinimum
      */
-    public double getTemperatureMinimum() {
+    public final double getTemperatureMinimum() {
         return temperatureMinimum;
     }
 
     /**
      * @param temperatureMinimum the temperatureMinimum to set
      */
-    public void setTemperatureMinimum(double temperatureMinimum) {
+    public final void setTemperatureMinimum(double temperatureMinimum) {
         this.temperatureMinimum = temperatureMinimum;
     }
 
     /**
      * @return the temperatureOptimal
      */
-    public double getTemperatureOptimal() {
+    public final double getTemperatureOptimal() {
         return temperatureOptimal;
     }
 
     /**
      * @param temperatureOptimal the temperatureOptimal to set
      */
-    public void setTemperatureOptimal(double temperatureOptimal) {
+    public final void setTemperatureOptimal(double temperatureOptimal) {
         this.temperatureOptimal = temperatureOptimal;
     }
 
     /**
      * @return the temperatureMaximum
      */
-    public double getTemperatureMaximum() {
+    public final double getTemperatureMaximum() {
         return temperatureMaximum;
     }
 
     /**
      * @param temperatureMaximum the temperatureMaximum to set
      */
-    public void setTemperatureMaximum(double temperatureMaximum) {
+    public final void setTemperatureMaximum(double temperatureMaximum) {
         this.temperatureMaximum = temperatureMaximum;
     }
 
     /**
      * @return the sunlightMinimum
      */
-    public double getSunlightMinimum() {
+    public final double getSunlightMinimum() {
         return sunlightMinimum;
     }
 
     /**
      * @param sunlightMinimum the sunlightMinimum to set
      */
-    public void setSunlightMinimum(double sunlightMinimum) {
+    public final void setSunlightMinimum(double sunlightMinimum) {
         this.sunlightMinimum = sunlightMinimum;
     }
 
     /**
      * @return the sunlightOptimal
      */
-    public double getSunlightOptimal() {
+    public final double getSunlightOptimal() {
         return sunlightOptimal;
     }
 
     /**
      * @param sunlightOptimal the sunlightOptimal to set
      */
-    public void setSunlightOptimal(double sunlightOptimal) {
+    public final void setSunlightOptimal(double sunlightOptimal) {
         this.sunlightOptimal = sunlightOptimal;
     }
 
     /**
      * @return the sunlightMaximum
      */
-    public double getSunlightMaximum() {
+    public final double getSunlightMaximum() {
         return sunlightMaximum;
     }
 
     /**
      * @param sunlightMaximum the sunlightMaximum to set
      */
-    public void setSunlightMaximum(double sunlightMaximum) {
+    public final void setSunlightMaximum(double sunlightMaximum) {
         this.sunlightMaximum = sunlightMaximum;
     }
 
     /**
      * @return the nutrientMinimum
      */
-    public double getNutrientMinimum() {
+    public final double getNutrientMinimum() {
         return nutrientMinimum;
     }
 
     /**
      * @param nutrientMinimum the nutrientMinimum to set
      */
-    public void setNutrientMinimum(double nutrientMinimum) {
+    public final void setNutrientMinimum(double nutrientMinimum) {
         this.nutrientMinimum = nutrientMinimum;
     }
 
     /**
      * @return the nutrientOptimal
      */
-    public double getNutrientOptimal() {
+    public final double getNutrientOptimal() {
         return nutrientOptimal;
     }
 
     /**
      * @param nutrientOptimal the nutrientOptimal to set
      */
-    public void setNutrientOptimal(double nutrientOptimal) {
+    public final void setNutrientOptimal(double nutrientOptimal) {
         this.nutrientOptimal = nutrientOptimal;
     }
 
     /**
      * @return the nutrientMaximum
      */
-    public double getNutrientMaximum() {
+    public final double getNutrientMaximum() {
         return nutrientMaximum;
     }
 
     /**
      * @param nutrientMaximum the nutrientMaximum to set
      */
-    public void setNutrientMaximum(double nutrientMaximum) {
+    public final void setNutrientMaximum(double nutrientMaximum) {
         this.nutrientMaximum = nutrientMaximum;
     }
 
