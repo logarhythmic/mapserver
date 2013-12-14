@@ -1,6 +1,8 @@
 package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.*;
+import fi.paivola.mapserver.utils.*;
+import fi.paivola.mapserver.core.setting.*;
 /**
  *
  * @version 0.1
@@ -17,8 +19,9 @@ public class Field extends PointModel {
      */
     public Field(int id) {
         super(id);
-        this.settings.add(new Setting("area", "double", "1"));
-        this.settings.add(new Setting("content", "string", "empty"));
+        this.settings.put("area", new SettingDouble("area", 1.0,
+                new Range(0, Integer.MAX_VALUE)));
+        this.settings.put("content", new SettingString("content", "empty"));
     }
 
     @Override

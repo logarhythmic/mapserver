@@ -1,7 +1,7 @@
 package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.setting.*;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @version 0.1
@@ -10,7 +10,7 @@ import java.util.List;
  */
 
 public class Maize extends Crop {
-    public Maize(List<Setting> settings) {
+    public Maize(Map<String, Setting> settings) {
         super(settings);
         this.setWaterMinimum(1.01);
         this.setWaterOptimal(2.07);

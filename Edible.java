@@ -2,7 +2,7 @@ package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.setting.*;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @version 0.1
@@ -12,8 +12,8 @@ import java.util.List;
 
 public abstract class Edible {
 
-    List<Setting> settings;
-    public Edible(List<Setting> settings) {
+    Map<String, Setting> settings;
+    public Edible(Map<String, Setting> settings) {
         this.settings = settings;
     }
     

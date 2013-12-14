@@ -2,7 +2,9 @@ package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.Range;
 import java.util.List;
+import java.util.Map;
 /**
  * @version 0.1
  * @author Jaakko Hannikainen
@@ -25,22 +27,36 @@ public abstract class Crop extends Edible {
     private double nutrientOptimal;
     private double nutrientMaximum;
     
-    public Crop(List<Setting> settings) {
+    public Crop(Map<String, Setting> settings) {
         super(settings);
         
-        this.settings.add(new Setting("name", "string", cropName));
-        this.settings.add(new Setting("water minimum (cm/week)", "double", getWaterMinimum() + ""));
-        this.settings.add(new Setting("water optimum (cm/week)", "double", getWaterOptimal() + ""));
-        this.settings.add(new Setting("water maximum (cm/week)", "double", getWaterMaximum() + ""));
-        this.settings.add(new Setting("minimum average temperature (C)", "double", getTemperatureMinimum() + ""));
-        this.settings.add(new Setting("optimal average temperature (C)", "double", getTemperatureOptimal() + ""));
-        this.settings.add(new Setting("maximum average temperature (C)", "double", getTemperatureMaximum() + ""));
-        this.settings.add(new Setting("minimum sunlight (hours / day)", "double", getSunlightMinimum() + ""));
-        this.settings.add(new Setting("optimal sunlight (hours / day)", "double", getSunlightOptimal() + ""));
-        this.settings.add(new Setting("maximum sunlight (hours / day)", "double", getSunlightMaximum() + ""));
-        this.settings.add(new Setting("minimum nutrient content", "double", getNutrientMinimum() + ""));
-        this.settings.add(new Setting("optimal nutrient content", "double", getNutrientOptimal() + ""));
-        this.settings.add(new Setting("maximum nutrient content", "double", getNutrientMaximum() + ""));
+        Range r = new Range(0, Integer.MAX_VALUE);
+        
+        this.settings.put("name", new SettingString("name", cropName));
+        this.settings.put("minwater", new SettingDouble("water minimum"
+                + "(cm/week)", getWaterMinimum(), r));
+        this.settings.put("optwater", new SettingDouble("water optimum"
+                + "(cm/week)", getWaterOptimal(), r));
+        this.settings.put("maxwater", new SettingDouble("water maximum"
+                + "(cm/week)", getWaterMaximum(), r));
+        this.settings.put("mintemp", new SettingDouble("minimum average "
+                + "temperature (C)", getTemperatureMinimum(), r));
+        this.settings.put("opttemp", new SettingDouble("optimal average "
+                + "temperature (C)", getTemperatureOptimal(), r));
+        this.settings.put("maxtemp", new SettingDouble("maximum average "
+                + "temperature (C)", getTemperatureMaximum(), r));
+        this.settings.put("minsun", new SettingDouble("minimum sunlight "
+                + "(hours / day)", getSunlightMinimum(), r));
+        this.settings.put("optsun", new SettingDouble("optimal sunlight "
+                + "(hours / day)", getSunlightOptimal(), r));
+        this.settings.put("maxsun", new SettingDouble("maximum sunlight "
+                + "(hours / day)", getSunlightMaximum(), r));
+        this.settings.put("minnut", new SettingDouble("minimum nutrient "
+                + "content", getNutrientMinimum(), r));
+        this.settings.put("optnut", new SettingDouble("optimal nutrient "
+                + "content", getNutrientOptimal(), r));
+        this.settings.put("maxnut", new SettingDouble("maximum nutrient "
+                + "content", getNutrientMaximum(), r));
     }
 
     public double onTick(DataFrame last) {
