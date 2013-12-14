@@ -5,7 +5,6 @@ import fi.paivola.mapserver.core.setting.*;
 import java.util.Map;
 
 /**
- * @version 0.1
  * @author Jaakko Hannikainen
  * Base class for edible things.
  */

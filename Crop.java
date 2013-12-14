@@ -6,7 +6,6 @@ import fi.paivola.mapserver.utils.Range;
 import java.util.List;
 import java.util.Map;
 /**
- * @version 0.1
  * @author Jaakko Hannikainen
  * Generic class for field products, eg. maize.
  */

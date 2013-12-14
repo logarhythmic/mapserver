@@ -4,8 +4,6 @@ import fi.paivola.mapserver.core.*;
 import fi.paivola.mapserver.utils.*;
 import fi.paivola.mapserver.core.setting.*;
 /**
- *
- * @version 0.1
  * @author Jaakko Hannikainen
  */
 public class Field extends PointModel {
