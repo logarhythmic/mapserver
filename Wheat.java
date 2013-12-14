@@ -11,17 +11,17 @@ import java.util.Map;
 public class Wheat extends Crop {
     public Wheat(Map<String, Setting> settings) {
         super(settings);
-        this.setWaterMinimum(1.01);
-        this.setWaterOptimal(2.07);
-        this.setWaterMaximum(3.01);
-        this.setTemperatureMinimum(20);
-        this.setTemperatureOptimal(30);
-        this.setTemperatureMaximum(40);
+        this.setWaterMinimum(1.09);
+        this.setWaterOptimal(2.17);
+        this.setWaterMaximum(3.23);
+        this.setTemperatureMinimum(19);
+        this.setTemperatureOptimal(22);
+        this.setTemperatureMaximum(25);
         this.setSunlightMinimum(42);
         this.setSunlightOptimal(45);
         this.setSunlightMaximum(70);
-        this.setPHMinimum(5);
-        this.setPHOptimal(6);
+        this.setPHMinimum(6);
+        this.setPHOptimal(6.5);
         this.setPHMaximum(7);
     }
 }
