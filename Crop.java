@@ -23,9 +23,9 @@ public abstract class Crop extends Edible {
     private double sunlightMinimum;
     private double sunlightOptimal;
     private double sunlightMaximum;
-    private double nutrientMinimum;
-    private double nutrientOptimal;
-    private double nutrientMaximum;
+    private double phMinimum;
+    private double phOptimal;
+    private double phMaximum;
     
     public Crop(Map<String, Setting> settings) {
         super(settings);
@@ -51,17 +51,17 @@ public abstract class Crop extends Edible {
                 + "(hours / day)", getSunlightOptimal(), r));
         this.settings.put("maxsun", new SettingDouble("maximum sunlight "
                 + "(hours / day)", getSunlightMaximum(), r));
-        this.settings.put("minnut", new SettingDouble("minimum nutrient "
-                + "content", getNutrientMinimum(), r));
-        this.settings.put("optnut", new SettingDouble("optimal nutrient "
-                + "content", getNutrientOptimal(), r));
-        this.settings.put("maxnut", new SettingDouble("maximum nutrient "
-                + "content", getNutrientMaximum(), r));
+        this.settings.put("minph", new SettingDouble("minimum ph",
+                    getPHMinimum(), r));
+        this.settings.put("optph", new SettingDouble("optimal ph", 
+                    getPHOptimal(), r));
+        this.settings.put("maxph", new SettingDouble("maximum ph",
+                    getPHMaximum(), r));
     }
 
     public double onTick(DataFrame last) {
         return this.getWaterIndex(last) * this.getTemperatureIndex(last)
-                * this.getSunshineIndex(last) * this.getNutrientIndex(last)
+                * this.getSunshineIndex(last) * this.getPHIndex(last)
                 * this.getArea() * this.getMaxYield();
     }
     
@@ -77,7 +77,7 @@ public abstract class Crop extends Edible {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private double getNutrientIndex(DataFrame last) {
+    private double getPHIndex(DataFrame last) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -231,45 +231,45 @@ public abstract class Crop extends Edible {
     }
 
     /**
-     * @return the nutrientMinimum
+     * @return the phMinimum
      */
-    public final double getNutrientMinimum() {
-        return nutrientMinimum;
+    public final double getPHMinimum() {
+        return phMinimum;
     }
 
     /**
-     * @param nutrientMinimum the nutrientMinimum to set
+     * @param phMinimum the phMinimum to set
      */
-    public final void setNutrientMinimum(double nutrientMinimum) {
-        this.nutrientMinimum = nutrientMinimum;
+    public final void setPHMinimum(double phMinimum) {
+        this.phMinimum = phMinimum;
     }
 
     /**
-     * @return the nutrientOptimal
+     * @return the phOptimal
      */
-    public final double getNutrientOptimal() {
-        return nutrientOptimal;
+    public final double getPHOptimal() {
+        return phOptimal;
     }
 
     /**
-     * @param nutrientOptimal the nutrientOptimal to set
+     * @param phOptimal the phOptimal to set
      */
-    public final void setNutrientOptimal(double nutrientOptimal) {
-        this.nutrientOptimal = nutrientOptimal;
+    public final void setPHOptimal(double phOptimal) {
+        this.phOptimal = phOptimal;
     }
 
     /**
-     * @return the nutrientMaximum
+     * @return the phMaximum
      */
-    public final double getNutrientMaximum() {
-        return nutrientMaximum;
+    public final double getPHMaximum() {
+        return phMaximum;
     }
 
     /**
-     * @param nutrientMaximum the nutrientMaximum to set
+     * @param phMaximum the phMaximum to set
      */
-    public final void setNutrientMaximum(double nutrientMaximum) {
-        this.nutrientMaximum = nutrientMaximum;
+    public final void setPHMaximum(double phMaximum) {
+        this.phMaximum = phMaximum;
     }
 
 }
