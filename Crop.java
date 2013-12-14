@@ -80,14 +80,17 @@ public abstract class Crop extends Edible {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * @return the area
+     */
+
     private double getArea() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Double.parseDouble(settings.get("area));
     }
 
     private double getMaxYield() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
     
     /**
      * @return the cropName
