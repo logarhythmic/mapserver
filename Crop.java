@@ -85,7 +85,7 @@ public abstract class Crop extends Edible {
      */
 
     private double getArea() {
-        return Double.parseDouble(settings.get("area));
+        return Double.parseDouble(settings.get("area").getValue());
     }
 
     private double getMaxYield() {
