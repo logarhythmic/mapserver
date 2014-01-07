@@ -17,6 +17,10 @@
         {
             "name": "asdGlobal",
             "class": "fi.paivola.mapserver.models.AsdGlobal"
+        },
+        {
+            "name": "Power plant",
+            "class": "fi.kivibot.power.models.PowerPlant"
         }
     ]
 }
