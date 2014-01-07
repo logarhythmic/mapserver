@@ -2,7 +2,7 @@ package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.setting.*;
-import fi.paivola.mapserver.utils.Range;
+import fi.paivola.mapserver.utils.*;
 import java.util.List;
 import java.util.Map;
 /**
@@ -25,11 +25,15 @@ public abstract class Crop extends Edible {
     private double phMinimum;
     private double phOptimal;
     private double phMaximum;
-    
+    private Distribution waterDistribution;
+    private Distribution temperatureDistribution;
+    private Distribution sunlightDistribution;
+    private Distribution phDistribution;
+
     public Crop(Map<String, Setting> settings) {
         super(settings);
         
-        Range r = new Range(0, Integer.MAX_VALUE);
+        RangeDouble r = new RangeDouble(0, Integer.MAX_VALUE);
         
         this.settings.put("name", new SettingString("name", cropName));
         this.settings.put("minwater", new SettingDouble("water minimum"
@@ -56,6 +60,19 @@ public abstract class Crop extends Edible {
                     getPHOptimal(), r));
         this.settings.put("maxph", new SettingDouble("maximum ph",
                     getPHMaximum(), r));
+
+        this.waterDistribution = new Distribution(getWaterMinimum(),
+                                                  getWaterOptimal(),
+                                                  getWaterMaximum());
+        this.temperatureDistribution = new Distribution(getTemperatureMinimum(),
+                                                  getTemperatureOptimal(),
+                                                  getTemperatureMaximum());
+        this.sunlightDistribution = new Distribution(getSunlightMinimum(),
+                                                  getSunlightOptimal(),
+                                                  getSunlightMaximum());
+        this.phDistribution = new Distribution(getPHMinimum(),
+                                                  getPHOptimal(),
+                                                  getPHMaximum());
     }
 
     public double onTick(DataFrame last) {
@@ -63,7 +80,8 @@ public abstract class Crop extends Edible {
                 * this.getSunshineIndex(last) * this.getPHIndex(last)
                 * this.getArea() * this.getMaxYield();
     }
-    
+   
+    // These need data from Weather...
     private double getWaterIndex(DataFrame last) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

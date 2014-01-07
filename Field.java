@@ -18,7 +18,7 @@ public class Field extends PointModel {
     public Field(int id) {
         super(id);
         this.settings.put("area", new SettingDouble("area", 1.0,
-                new Range(0, Integer.MAX_VALUE)));
+                new RangeDouble(0, Integer.MAX_VALUE)));
         this.settings.put("content", new SettingString("content", "empty"));
     }
 
