@@ -35,7 +35,7 @@ public class PowerPlant extends PointModel {
     }
 
     @Override
-    public void onEvent(Event e) {
+    public void onEvent(Event e, DataFrame current) {
         System.out.println(e.name);
         switch (e.name) {
             case "energy-req":
@@ -47,8 +47,7 @@ public class PowerPlant extends PointModel {
                 }
                 energy -= es;
                 Event ev = new Event("energy-get", "double", "" + es);
-                ev.frame = e.frame+1;
-                e.sender.addEvent(e, this);
+                this.addEventTo(e.sender, current, ev);
                 break;
         }
     }

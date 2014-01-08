@@ -36,7 +36,7 @@ public class PowerUser extends PointModel{
     }
 
     @Override
-    public void onEvent(Event e) {
+    public void onEvent(Event e, DataFrame current) {
     }
 
     @Override
