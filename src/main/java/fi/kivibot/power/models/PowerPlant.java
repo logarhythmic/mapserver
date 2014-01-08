@@ -31,12 +31,11 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        this.addEventTo(this, current, new Event("energy-req", "double", "0"));
+        //this.addEventTo(this, current, new Event("energy-req", "double", "0"));
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
-        System.out.println(e.name);
         switch (e.name) {
             case "energy-req":
                 System.out.println("energy request from " + e.sender);

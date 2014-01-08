@@ -20,11 +20,15 @@ public class PowerConnection extends ConnectionModel{
     public PowerConnection(int id, SettingMaster sm){
         super(id,sm);
         this.passtrough = true;
+        this.type = "Power connection";
+        this.maxConnections = Integer.MAX_VALUE;
     }
     
     public PowerConnection(){
         super();
         this.passtrough = true;
+        this.type = "Power connection";
+        this.maxConnections = Integer.MAX_VALUE;
     }
     
     @Override

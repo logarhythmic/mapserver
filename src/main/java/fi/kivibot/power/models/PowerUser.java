@@ -30,13 +30,19 @@ public class PowerUser extends PointModel{
     public void onTick(DataFrame last, DataFrame current) {
         for(Model m : this.connections){
             if(m.type.equals("Power connection")){
-                this.addEvent(new Event("energy-req","double","1"),m);
+                System.out.println("u");
+                this.addEventTo(m, last, new Event("energy-req","double","1"));
             }
         }
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
+        switch(e.name){
+            case "energy-get":
+                System.out.println("We got some energy! :D");
+                break;
+        }
     }
 
     @Override

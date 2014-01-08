@@ -206,6 +206,7 @@ public class GameManager {
      */
     public boolean linkModels(Model first, Model second) {
         if (!first.linkModel(second)) {
+            System.out.println("eka :( "+first.type+"  "+second.type);
             return false;
         }
         if (!second.linkModel(first)) {
