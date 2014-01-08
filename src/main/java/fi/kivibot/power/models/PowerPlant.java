@@ -19,12 +19,38 @@ import fi.paivola.mapserver.utils.Icon;
  */
 public class PowerPlant extends PointModel {
 
+    private double energy = 10;
+
+    public PowerPlant(int id, SettingMaster sm) {
+        super(id, sm);
+    }
+
+    public PowerPlant() {
+        super();
+    }
+
     @Override
     public void onTick(DataFrame last, DataFrame current) {
+        this.addEventTo(this, current, new Event("energy-req", "double", "0"));
     }
 
     @Override
     public void onEvent(Event e) {
+        System.out.println(e.name);
+        switch (e.name) {
+            case "energy-req":
+                System.out.println("energy request from " + e.sender);
+                double am = e.getDouble();
+                double es = energy;
+                if (energy >= am) {
+                    es = am;
+                }
+                energy -= es;
+                Event ev = new Event("energy-get", "double", "" + es);
+                ev.frame = e.frame+1;
+                e.sender.addEvent(e, this);
+                break;
+        }
     }
 
     @Override

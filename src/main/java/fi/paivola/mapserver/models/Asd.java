@@ -57,6 +57,7 @@ public class Asd extends PointModel {
         switch (e.name) {
             case "boom":
                 this.boomcount += e.getInt();
+                
                 //System.out.println(this.id + " recieved " + e.name + ": " + this.boomcount);
                 break;
             default:
