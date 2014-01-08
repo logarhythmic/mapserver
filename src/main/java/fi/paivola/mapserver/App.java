@@ -22,41 +22,39 @@ public class App {
             return;
         }
 
-        SettingsParser sp = new SettingsParser();
-
         WSServer ws = new WSServer(parseInt(SettingsParser.settings.get("websocket_port").toString()));
         ws.start();
-
-        BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
+        
+        BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
+        printHelp();
         mainloop:
-        while (true) {
+        while(true) {
             String in = sysin.readLine();
-            switch (in) {
-                case "q":
-                case "quit":
-                case "e":
-                case "exit":
+            switch(in) {
+                case "q": case "quit": case "e": case "exit":
                     ws.stop();
                     break mainloop;
-                case "t":
-                case "test":
+                case "t": case "test":
                     ws.stop();
                     runTest();
                     break mainloop;
-                case "h":
-                case "help":
-                    System.out.println(
-                            "q|e|quit|exit   - Quits the program\n"
-                            + "t|test          - Run the test function\n"
-                            + "h|help          - Display this help");
+                case "h": case "help":
+                    printHelp();
                     break;
                 default:
-                    System.out.println("Unknown command (" + in + ")");
+                    System.out.println("Unknown command ("+in+")");
+                    printHelp();
                     break;
             }
         }
     }
-
+    
+    static void printHelp() {
+        System.out.println("q|e|quit|exit   - Quits the program\n"
+                         + "t|test          - Run the test function\n"
+                         + "h|help          - Display this help");
+    }
+    
     /**
      * This function can be used for testing your own models. Please modify
      * this!
