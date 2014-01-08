@@ -62,10 +62,10 @@ public abstract class Model {
      * List of allowed connection tags.
      */
     public List<String> allowedTags;
-
+    
     public boolean proto;
     public SettingMaster sm;
-
+    
     public Model(int id, SettingMaster sm) {
         this.id = id;
         this.connections = new ArrayList<>();
@@ -73,32 +73,31 @@ public abstract class Model {
         this.data = new HashMap();
         this.extensions = new HashMap();
         this.allowedTags = new ArrayList<>();
-        if (sm == null) {
+        if(sm == null) {
             this.proto = true;
             this.sm = null;
-        } else {
+        }else{
             this.proto = false;
             this.sm = sm;
         }
-        this.ll = new LatLng(0, 0);
+        this.ll = new LatLng(0,0);
     }
-
+    
     public Model() {
         this(0, null);
     }
-
+    
     public void setLatLng(double lat, double lng) {
         this.ll.latitude = lat;
         this.ll.longitude = lng;
     }
-
+    
     public LatLng getLatLng() {
         return this.ll;
     }
-
+    
     /**
      * How far is this model from another one.
-     *
      * @param m The other model
      * @return distance in km.
      */
@@ -114,14 +113,13 @@ public abstract class Model {
      */
     public void onTickStart(DataFrame last, DataFrame current) {
         // breaking prototype models legs...
-        if (this.proto) {
+        if(this.proto)
             return;
-        }
-
+        
         // lets check if there is some events waiting to get trough
         for (Event i : this.events) {
             if (i.frame == last.index) {
-               this.onEvent(i);
+                this.onEvent(i, current);
             }
         }
 
@@ -132,7 +130,7 @@ public abstract class Model {
             // lets go trough the events ONCE again... this time for extensions
             for (Event i : this.events) {
                 if (i.frame == last.index) {
-                    ((ExtensionModel) pairs.getValue()).onEvent(i);
+                    ((ExtensionModel) pairs.getValue()).onEvent(i, current);
                 }
             }
         }
@@ -250,58 +248,55 @@ public abstract class Model {
     }
 
     /**
-     * Saves an integer. Will be saved to dataframe. Uses parents data if
-     * possible.
-     *
-     * @param name name of the integer
-     * @param a actual integer
+     * Saves an integer. Will be saved to dataframe. Uses parents data if possible.
+     * 
+     * @param name  name of the integer
+     * @param a     actual integer
      */
     public void saveInt(String name, int a) {
-        if (this.parent != null) {
+        if(this.parent != null) {
             this.parent.saveInt(name, a);
-        } else {
+        }else{
             this.data.put(name, "" + a);
         }
     }
 
     /**
-     * Saves a double. Will be saved to dataframe. Uses parents data if
-     * possible.
-     *
-     * @param name name of the double
-     * @param a actual double
+     * Saves a double. Will be saved to dataframe. Uses parents data if possible.
+     * 
+     * @param name  name of the double
+     * @param a     actual double
      */
     public void saveDouble(String name, double a) {
-        if (this.parent != null) {
+        if(this.parent != null) {
             this.parent.saveDouble(name, a);
-        } else {
+        }else{
             this.data.put(name, "" + a);
         }
     }
 
     /**
-     * Saves a string. Will be saved to dataframe. Uses parents data if
-     * possible.
-     *
-     * @param name name of the string
-     * @param a actual string
+     * Saves a string. Will be saved to dataframe. Uses parents data if possible.
+     * 
+     * @param name  name of the string
+     * @param a     actual string
      */
     public void saveString(String name, String a) {
-        if (this.parent != null) {
+        if(this.parent != null) {
             this.parent.saveString(name, a);
-        } else {
-            this.data.put(name, a);
+        }else{
+            this.data.put(name,a);
         }
     }
 
     /**
      * Gets an integer. Uses parents data if possible.
-     *
-     * @param name name of the integer
-     * @return the integer or null
+     * 
+     * @param name  name of the integer
+     * @return      the integer or null
      */
     public int getInt(String name) {
-        if (this.parent != null) {
+        if(this.parent != null) {
             return this.parent.getInt(name);
         }
         return parseInt(this.data.get(name));
@@ -309,12 +304,12 @@ public abstract class Model {
 
     /**
      * Gets a double. Uses parents data if possible.
-     *
-     * @param name name of the double
-     * @return the double or null
+     * 
+     * @param name  name of the double
+     * @return      the double or null
      */
     public double getDouble(String name) {
-        if (this.parent != null) {
+        if(this.parent != null) {
             return this.parent.getDouble(name);
         }
         return parseDouble(this.data.get(name));
@@ -322,12 +317,12 @@ public abstract class Model {
 
     /**
      * Gets a string. Uses parents data if possible.
-     *
-     * @param name name of the string
-     * @return the string or null
+     * 
+     * @param name  name of the string
+     * @return      the string or null
      */
     public String getString(String name) {
-        if (this.parent != null) {
+        if(this.parent != null) {
             return this.parent.getString(name);
         }
         return (this.data.get(name));
@@ -347,12 +342,11 @@ public abstract class Model {
      *
      * @param e event thats handled
      */
-    public abstract void onEvent(Event e);
-
+    public abstract void onEvent(Event e, DataFrame current);
+    
     /**
      * This is called from the GameManager and performs some extra steps before
      * the users own onRegisteration is called.
-     *
      * @param gm
      * @param sm
      */
@@ -364,7 +358,7 @@ public abstract class Model {
 
     /**
      * Called when a particular model is added to the database of possible
-     * models. Add settings here! Useful if you need to, say, register the
+     * models. Add settings here! Useful if you need to, say, register the 
      * current model as a extension to some other model.
      *
      * @param gm game manager
@@ -374,7 +368,6 @@ public abstract class Model {
 
     /**
      * Called when the module is asked for defaults, use save* here.
-     *
      * @param df dataframe
      */
     public abstract void onGenerateDefaults(DataFrame df);
