@@ -38,13 +38,13 @@ public class PowerPlant extends PointModel {
     public void onEvent(Event e, DataFrame current) {
         switch (e.name) {
             case "energy-req":
-                System.out.println("energy request from " + e.sender);
                 double am = e.getDouble();
                 double es = energy;
                 if (energy >= am) {
                     es = am;
                 }
                 energy -= es;
+                e.value = ""+(am-es);
                 Event ev = new Event("energy-get", "double", "" + es);
                 this.addEventTo(e.sender, current, ev);
                 break;
