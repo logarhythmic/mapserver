@@ -78,7 +78,7 @@ public class App {
         // And link!
         gm.linkModels(m1, m2);
         gm.linkModels(m12, m2);
-        System.out.println(gm.linkModels(m2, m3));
+        gm.linkModels(m2, m3);
 
         // Print final data in the end?
         //gm.printOnDone = 1;

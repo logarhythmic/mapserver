@@ -17,6 +17,8 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  * @author kivi
  */
 public class PowerUser extends PointModel{
+    
+    private double la = 0;
 
     public PowerUser(int id, SettingMaster sm) {
         super(id, sm);
@@ -30,8 +32,14 @@ public class PowerUser extends PointModel{
     public void onTick(DataFrame last, DataFrame current) {
         for(Model m : this.connections){
             if(m.type.equals("Power connection")){
-                this.addEventTo(m, last, new Event("energy-req","double","0.305"));
+                this.addEventTo(m, last, new Event("energy-req","double",""+(0.70-la)));
             }
+        }
+        if(la >= 0.35){
+            la -= +.35;
+            System.out.println("1");
+        }else{
+            System.out.println("0");
         }
     }
 
@@ -39,7 +47,7 @@ public class PowerUser extends PointModel{
     public void onEvent(Event e, DataFrame current) {
         switch(e.name){
             case "energy-get":
-                System.out.println("energy: "+e.getString());
+                la += e.getDouble();
                 break;
         }
     }
