@@ -11,9 +11,10 @@ import java.util.Map;
 
 public abstract class Edible {
 
-    Map<String, Setting> settings;
+    SettingMaster sm;
     public Edible(Map<String, Setting> settings) {
-        this.settings = settings;
+        this.sm = new SettingMaster();
+        this.sm.settings = settings;
     }
     
     abstract double onTick(DataFrame last);

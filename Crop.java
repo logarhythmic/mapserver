@@ -25,6 +25,7 @@ public abstract class Crop extends Edible {
     private double phMinimum;
     private double phOptimal;
     private double phMaximum;
+    private int growTime;
     private Distribution waterDistribution;
     private Distribution temperatureDistribution;
     private Distribution sunlightDistribution;
@@ -33,33 +34,36 @@ public abstract class Crop extends Edible {
     public Crop(Map<String, Setting> settings) {
         super(settings);
         
-        RangeDouble r = new RangeDouble(0, Integer.MAX_VALUE);
+        RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
+        RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
         
-        this.settings.put("name", new SettingString("name", cropName));
-        this.settings.put("minwater", new SettingDouble("water minimum"
+        this.sm.settings.put("name", new SettingString("name", cropName));
+        this.sm.settings.put("minwater", new SettingDouble("water minimum"
                 + "(cm/week)", getWaterMinimum(), r));
-        this.settings.put("optwater", new SettingDouble("water optimum"
+        this.sm.settings.put("optwater", new SettingDouble("water optimum"
                 + "(cm/week)", getWaterOptimal(), r));
-        this.settings.put("maxwater", new SettingDouble("water maximum"
+        this.sm.settings.put("maxwater", new SettingDouble("water maximum"
                 + "(cm/week)", getWaterMaximum(), r));
-        this.settings.put("mintemp", new SettingDouble("minimum average "
+        this.sm.settings.put("mintemp", new SettingDouble("minimum average "
                 + "temperature (C)", getTemperatureMinimum(), r));
-        this.settings.put("opttemp", new SettingDouble("optimal average "
+        this.sm.settings.put("opttemp", new SettingDouble("optimal average "
                 + "temperature (C)", getTemperatureOptimal(), r));
-        this.settings.put("maxtemp", new SettingDouble("maximum average "
+        this.sm.settings.put("maxtemp", new SettingDouble("maximum average "
                 + "temperature (C)", getTemperatureMaximum(), r));
-        this.settings.put("minsun", new SettingDouble("minimum sunlight "
+        this.sm.settings.put("minsun", new SettingDouble("minimum sunlight "
                 + "(hours / day)", getSunlightMinimum(), r));
-        this.settings.put("optsun", new SettingDouble("optimal sunlight "
+        this.sm.settings.put("optsun", new SettingDouble("optimal sunlight "
                 + "(hours / day)", getSunlightOptimal(), r));
-        this.settings.put("maxsun", new SettingDouble("maximum sunlight "
+        this.sm.settings.put("maxsun", new SettingDouble("maximum sunlight "
                 + "(hours / day)", getSunlightMaximum(), r));
-        this.settings.put("minph", new SettingDouble("minimum ph",
+        this.sm.settings.put("minph", new SettingDouble("minimum ph",
                     getPHMinimum(), r));
-        this.settings.put("optph", new SettingDouble("optimal ph", 
+        this.sm.settings.put("optph", new SettingDouble("optimal ph", 
                     getPHOptimal(), r));
-        this.settings.put("maxph", new SettingDouble("maximum ph",
+        this.sm.settings.put("maxph", new SettingDouble("maximum ph",
                     getPHMaximum(), r));
+        this.sm.settings.put("growtime", new SettingInt("growing time",
+                    getGrowTime(), i));
 
         this.waterDistribution = new Distribution(getWaterMinimum(),
                                                   getWaterOptimal(),
@@ -81,21 +85,25 @@ public abstract class Crop extends Edible {
                 * this.getArea() * this.getMaxYield();
     }
    
-    // These need data from Weather...
+    // These need data from Weather... assuming random weather for now.
     private double getWaterIndex(DataFrame last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return waterDistribution.random();
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
     
     private double getTemperatureIndex(DataFrame last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return temperatureDistribution.random();
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private double getSunshineIndex(DataFrame last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return sunlightDistribution.random();
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private double getPHIndex(DataFrame last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return phDistribution.random();
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -103,7 +111,7 @@ public abstract class Crop extends Edible {
      */
 
     private double getArea() {
-        return Double.parseDouble(settings.get("area").getValue());
+        return Double.parseDouble(this.sm.settings.get("area").getValue());
     }
 
     private double getMaxYield() {
@@ -292,4 +300,18 @@ public abstract class Crop extends Edible {
         this.phMaximum = phMaximum;
     }
 
+    /**
+     * @return the growTime
+     */
+    public final int getGrowTime() {
+        return growTime;
+    }
+
+    /**
+     * @param growTime the growTime (in weeks) to set
+     */
+    public final void setGrowTime(int growTime) {
+        this.growTime = growTime;
+    }
+    
 }

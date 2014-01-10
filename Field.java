@@ -14,12 +14,14 @@ public class Field extends PointModel {
      * Main constructor for the food model
      * 
      * @param id ID of the field
+     * @param sm
      */
-    public Field(int id) {
-        super(id);
-        this.settings.put("area", new SettingDouble("area", 1.0,
+    public Field(int id, SettingMaster sm) {
+        super(id, sm);
+        this.sm = sm;
+        this.sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
-        this.settings.put("content", new SettingString("content", "empty"));
+        this.sm.settings.put("content", new SettingString("content", "empty"));
     }
 
     @Override
@@ -28,7 +30,7 @@ public class Field extends PointModel {
     }
 
     @Override
-    public void onEvent(Event e) {
+    public void onEvent(Event e, DataFrame current) {
         switch(e.name) {
             default:
                 break;
@@ -36,15 +38,14 @@ public class Field extends PointModel {
     }
 
     @Override
-    public void onRegisteration(GameManager gm) {
+    public void onRegisteration(GameManager gm, SettingMaster sm) {
 
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        content = new Empty(settings);
+        content = new Empty(sm.settings);
     }
-
 }
 
 
