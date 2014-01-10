@@ -26,6 +26,8 @@ public abstract class Crop extends Edible {
     private double phOptimal;
     private double phMaximum;
     private int growTime;
+    private int currentGrowTime;
+    private double currentIndexMultiplier;
     private Distribution waterDistribution;
     private Distribution temperatureDistribution;
     private Distribution sunlightDistribution;
@@ -79,10 +81,17 @@ public abstract class Crop extends Edible {
                                                   getPHMaximum());
     }
 
+    @Override
     public double onTick(DataFrame last) {
-        return this.getWaterIndex(last) * this.getTemperatureIndex(last)
-                * this.getSunshineIndex(last) * this.getPHIndex(last)
-                * this.getArea() * this.getMaxYield();
+        if(this.getCurrentGrowTime() == this.getGrowTime()) {
+            return this.getCurrentIndexMultiplier() / this.getCurrentGrowTime()
+                    * this.getArea() * this.getMaxYield();
+        }
+        this.setCurrentGrowTime(this.getCurrentGrowTime() + 1);
+        this.setCurrentIndexMultiplier(this.getCurrentIndexMultiplier() +
+                this.getWaterIndex(last) * this.getTemperatureIndex(last)
+                    * this.getSunshineIndex(last) * this.getPHIndex(last));
+        return 0;
     }
    
     // These need data from Weather... assuming random weather for now.
@@ -313,5 +322,32 @@ public abstract class Crop extends Edible {
     public final void setGrowTime(int growTime) {
         this.growTime = growTime;
     }
+
+    /**
+     * @return the currentGrowTime
+     */
+    public int getCurrentGrowTime() {
+        return currentGrowTime;
+    }
+
+    /**
+     * @param currentGrowTime the currentGrowTime to set
+     */
+    public void setCurrentGrowTime(int currentGrowTime) {
+        this.currentGrowTime = currentGrowTime;
+    }
     
+    /**
+     * @return the currentIndexMultiplier
+     */
+    public double getCurrentIndexMultiplier() {
+        return currentIndexMultiplier;
+    }
+
+    /**
+     * @param currentIndexMultiplier the currentIndexMultiplier to set
+     */
+    public void setCurrentIndexMultiplier(double currentIndexMultiplier) {
+        this.currentIndexMultiplier = currentIndexMultiplier;
+    }
 }
