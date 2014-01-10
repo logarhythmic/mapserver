@@ -31,7 +31,7 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        this.energy += 0.15;
+        this.energy = 0.16;
     }
 
     @Override

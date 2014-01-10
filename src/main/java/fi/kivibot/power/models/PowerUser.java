@@ -16,38 +16,38 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  *
  * @author kivi
  */
-public class PowerUser extends PointModel{
-    
-    private double la = 0;
+public class PowerUser extends PointModel {
 
+    private double usage = 0.3;
+    private boolean online = true;
+
+    private double pogo = 0;
+    
     public PowerUser(int id, SettingMaster sm) {
         super(id, sm);
     }
-    
-    public PowerUser(){
+
+    public PowerUser() {
         super();
     }
-    
+
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        for(Model m : this.connections){
-            if(m.type.equals("Power connection")){
-                this.addEventTo(m, last, new Event("energy-req","double",""+(0.70-la)));
+        Event e = new Event("energy-req", "double", "" + (usage));
+        for (Model m : this.connections) {
+            if (m.type.equals("Power connection")) {
+                this.addEventTo(m, last, e);
             }
         }
-        if(la >= 0.35){
-            la -= +.35;
-            System.out.println("1");
-        }else{
-            System.out.println("0");
-        }
+        System.out.println(">>"+pogo/usage);
+        pogo = 0;
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
-        switch(e.name){
+        switch (e.name) {
             case "energy-get":
-                la += e.getDouble();
+                pogo += e.getDouble();
                 break;
         }
     }
@@ -59,5 +59,5 @@ public class PowerUser extends PointModel{
     @Override
     public void onGenerateDefaults(DataFrame df) {
     }
-    
+
 }
