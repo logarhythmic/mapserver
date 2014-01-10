@@ -9,8 +9,8 @@ import java.util.Map;
  */
 
 public class Maize extends Crop {
-    public Maize(Map<String, Setting> settings) {
-        super(settings);
+    public Maize(SettingMaster sm) {
+        super(sm);
         this.setWaterMinimum(1.01);
         this.setWaterOptimal(2.07);
         this.setWaterMaximum(3.01);

@@ -9,8 +9,8 @@ import java.util.Map;
  */
 
 public class Sorghum extends Crop {
-    public Sorghum(Map<String, Setting> settings) {
-        super(settings);
+    public Sorghum(SettingMaster sm) {
+        super(sm);
         this.setWaterMinimum(1.33); // water is for sorghum, all else isn't
         this.setWaterOptimal(2.66);
         this.setWaterMaximum(3.99);

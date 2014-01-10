@@ -12,18 +12,18 @@ public class Field extends PointModel {
 
     /**
      * Main constructor for the food model
-     * 
-     * @param id ID of the field
-     * @param sm
      */
-    public Field(int id, SettingMaster sm) {
-        super(id, sm);
-        this.sm = sm;
+    public Field() {
+        super();
         this.sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
         this.sm.settings.put("content", new SettingString("content", "empty"));
     }
 
+    public Field(int id, SettingMaster sm) {
+        super(id, sm);
+    }
+    
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         this.saveDouble("foodAmount", this.content.onTick(last));
@@ -44,7 +44,7 @@ public class Field extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        content = new Empty(sm.settings);
+        content = new Empty(sm);
     }
 }
 

@@ -9,8 +9,8 @@ import java.util.Map;
  */
 
 public class Wheat extends Crop {
-    public Wheat(Map<String, Setting> settings) {
-        super(settings);
+    public Wheat(SettingMaster sm) {
+        super(sm);
         this.setWaterMinimum(1.09);
         this.setWaterOptimal(2.17);
         this.setWaterMaximum(3.23);

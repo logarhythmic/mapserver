@@ -3,7 +3,6 @@ package fi.paivola.foodmodel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.*;
-import java.util.List;
 import java.util.Map;
 /**
  * @author Jaakko Hannikainen
@@ -33,8 +32,8 @@ public abstract class Crop extends Edible {
     private Distribution sunlightDistribution;
     private Distribution phDistribution;
 
-    public Crop(Map<String, Setting> settings) {
-        super(settings);
+    public Crop(SettingMaster sm) {
+        super(sm);
         
         RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
         RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
