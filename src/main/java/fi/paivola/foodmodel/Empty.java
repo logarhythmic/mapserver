@@ -10,11 +10,12 @@ import java.util.Map;
 public class Empty extends Edible {
 
     public Empty(SettingMaster sm) {
-        super(sm);
+        super(sm, "Empty");
     }
 
     @Override
     double onTick(DataFrame last) {
+        System.out.println("Empty shit");
         return 0;
     }
     

@@ -11,7 +11,6 @@ import java.util.Map;
 
 public abstract class Crop extends Edible {
 
-    private String cropName; 
     private double waterMinimum;
     private double waterOptimal;
     private double waterMaximum;
@@ -32,13 +31,30 @@ public abstract class Crop extends Edible {
     private Distribution sunlightDistribution;
     private Distribution phDistribution;
 
-    public Crop(SettingMaster sm) {
-        super(sm);
+    public Crop(SettingMaster sm, String name, double wmin, double wopt, double wmax,
+            double tmin, double topt, double tmax, double smin, double sopt,
+            double smax, double phmin, double phopt, double phmax, int gtime) {
+        super(sm, name);
         
         RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
         RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
         
-        this.sm.settings.put("name", new SettingString("name", cropName));
+        this.name = name;
+        waterMinimum = wmin;
+        waterOptimal = wopt;
+        waterMaximum = wmax;
+        temperatureMinimum = tmin;
+        temperatureOptimal = topt;
+        temperatureMaximum = tmax;
+        sunlightMinimum = smin;
+        sunlightOptimal = sopt;
+        sunlightMaximum = smax;
+        phMinimum = phmin;
+        phOptimal = phopt;
+        phMaximum = phmax;
+        growTime = gtime;
+        
+        this.sm.settings.put("name", new SettingString("name", this.name));
         this.sm.settings.put("minwater", new SettingDouble("water minimum"
                 + "(cm/week)", getWaterMinimum(), r));
         this.sm.settings.put("optwater", new SettingDouble("water optimum"
@@ -122,24 +138,11 @@ public abstract class Crop extends Edible {
         return Double.parseDouble(this.sm.settings.get("area").getValue());
     }
 
+    /* XXX: arbitary value */
     private double getMaxYield() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    /**
-     * @return the cropName
-     */
-    public final String getCropName() {
-        return cropName;
+        return 1;
     }
 
-    /**
-     * @param cropName the cropName to set
-     */
-    public final void setCropName(String cropName) {
-        this.cropName = cropName;
-    }
-    
     /**
      * @return the waterMinimum
      */

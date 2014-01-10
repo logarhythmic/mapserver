@@ -10,18 +10,10 @@ import java.util.Map;
 
 public class Sorghum extends Crop {
     public Sorghum(SettingMaster sm) {
-        super(sm);
-        this.setWaterMinimum(1.33); // water is for sorghum, all else isn't
-        this.setWaterOptimal(2.66);
-        this.setWaterMaximum(3.99);
-        this.setTemperatureMinimum(19);
-        this.setTemperatureOptimal(22);
-        this.setTemperatureMaximum(25);
-        this.setSunlightMinimum(42);
-        this.setSunlightOptimal(45);
-        this.setSunlightMaximum(70);
-        this.setPHMinimum(6);
-        this.setPHOptimal(6.5);
-        this.setPHMaximum(7);
+        super(sm, "Sorghum", 1.33, 2.66, 3.99,
+                                19, 22, 25,
+                                42, 45, 70,
+                                6, 6.5, 7,
+                                18);    
     }
 }

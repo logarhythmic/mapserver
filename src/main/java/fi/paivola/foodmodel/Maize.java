@@ -10,18 +10,10 @@ import java.util.Map;
 
 public class Maize extends Crop {
     public Maize(SettingMaster sm) {
-        super(sm);
-        this.setWaterMinimum(1.01);
-        this.setWaterOptimal(2.07);
-        this.setWaterMaximum(3.01);
-        this.setTemperatureMinimum(20);
-        this.setTemperatureOptimal(30);
-        this.setTemperatureMaximum(40);
-        this.setSunlightMinimum(42);
-        this.setSunlightOptimal(45);
-        this.setSunlightMaximum(70);
-        this.setPHMinimum(5.5);
-        this.setPHOptimal(6.25);
-        this.setPHMaximum(7);
+        super(sm, "Maize", 1.01, 2.07, 3.01,
+                            20, 30, 40,
+                            42, 45, 70,
+                            5.5, 6.25, 7,
+                            18);
     }
 }

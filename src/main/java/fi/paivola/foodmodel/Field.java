@@ -15,18 +15,30 @@ public class Field extends PointModel {
      */
     public Field() {
         super();
-        this.sm.settings.put("area", new SettingDouble("area", 1.0,
-                new RangeDouble(0, Integer.MAX_VALUE)));
-        this.sm.settings.put("content", new SettingString("content", "empty"));
     }
 
     public Field(int id, SettingMaster sm) {
         super(id, sm);
+        if(sm.settings.containsKey("content")) {
+            switch(sm.settings.get("content").getValue()) {
+                case "empty":
+                    content = new Empty(sm);
+                    break;
+                case "wheat":
+                    content = new Wheat(sm);
+                    break;
+                default:
+                    content = new Empty(sm);
+                    break;
+            }
+        }
     }
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        this.saveDouble("foodAmount", this.content.onTick(last));
+        double d = this.content.onTick(last);
+        System.out.println(d + " " + content);
+        this.saveDouble("foodAmount", d);
     }
 
     @Override
@@ -39,12 +51,16 @@ public class Field extends PointModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-
+        sm.settings.put("area", new SettingDouble("area", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        if(!sm.settings.containsKey("content"))
+            sm.settings.put("content", new SettingString("content", "empty"));
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        content = new Empty(sm);
+        if(content == null)
+            content = new Empty(sm);
     }
 }
 

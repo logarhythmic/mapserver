@@ -4,7 +4,7 @@
     "models": [
         {
             "name": "Field",
-            "class": "fi.paivola.mapserver.models.Field"
+            "class": "fi.paivola.foodmodel.Field"
         },
     ]
 }
