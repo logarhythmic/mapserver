@@ -5,6 +5,10 @@
         {
             "name": "Lake",
             "class": "fi.water.Lake"
+        },
+        {
+            "name": "River",
+            "class": "fi.water.River"
         }
     ]
 }

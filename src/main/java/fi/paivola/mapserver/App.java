@@ -77,11 +77,20 @@ public class App
     static void runTest() {
         
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread(1);
+        GameThread one = new GameThread(10);
         GameManager gm = one.game;
         
-        Model m1 = gm.createModel("Lake");
-        gm.addModel(m1, "Lake");
+        Model lake1 = gm.createModel("Lake");
+        gm.addModel(lake1, "Lake");
+        
+        Model lake2 = gm.createModel("Lake");
+        gm.addModel(lake2, "Lake");
+        
+        Model river1 = gm.createModel("River");
+        gm.addModel(river1, "River");
+        
+        gm.linkModels(lake1,river1);
+        gm.linkModels(river1, lake2);
         
         // Print final data in the end?
         if(!profilingRun)

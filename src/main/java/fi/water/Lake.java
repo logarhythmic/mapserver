@@ -5,6 +5,7 @@ package fi.water;
  */
 
 import fi.paivola.mapserver.utils.Color;
+import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
@@ -16,17 +17,16 @@ import fi.paivola.mapserver.utils.Icon;
 
 public class Lake extends PointModel
 {
-    private int radius = 500;           // meters
-    private int depth = 10;             // meters
-    private int k = 1;                  // unitless
+    private int area = 6500;               // meters
+    private float depth = 0.03f;             // meters, everything over this is going to flow to the rivers. If there are none, the lake is going to overflow 
+    private float k = 1.2f;                  // unitless
     private float waterAmount = 0;     
-    private float temp = 27;         
+    private float temp = 28;         
     private float time = 12;         
-    private float PET;          
+    private float PET;                  // mm/d
     private float es;        
-    private int drainageRadius = 100;
-    private float runoffCoeff = 0.5f;
-    private float rainfall = 20; // Temp variable until we get the actual rain data
+    private long drainageArea = 130000;
+    private float rainfall = 0.0002f;        // Temp variable until we get the actual rain data
     
     /*
     public Lake(int id, SettingMaster sm, int r, int dr, int d, int k, int water, int roc, int rain){
@@ -43,6 +43,8 @@ public class Lake extends PointModel
     
     public Lake(int id, SettingMaster sm){
         super(id, sm);
+        waterAmount = (float)(area*depth);
+        es = (float)(6.108*Math.exp(17.27*temp/(temp+237.3)));
     }
     
     public Lake(){
@@ -51,20 +53,28 @@ public class Lake extends PointModel
      @Override
     public void onTick(DataFrame last, DataFrame current) 
     {
-        waterAmount = (float)(Math.PI*Math.pow(radius,2));
-        System.out.print("Before rain: "+waterAmount);
-        waterAmount += (rainfall * Math.PI * Math.pow(drainageRadius, 2))/1000;
-        System.out.println("After rain: "+waterAmount);
-        es = (float)(6.108*Math.exp(17.27*temp/(temp+237.3)));
+        waterAmount += drainageArea*(rainfall/1000);
         PET = (float)(k*0.165*216.7*time*(es/(temp+273.3)));
         waterAmount -= PET;
-        System.out.println("PET: "+PET+" After evapotranspiration "+waterAmount);
+        
+        if(waterAmount > (float)(area*depth)) {
+            float of = (float)(0.035*Math.sqrt(waterAmount/area));
+            waterAmount -= of;
+            System.out.print("Overflow "+of);
+            Event e = new Event("Overflow", "double", ""+of);
+            for(Model m : this.connections){
+                this.addEventTo(m, current, e);
+            }
+        }
+        System.out.println(" Lake "+waterAmount);
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
     switch(e.name){
-        // Event handling here
+        case "Runoff":
+            waterAmount += e.getDouble();
+            break;
     }
     }
 
@@ -77,4 +87,6 @@ public class Lake extends PointModel
     @Override
     public void onGenerateDefaults(DataFrame df) {
     }
+    
+    
 }
