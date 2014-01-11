@@ -14,11 +14,13 @@ import java.net.UnknownHostException;
 import java.util.logging.LogManager;
 import org.json.simple.parser.ParseException;
 
-public class App {
+public class App 
+{
     
     static final boolean profilingRun = false;
 
-    public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
+    public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException 
+    {
         
         SettingsParser sp = new SettingsParser();
         
@@ -26,7 +28,8 @@ public class App {
         
             LogManager.getLogManager().reset();
 
-            for(int i = 0; i < 1000; i++) {
+            for(int i = 0; i < 1000; i++) 
+            {
                 runTest();
             }
         
@@ -38,7 +41,8 @@ public class App {
             BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
             printHelp();
             mainloop:
-            while(true) {
+            while(true) 
+            {
                 String in = sysin.readLine();
                 switch(in) {
                     case "q": case "quit": case "e": case "exit":
@@ -60,7 +64,8 @@ public class App {
         }
     }
     
-    static void printHelp() {
+    static void printHelp() 
+    {
         System.out.println("q|e|quit|exit   - Quits the program\n"
                          + "t|test          - Run the test function\n"
                          + "h|help          - Display this help");
@@ -72,33 +77,11 @@ public class App {
     static void runTest() {
         
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread(52*20);
+        GameThread one = new GameThread(1);
         GameManager gm = one.game;
         
-        // Create and add
-        Model mg = gm.createModel("asdGlobal");
-        gm.addModel(mg, "asdGlobal");
-
-        Model m1 = gm.createModel("asd");
-        gm.addModel(m1, "asd");
-        Model m2 = gm.createModel("asdConnection");
-        gm.addModel(m2, "asdConnection");
-        Model m3 = gm.createModel("asd");
-        gm.addModel(m3, "asd");
-        Model m4 = gm.createModel("asdConnection");
-        gm.addModel(m4, "asdConnection");
-        Model m5 = gm.createModel("asd");
-        gm.addModel(m5, "asd");
-        Model m6 = gm.createModel("asdConnection");
-        gm.addModel(m6, "asdConnection");
-
-        // And link!
-        gm.linkModels(m1, m2);
-        gm.linkModels(m2, m3);
-        gm.linkModels(m3, m4);
-        gm.linkModels(m4, m5);
-        gm.linkModels(m5, m6);
-        gm.linkModels(m6, m1);
+        Model m1 = gm.createModel("Lake");
+        gm.addModel(m1, "Lake");
         
         // Print final data in the end?
         if(!profilingRun)

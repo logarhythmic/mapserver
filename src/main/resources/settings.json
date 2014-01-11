@@ -1,22 +1,10 @@
 {
-    "default_ticks": 10,
+    "default_ticks": 20,
     "websocket_port": 8080,
     "models": [
         {
-            "name": "asd",
-            "class": "fi.paivola.mapserver.models.Asd"
-        },
-        {
-            "name": "asdExtender",
-            "class": "fi.paivola.mapserver.models.AsdExtender"
-        },
-        {
-            "name": "asdConnection",
-            "class": "fi.paivola.mapserver.models.AsdConnection"
-        },
-        {
-            "name": "asdGlobal",
-            "class": "fi.paivola.mapserver.models.AsdGlobal"
+            "name": "Lake",
+            "class": "fi.water.Lake"
         }
     ]
 }
