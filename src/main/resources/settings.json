@@ -17,6 +17,10 @@
         {
             "name": "asdGlobal",
             "class": "fi.paivola.mapserver.models.AsdGlobal"
+        },
+        {
+            "name": "Road",
+            "class": "fi.paivola.mapserver.models.RoadModel"
         }
     ]
 }
