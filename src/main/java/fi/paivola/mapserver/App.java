@@ -11,40 +11,56 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Integer.parseInt;
 import java.net.UnknownHostException;
+import java.util.logging.LogManager;
 import org.json.simple.parser.ParseException;
 
 public class App {
+    
+    static final boolean profilingRun = false;
 
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
-
+        
         App.runTest();
         if (true) {
             return;
         }
 
-        WSServer ws = new WSServer(parseInt(SettingsParser.settings.get("websocket_port").toString()));
-        ws.start();
         
-        BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
-        printHelp();
-        mainloop:
-        while(true) {
-            String in = sysin.readLine();
-            switch(in) {
-                case "q": case "quit": case "e": case "exit":
-                    ws.stop();
-                    break mainloop;
-                case "t": case "test":
-                    ws.stop();
-                    runTest();
-                    break mainloop;
-                case "h": case "help":
-                    printHelp();
-                    break;
-                default:
-                    System.out.println("Unknown command ("+in+")");
-                    printHelp();
-                    break;
+        SettingsParser sp = new SettingsParser();
+        
+        if(profilingRun) { // For profiling
+        
+            LogManager.getLogManager().reset();
+
+            for(int i = 0; i < 1000; i++) {
+                runTest();
+            }
+        }else{
+
+            WSServer ws = new WSServer(parseInt(SettingsParser.settings.get("websocket_port").toString()));
+            ws.start();
+
+            BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
+            printHelp();
+            mainloop:
+            while(true) {
+                String in = sysin.readLine();
+                switch(in) {
+                    case "q": case "quit": case "e": case "exit":
+                        ws.stop();
+                        break mainloop;
+                    case "t": case "test":
+                        ws.stop();
+                        runTest();
+                        break mainloop;
+                    case "h": case "help":
+                        printHelp();
+                        break;
+                    default:
+                        System.out.println("Unknown command ("+in+")");
+                        printHelp();
+                        break;
+                }
             }
         }
     }
@@ -62,7 +78,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread(100);
+        GameThread one = new GameThread(52*20);
         GameManager gm = one.game;
 
         Model m1 = gm.createModel("Power plant");
@@ -81,7 +97,6 @@ public class App {
         gm.linkModels(m2, m3);
 
         // Print final data in the end?
-        //gm.printOnDone = 1;
         // Start the gamethread
         one.start();
     }

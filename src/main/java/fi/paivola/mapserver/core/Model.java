@@ -59,9 +59,13 @@ public abstract class Model {
      */
     public LatLng ll;
     /**
-     * List of allowed connection tags.
+     * List of allowed connection names.
      */
-    public List<String> allowedTags;
+    public List<String> allowedNames;
+    /**
+     * Name of this model.
+     */
+    public String name;
     
     /**
      * Is this model a prototype model or not?
@@ -84,7 +88,7 @@ public abstract class Model {
         this.events = new ArrayList<>();
         this.data = new HashMap();
         this.extensions = new HashMap();
-        this.allowedTags = new ArrayList<>();
+        this.allowedNames = new ArrayList<>();
         if(sm == null) {
             this.proto = true;
             this.sm = null;
@@ -165,10 +169,8 @@ public abstract class Model {
             ((ExtensionModel) pairs.getValue())
                     .onExtensionTickStart(last, current);
             // lets go trough the events ONCE again... this time for extensions
-            for (Event i : this.events) {
-                if (i.frame == last.index) {
-                    ((ExtensionModel) pairs.getValue()).onEvent(i, current);
-                }
+            for(Event i : _buf){
+                ((ExtensionModel) pairs.getValue()).onEvent(i, current);
             }
         }
 
@@ -275,6 +277,9 @@ public abstract class Model {
 
     public boolean linkModel(Model m) {
         if (this.connections.size() >= this.maxConnections) {
+            return false;
+        }
+        if (this.allowedNames.size() != 0 && this.allowedNames.contains(m.name)) {
             return false;
         }
         return this.connections.add(m);
@@ -390,7 +395,8 @@ public abstract class Model {
     public void onActualRegisteration(GameManager gm, SettingMaster sm) {
         sm.type = this.type;
         this.onRegisteration(gm, sm);
-        this.allowedTags = sm.allowedTags;
+        this.name = sm.name;
+        this.allowedNames = sm.allowedNames;
     }
 
     /**

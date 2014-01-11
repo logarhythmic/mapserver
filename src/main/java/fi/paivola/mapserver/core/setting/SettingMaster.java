@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -35,17 +36,22 @@ public class SettingMaster {
      */
     public List<String> exts;
     /**
-     * Tags that are allowed to be connected.
+     * Names that are allowed to be connected.
     */
-    public List<String> allowedTags;
+    public List<String> allowedNames;
+    /**
+     * Name of the model.
+     */
+    public String name;
     
     public SettingMaster() {
         settings = new HashMap<>();
         misc = new HashMap<>();
         color = new Color(0,0,0);
         exts = new ArrayList();
-        allowedTags = new ArrayList();
+        allowedNames = new ArrayList();
         type = "";
+        name = "";
     }
     
     /**
@@ -74,19 +80,26 @@ public class SettingMaster {
         objParent.put("color", this.color.toString());
         objParent.put("extends", this.exts);
         objParent.put("type", this.type);
-        objParent.put("allowedTags", this.allowedTags);
+        objParent.put("allowedNames", this.allowedNames);
+        objParent.put("name", this.name);
         return objParent;
     }
     
     /**
      * Summons a SettingMaster from a JSON string.
-     * @param JSON The JSON string.
+     * @param obj The JSON object.
      * @return SettingMaster, the master of all settings. Now with 100% more resurrection.
      */
-    public static SettingMaster fromJSON(String JSON) {
+    public static SettingMaster fromJSON(JSONObject obj) {
         SettingMaster sm = new SettingMaster();
         
-        
+        sm.misc.putAll(((JSONObject)obj.get("misc")));
+        sm.settings.putAll(((JSONObject)obj.get("settings")));
+        sm.color = new Color(obj.get("color").toString());
+        sm.exts.addAll((JSONArray)obj.get("extends"));
+        sm.type = obj.get("type").toString();
+        sm.allowedNames.addAll((JSONArray)obj.get("allowedNames"));
+        sm.name = obj.get("name").toString();
         
         return sm;
     }
