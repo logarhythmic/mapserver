@@ -23,6 +23,7 @@ public abstract class Crop extends Edible {
     private double phMinimum;
     private double phOptimal;
     private double phMaximum;
+    private double maxYield;
     private int growTime;
     private int currentGrowTime;
     private double currentIndexMultiplier;
@@ -33,7 +34,8 @@ public abstract class Crop extends Edible {
 
     public Crop(SettingMaster sm, String name, double wmin, double wopt, double wmax,
             double tmin, double topt, double tmax, double smin, double sopt,
-            double smax, double phmin, double phopt, double phmax, int gtime) {
+            double smax, double phmin, double phopt, double phmax, int gtime,
+            double yield) {
         super(sm, name);
         
         RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
@@ -53,6 +55,7 @@ public abstract class Crop extends Edible {
         phOptimal = phopt;
         phMaximum = phmax;
         growTime = gtime;
+        maxYield = yield;
         
         this.sm.settings.put("name", new SettingString("name", this.name));
         this.sm.settings.put("minwater", new SettingDouble("water minimum"
@@ -138,9 +141,8 @@ public abstract class Crop extends Edible {
         return Double.parseDouble(this.sm.settings.get("area").getValue());
     }
 
-    /* XXX: arbitary value */
     private double getMaxYield() {
-        return 1;
+        return maxYield;
     }
 
     /**

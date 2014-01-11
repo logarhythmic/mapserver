@@ -14,6 +14,6 @@ public class Sorghum extends Crop {
                                 19, 22, 25,
                                 42, 45, 70,
                                 6, 6.5, 7,
-                                18);    
+                                18, 3); 
     }
 }

@@ -14,6 +14,6 @@ public class Wheat extends Crop {
                            19, 22, 25,
                            42, 45, 70,
                            6, 6.5, 7,
-                           15);
+                           15, 8);
     }
 }

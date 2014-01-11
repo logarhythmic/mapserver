@@ -14,6 +14,6 @@ public class Maize extends Crop {
                             20, 30, 40,
                             42, 45, 70,
                             5.5, 6.25, 7,
-                            18);
+                            18, 8);
     }
 }
