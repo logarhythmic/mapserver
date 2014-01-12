@@ -48,7 +48,7 @@ public class PowerPlant extends PointModel {
                 }
                 energy -= es;
                 amo[0] = Double.valueOf(am - es);
-                Event ev = new Event("energy-get", "double", "" + es);
+                Event ev = new Event("energy-get", Event.Type.OBJECT, "" + es);
                 this.addEventTo(e.sender, current, ev);
                 break;
             default:

@@ -17,6 +17,7 @@ public class App {
 
     static final boolean profilingRun = false;
 
+    
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
 
         App.runTest();

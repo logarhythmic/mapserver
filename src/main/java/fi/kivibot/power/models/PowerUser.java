@@ -34,7 +34,7 @@ public class PowerUser extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         Object o = new Object[]{new Object[]{usage}, Double.valueOf(0)};
-        Event e = new Event("energy-req", "energy-req-type", o);
+        Event e = new Event("energy-req", Event.Type.OBJECT, o);
         for (Model m : this.connections) {
             if (m.name.equals("Power connection")) {
                 this.addEventTo(m, current, e);
