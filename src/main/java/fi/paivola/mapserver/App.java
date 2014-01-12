@@ -14,12 +14,16 @@ import java.net.UnknownHostException;
 import java.util.logging.LogManager;
 import org.json.simple.parser.ParseException;
 
-
 public class App {
 
     static final boolean profilingRun = false;
 
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
+
+        App.runTest();
+        if (true) {
+            return;
+        }
 
         SettingsParser.parse();
 
@@ -30,7 +34,6 @@ public class App {
             for (int i = 0; i < 1000; i++) {
                 runTest();
             }
-
         } else {
 
             WSServer ws = new WSServer(parseInt(SettingsParser.settings.get("websocket_port").toString()));
@@ -39,7 +42,7 @@ public class App {
             BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
             printHelp();
             mainloop:
-
+            while (true) {
                 String in = sysin.readLine();
                 switch (in) {
                     case "q":
@@ -65,6 +68,8 @@ public class App {
             }
         }
     }
+
+    static void printHelp() {
         System.out.println("q|e|quit|exit   - Quits the program\n"
                 + "t|test          - Run the test function\n"
                 + "h|help          - Display this help");
@@ -76,32 +81,26 @@ public class App {
      */
     static void runTest() {
 
-        // How many ticks? Each one is a week.
-
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
+        GameThread one = new GameThread(10000);
         GameManager gm = one.game;
-
-        // Create and add
-        Model mg = gm.createModel("exampleGlobal");
-
-        // This is how you change a "setting" from the code.
-        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
-        sm.settings.get("luck").setValue("0.7");
-        mg.onActualUpdateSettings(sm);
-
+        
         Model l1 = gm.createModel("Lake");
-        Model l2 = gm.createModel("River");
-        Model r2 = gm.createModel("Lake");
+        SettingMaster sm = gm.getDefaultSM("Lake");
+        sm.settings.get("height").setValue("1");
+        l1.onActualUpdateSettings(sm);
+        
+        Model l2 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("height").setValue("3");
+        l2.onActualUpdateSettings(sm);
 
-        // And link!
-        gm.linkModelsWith(l1,r1,l2);
+        Model r1 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("height").setValue("2");
+        l2.onActualUpdateSettings(sm);
 
-        // Print final data in the end?
-        if (!profilingRun) {
-            gm.printOnDone = 2;
-        }
+        gm.linkModelsWith(l1, r1, l2);;
 
-        // Start the gamethread
         one.start();
     }
 }
