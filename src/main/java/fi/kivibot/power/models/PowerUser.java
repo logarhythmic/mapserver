@@ -23,12 +23,8 @@ public class PowerUser extends PointModel {
 
     private double pogo = 0;
 
-    public PowerUser(int id, SettingMaster sm) {
-        super(id, sm);
-    }
-
-    public PowerUser() {
-        super();
+    public PowerUser(int id) {
+        super(id);
     }
 
     @Override
@@ -40,7 +36,6 @@ public class PowerUser extends PointModel {
                 this.addEventTo(m, current, e);
             }
         }
-        //System.out.println(">>" + pogo / usage);
         pogo = 0;
     }
 
@@ -59,6 +54,10 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
     }
 
 }

@@ -71,41 +71,26 @@ public abstract class Model {
      * Is this model a prototype model or not?
      */
     public boolean proto;
-
     /**
-     * This is our SettingMaster with the user changed data.
+     * Is this model in the need for a SM?
      */
-    public SettingMaster sm;
+    public boolean needsSM;
 
     /**
-     * This is used when the model is actually used in a simulation
+     *
      *
      * @param id id of this model
-     * @param sm SettingMaster with all of the user changed data (and original).
      */
-    public Model(int id, SettingMaster sm) {
+    public Model(int id) {
         this.id = id;
         this.connections = new ArrayList<>();
         this.events = new ArrayList<>();
         this.data = new HashMap();
         this.extensions = new HashMap();
         this.allowedNames = new ArrayList<>();
-        if (sm == null) {
-            this.proto = true;
-            this.sm = null;
-        } else {
-            this.proto = false;
-            this.sm = sm;
-        }
+        this.proto = id == -1;
+        this.needsSM = !this.proto;
         this.ll = new LatLng(0, 0);
-    }
-
-    /**
-     * This is for prototype model, eg initializing the default SettingMaster
-     * and registerations.
-     */
-    public Model() {
-        this(0, null);
     }
 
     /**
@@ -155,7 +140,7 @@ public abstract class Model {
      */
     public void onTickStart(DataFrame last, DataFrame current) {
         // breaking prototype models legs...
-        if (this.proto) {
+        if (this.proto || this.needsSM) {
             return;
         }
 
@@ -170,7 +155,7 @@ public abstract class Model {
         for (Event i : _buf) {
             this.onEvent(i, current);
         }
-
+        
         this.onTick(last, current);
         for (Map.Entry pairs : this.extensions.entrySet()) {
             // lets go trough the events ONCE again... this time for extensions
@@ -188,7 +173,7 @@ public abstract class Model {
                 it.remove();
             }
         }
-
+        
         this.dumpToDataFrame(current);
     }
 
@@ -265,11 +250,12 @@ public abstract class Model {
             cls = (Class) pair.getValue();
             Constructor<Model> c;
             try {
-                c = cls.getDeclaredConstructor(int.class, SettingMaster.class);
+                c = cls.getDeclaredConstructor(int.class);
                 c.setAccessible(true);
                 try {
-                    ExtensionModel em = (ExtensionModel) c.newInstance(gm.current_id++, gm.getDefaultSM((Class) pair.getValue()));
+                    ExtensionModel em = (ExtensionModel) c.newInstance(gm.current_id++);
                     em.parent = this;
+                    em.onActualUpdateSettings(gm.getDefaultSM((Class) pair.getValue()));
                     this.addExtension(pair.getKey().toString(), em);
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     Logger.getLogger(GameManager.class.getName())
@@ -442,4 +428,22 @@ public abstract class Model {
      */
     public abstract void onGenerateDefaults(DataFrame df);
 
+    /**
+     * Called when there is a new SettingMaster and this model needs to be
+     * updated.
+     *
+     * @param sm
+     */
+    public void onActualUpdateSettings(SettingMaster sm) {
+        this.needsSM = false;
+        this.name = sm.name;
+        this.onUpdateSettings(sm);
+    }
+
+    /**
+     * Called when there are settings to be changed, HANDLE THE CHANGES PLEASE.
+     *
+     * @param sm
+     */
+    public abstract void onUpdateSettings(SettingMaster sm);
 }

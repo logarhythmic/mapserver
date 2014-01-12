@@ -22,12 +22,8 @@ public class PowerPlant extends PointModel {
 
     private double energy = 0;
 
-    public PowerPlant(int id, SettingMaster sm) {
-        super(id, sm);
-    }
-
-    public PowerPlant() {
-        super();
+    public PowerPlant(int id) {
+        super(id);
     }
 
     @Override
@@ -64,6 +60,10 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
     }
 
 }

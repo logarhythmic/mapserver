@@ -18,15 +18,8 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  */
 public class PowerConnection extends ConnectionModel {
 
-    public PowerConnection(int id, SettingMaster sm) {
-        super(id, sm);
-        this.passthrough = true;
-        this.name = "Power connection";
-        this.maxConnections = 2;
-    }
-
-    public PowerConnection() {
-        super();
+    public PowerConnection(int id) {
+        super(id);
         this.passthrough = true;
         this.name = "Power connection";
         this.maxConnections = 2;
@@ -74,5 +67,10 @@ public class PowerConnection extends ConnectionModel {
         }
 
         super.addEvent(e, m);
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
+
     }
 }

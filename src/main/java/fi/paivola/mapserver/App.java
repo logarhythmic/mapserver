@@ -5,6 +5,7 @@ import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
+import fi.paivola.mapserver.core.setting.SettingMaster;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,7 +18,6 @@ public class App {
 
     static final boolean profilingRun = false;
 
-    
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
 
         App.runTest();
@@ -85,25 +85,18 @@ public class App {
         GameManager gm = one.game;
 
         Model m1 = gm.createModel("Power plant");
-        gm.addModel(m1, "Power plant");
         Model m12 = gm.createModel("Power plant");
-        gm.addModel(m12, "Power plant");
 
         m1.getLatLng().latitude = 4;
         m12.getLatLng().latitude = 10;
 
         Model m2 = gm.createModel("Power connection");
-        gm.addModel(m2, "Power connection");
         Model m22 = gm.createModel("Power connection");
-        gm.addModel(m22, "Power connection");
 
         Model m3 = gm.createModel("Power user");
-        gm.addModel(m3, "Power user");
-        gm.linkModels(m1, m2);
-        gm.linkModels(m2, m3);
 
-        gm.linkModels(m22, m3);
-        gm.linkModels(m22, m12);
+        gm.linkModelsWith(m1, m3, m2);
+        gm.linkModelsWith(m3, m12, m22);
 
         one.start();
     }

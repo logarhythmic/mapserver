@@ -11,14 +11,10 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  *
  * @author juhani
  */
-public class AsdExtender extends ExtensionModel {
+public class ExampleExtender extends ExtensionModel {
 
-    public AsdExtender(int id, SettingMaster sm) {
-        super(id, sm);
-    }
-
-    public AsdExtender() {
-        super();
+    public ExampleExtender(int id) {
+        super(id);
     }
 
     /**
@@ -30,8 +26,7 @@ public class AsdExtender extends ExtensionModel {
      */
     @Override
     public void onExtensionTick(DataFrame l, DataFrame c) {
-        this.parent.addEventToAll(c, new Event("boom2", Event.Type.INT, 1));
-        //System.out.println(this.id + " (extender) sent boom2 trough " + p.id);
+
     }
 
     /**
@@ -41,25 +36,24 @@ public class AsdExtender extends ExtensionModel {
      */
     @Override
     public void onEvent(Event e, DataFrame current) {
-        //System.out.println(this.id + " (extender) recieved a " + e.name);
-        switch (e.name) {
-            case "boom2":
-                break;
-            default:
-                break;
-        }
+
     }
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-        gm.registerExtension("asd", "extender", this.getClass()); // This registers this model as a extension to "asd"
+        gm.registerExtension("examplePoint", "extender", this.getClass()); // This registers this model as a extension to "asd"
         // temp workaround ToDo: make it better for the user
-        sm.exts.add("asd"); // oh and you need to do this too
-        sm.name = "asdExtender";
+        sm.exts.add("examplePoint"); // oh and you need to do this too
+        sm.name = "exampleExtender";
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
 
     }
 
