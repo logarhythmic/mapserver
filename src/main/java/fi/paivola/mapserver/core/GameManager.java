@@ -321,7 +321,6 @@ public class GameManager {
      * @return true
      */
     public boolean step() {
-
         log.log(Level.FINE, "Running step {0}", this.tick_current);
 
         DataFrame current = this.frames.get(this.tick_current);

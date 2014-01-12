@@ -8,6 +8,7 @@ package fi.kivibot.power.models;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
+import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.utils.Color;
@@ -31,22 +32,26 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        this.energy = 0.16;
+        this.energy = 0.25;
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
         switch (e.name) {
             case "energy-req":
-                double am = e.getDouble();
+                Object[] dat = (Object[]) e.value;
+                Object[] amo = (Object[]) dat[0];
+                double am = ((Double) amo[0]).doubleValue();
                 double es = energy;
                 if (energy >= am) {
                     es = am;
                 }
                 energy -= es;
-                e.value = ""+(am-es);
+                amo[0] = Double.valueOf(am - es);
                 Event ev = new Event("energy-get", "double", "" + es);
                 this.addEventTo(e.sender, current, ev);
+                break;
+            default:
                 break;
         }
     }

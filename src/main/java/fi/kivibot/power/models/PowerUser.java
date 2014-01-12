@@ -22,7 +22,7 @@ public class PowerUser extends PointModel {
     private boolean online = true;
 
     private double pogo = 0;
-    
+
     public PowerUser(int id, SettingMaster sm) {
         super(id, sm);
     }
@@ -33,13 +33,14 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        Event e = new Event("energy-req", "double", "" + (usage));
+        Object o = new Object[]{new Object[]{usage}, Double.valueOf(0)};
+        Event e = new Event("energy-req", "energy-req-type", o);
         for (Model m : this.connections) {
             if (m.name.equals("Power connection")) {
-                this.addEventTo(m, last, e);
+                this.addEventTo(m, current, e);
             }
         }
-        System.out.println(">>"+pogo/usage);
+        //System.out.println(">>" + pogo / usage);
         pogo = 0;
     }
 
