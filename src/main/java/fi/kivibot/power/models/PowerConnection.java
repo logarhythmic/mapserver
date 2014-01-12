@@ -20,7 +20,7 @@ public class PowerConnection extends ConnectionModel{
     public PowerConnection(int id, SettingMaster sm){
         super(id,sm);
         this.passthrough = true;
-        this.type = "Power connection";
+        this.name = "Power connection";
         this.maxConnections = Integer.MAX_VALUE;
     }
     
