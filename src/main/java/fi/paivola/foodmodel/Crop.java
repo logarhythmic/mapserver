@@ -101,17 +101,25 @@ public abstract class Crop extends Edible {
 
     @Override
     public double onTick(DataFrame last) {
+        double crop = getCurrentCrop(last);
+        if(this.getCurrentGrowTime() == this.getGrowTime())
+            this.setCurrentGrowTime(0);
+        else
+            this.setCurrentGrowTime(this.getCurrentGrowTime() + 1);
+        return crop;
+    }
+   
+    public double getCurrentCrop(DataFrame last) {
         if(this.getCurrentGrowTime() == this.getGrowTime()) {
-            return this.getCurrentIndexMultiplier() / this.getCurrentGrowTime()
+            return this.getCurrentIndexMultiplier() / this.getGrowTime()
                     * this.getArea() * this.getMaxYield();
         }
-        this.setCurrentGrowTime(this.getCurrentGrowTime() + 1);
         this.setCurrentIndexMultiplier(this.getCurrentIndexMultiplier() +
                 this.getWaterIndex(last) * this.getTemperatureIndex(last)
                     * this.getSunshineIndex(last) * this.getPHIndex(last));
         return 0;
     }
-   
+    
     // These need data from Weather... assuming random weather for now.
     private double getWaterIndex(DataFrame last) {
         return waterDistribution.random();

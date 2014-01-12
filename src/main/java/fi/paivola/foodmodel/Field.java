@@ -37,7 +37,6 @@ public class Field extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         double d = this.content.onTick(last);
-        System.out.println(d + " " + content);
         this.saveDouble("foodAmount", d);
     }
 

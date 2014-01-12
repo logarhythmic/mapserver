@@ -15,7 +15,6 @@ public class Empty extends Edible {
 
     @Override
     double onTick(DataFrame last) {
-        System.out.println("Empty shit");
         return 0;
     }
     

@@ -68,7 +68,8 @@ public class App {
         // Create and add
         Model m = gm.createModel("Field", sm);
         gm.addModel(m, "Field");
-
+        
+        one.game.printOnDone = 1;
         // Start the gamethread
         one.start();
     }
