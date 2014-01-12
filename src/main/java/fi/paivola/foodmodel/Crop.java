@@ -27,6 +27,7 @@ public abstract class Crop extends Edible {
     private int growTime;
     private int currentGrowTime;
     private double currentIndexMultiplier;
+    private double currentStoredFood;
     private Distribution waterDistribution;
     private Distribution temperatureDistribution;
     private Distribution sunlightDistribution;
@@ -56,7 +57,8 @@ public abstract class Crop extends Edible {
         phMaximum = phmax;
         growTime = gtime;
         maxYield = yield;
-        
+        currentStoredFood = 0;
+        /*
         this.sm.settings.put("name", new SettingString("name", this.name));
         this.sm.settings.put("minwater", new SettingDouble("water minimum"
                 + "(cm/week)", getWaterMinimum(), r));
@@ -84,7 +86,7 @@ public abstract class Crop extends Edible {
                     getPHMaximum(), r));
         this.sm.settings.put("growtime", new SettingInt("growing time",
                     getGrowTime(), i));
-
+        */
         this.waterDistribution = new Distribution(getWaterMinimum(),
                                                   getWaterOptimal(),
                                                   getWaterMaximum());
@@ -101,23 +103,23 @@ public abstract class Crop extends Edible {
 
     @Override
     public double onTick(DataFrame last) {
-        double crop = getCurrentCrop(last);
-        if(this.getCurrentGrowTime() == this.getGrowTime())
+        if(this.getCurrentGrowTime() == this.getGrowTime()) {
+            currentStoredFood += this.getCurrentIndexMultiplier() /
+                    this.getGrowTime() * this.getArea() * this.getMaxYield();
             this.setCurrentGrowTime(0);
-        else
+            this.setCurrentIndexMultiplier(0);
+        }
+        else {
             this.setCurrentGrowTime(this.getCurrentGrowTime() + 1);
-        return crop;
+            this.setCurrentIndexMultiplier(this.getCurrentIndexMultiplier() +
+                    this.getWaterIndex(last) * this.getTemperatureIndex(last)
+                    * this.getSunshineIndex(last) * this.getPHIndex(last));            
+        }
+        return currentStoredFood;
     }
    
-    public double getCurrentCrop(DataFrame last) {
-        if(this.getCurrentGrowTime() == this.getGrowTime()) {
-            return this.getCurrentIndexMultiplier() / this.getGrowTime()
-                    * this.getArea() * this.getMaxYield();
-        }
-        this.setCurrentIndexMultiplier(this.getCurrentIndexMultiplier() +
-                this.getWaterIndex(last) * this.getTemperatureIndex(last)
-                    * this.getSunshineIndex(last) * this.getPHIndex(last));
-        return 0;
+    public double getCurrentStoredFood() {
+        return currentStoredFood;
     }
     
     // These need data from Weather... assuming random weather for now.
