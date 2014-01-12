@@ -25,7 +25,7 @@ public class App {
             return;
         }
 
-        SettingsParser sp = new SettingsParser();
+        SettingsParser.parse();
 
         if (profilingRun) { // For profiling
 
@@ -82,7 +82,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457*20));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
         Model m1 = gm.createModel("Power plant");
@@ -92,17 +92,15 @@ public class App {
 
         m1.getLatLng().latitude = 4;
         m12.getLatLng().latitude = 10;
-        
+
         Model m2 = gm.createModel("Power connection");
         gm.addModel(m2, "Power connection");
         Model m22 = gm.createModel("Power connection");
         gm.addModel(m22, "Power connection");
-        
+
         Model m3 = gm.createModel("Power user");
         gm.addModel(m3, "Power user");
-        
-        
-        
+
         // And link!
         gm.linkModels(m1, m2);
         //gm.linkModels(m12, m2);
