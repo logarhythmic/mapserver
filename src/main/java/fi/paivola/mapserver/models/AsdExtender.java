@@ -8,6 +8,7 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
 
 /**
  * Example model extension READ THIS!
+ *
  * @author juhani
  */
 public class AsdExtender extends ExtensionModel {
@@ -15,25 +16,28 @@ public class AsdExtender extends ExtensionModel {
     public AsdExtender(int id, SettingMaster sm) {
         super(id, sm);
     }
-    
+
     public AsdExtender() {
         super();
     }
 
     /**
-     * Extending models have a special tick that is run after the extensions master has completed it's tick and events.
+     * Extending models have a special tick that is run after the extensions
+     * master has completed it's tick and events.
+     *
      * @param l
-     * @param c 
+     * @param c
      */
     @Override
     public void onExtensionTick(DataFrame l, DataFrame c) {
-        this.parent.addEventToAll(c, new Event("boom2", "integer", "1"));
+        this.parent.addEventToAll(c, new Event("boom2", Event.Type.INT, 1));
         //System.out.println(this.id + " (extender) sent boom2 trough " + p.id);
     }
 
     /**
      * This is triggered by each of the parents events.
-     * @param e 
+     *
+     * @param e
      */
     @Override
     public void onEvent(Event e, DataFrame current) {

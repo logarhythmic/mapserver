@@ -10,27 +10,59 @@ import static java.lang.Integer.parseInt;
  */
 public class Event {
 
-    public String type;
-    public String value;
+    /**
+     * Enumeration of the possible types.
+     */
+    public static enum Type {
+
+        INT, DOUBLE, STRING, NOTIFICATION, OBJECT
+    }
+
+    /**
+     * What type of event this is (?).
+     */
+    public Type type;
+    /**
+     * Value as a object.
+     */
+    public Object value;
+    /**
+     * This events name.
+     */
     public String name;
+    /**
+     * In what frame was this sent.
+     */
     public int frame;
+    /**
+     * Who sent this event?
+     */
     public Model sender;
 
-    public Event(String name, String type, String value) {
+    public Event(String name, Type type, Object value) {
         this.name = name;
         this.type = type;
         this.value = value;
     }
 
     public int getInt() {
-        return parseInt(this.value);
+        if (this.type == Type.INT) {
+            return parseInt("" + this.value);
+        }
+        return 0;
     }
 
     public String getString() {
-        return this.value;
+        if (this.type == Type.STRING) {
+            return "" + this.value;
+        }
+        return null;
     }
 
     public double getDouble() {
-        return parseDouble(this.value);
+        if (this.type == Type.DOUBLE) {
+            return parseDouble("" + this.value);
+        }
+        return 0;
     }
 }
