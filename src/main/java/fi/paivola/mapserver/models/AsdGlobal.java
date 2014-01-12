@@ -5,10 +5,10 @@ import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GlobalModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import static java.lang.Integer.parseInt;
 
 /**
  * Example global model READ THIS.
+ *
  * @author juhani
  */
 public class AsdGlobal extends GlobalModel {
@@ -16,7 +16,7 @@ public class AsdGlobal extends GlobalModel {
     public AsdGlobal(int id, SettingMaster sm) {
         super(id, sm);
     }
-    
+
     public AsdGlobal() {
         super();
     }

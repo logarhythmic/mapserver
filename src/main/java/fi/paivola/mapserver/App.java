@@ -5,7 +5,6 @@ import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
-import fi.paivola.mapserver.utils.LatLng;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -81,7 +80,6 @@ public class App {
      */
     static void runTest() {
 
-        // How many ticks? Each one is a week.
         GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
@@ -100,17 +98,12 @@ public class App {
 
         Model m3 = gm.createModel("Power user");
         gm.addModel(m3, "Power user");
-
-        // And link!
         gm.linkModels(m1, m2);
-        //gm.linkModels(m12, m2);
         gm.linkModels(m2, m3);
 
         gm.linkModels(m22, m3);
         gm.linkModels(m22, m12);
 
-        // Print final data in the end?
-        // Start the gamethread
         one.start();
     }
 }
