@@ -7,12 +7,15 @@ import java.util.Objects;
  * @author juhani
  */
 public class StringPair {
+
     public String one;
     public String two;
+
     public StringPair(String one, String two) {
         this.one = one;
         this.two = two;
     }
+
     @Override
     public int hashCode() {
         int hash = 1;
@@ -33,9 +36,6 @@ public class StringPair {
         if (!Objects.equals(this.one, other.one)) {
             return false;
         }
-        if (!Objects.equals(this.two, other.two)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.two, other.two);
     }
 }

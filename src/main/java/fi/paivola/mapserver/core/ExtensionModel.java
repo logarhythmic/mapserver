@@ -11,15 +11,8 @@ public abstract class ExtensionModel extends Model {
 
     public boolean enabled;
 
-    public ExtensionModel(int id, SettingMaster sm) {
-        super(id, sm);
-        this.enabled = true;
-        this.type = "extension";
-        this.maxConnections = 0;
-    }
-    
-    public ExtensionModel() {
-        super();
+    public ExtensionModel(int id) {
+        super(id);
         this.enabled = true;
         this.type = "extension";
         this.maxConnections = 0;
@@ -45,7 +38,7 @@ public abstract class ExtensionModel extends Model {
 
     /**
      * Internal function that runs some checks and calls onExtensionTick.
-     * 
+     *
      * @param last last dataframe
      * @param current current dataframe
      */

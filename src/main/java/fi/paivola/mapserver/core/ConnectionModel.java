@@ -9,19 +9,12 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  */
 public abstract class ConnectionModel extends Model {
 
-    public boolean passtrough;
+    public boolean passthrough;
 
-    public ConnectionModel(int id, SettingMaster sm) {
-        super(id, sm);
+    public ConnectionModel(int id) {
+        super(id);
         this.type = "connection";
-        this.passtrough = true;
-        this.maxConnections = 2;
-    }
-    
-    public ConnectionModel() {
-        super();
-        this.type = "connection";
-        this.passtrough = true;
+        this.passthrough = true;
         this.maxConnections = 2;
     }
 
@@ -41,20 +34,22 @@ public abstract class ConnectionModel extends Model {
 
     @Override
     public void addEvent(Event e, Model m) {
-        if (this.passtrough) {
+        if (this.passthrough) {
             this.addEventToAllExceptOne(e, m);
         } else {
             super.addEvent(e, m);
         }
     }
-    
+
     /**
      * Get the distance of this connection model.
+     *
      * @return the distance if possible to calculate, otherwise 0
      */
     public double getLength() {
-        if(this.connections.size()>1)
+        if (this.connections.size() > 1) {
             return this.connections.get(0).distanceTo(this.connections.get(1));
+        }
         return 0;
     }
 

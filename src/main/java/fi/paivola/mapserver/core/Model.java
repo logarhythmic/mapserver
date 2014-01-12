@@ -66,48 +66,36 @@ public abstract class Model {
      * Name of this model.
      */
     public String name;
-    
+
     /**
      * Is this model a prototype model or not?
      */
     public boolean proto;
-    
     /**
-     * This is our SettingMaster with the user changed data.
+     * Is this model in the need for a SM?
      */
-    public SettingMaster sm;
-    
+    public boolean needsSM;
+
     /**
-     * This is used when the model is actually used in a simulation
+     *
+     *
      * @param id id of this model
-     * @param sm SettingMaster with all of the user changed data (and original).
      */
-    public Model(int id, SettingMaster sm) {
+    public Model(int id) {
         this.id = id;
         this.connections = new ArrayList<>();
         this.events = new ArrayList<>();
         this.data = new HashMap();
         this.extensions = new HashMap();
         this.allowedNames = new ArrayList<>();
-        if(sm == null) {
-            this.proto = true;
-            this.sm = null;
-        }else{
-            this.proto = false;
-            this.sm = sm;
-        }
-        this.ll = new LatLng(0,0);
+        this.proto = id == -1;
+        this.needsSM = !this.proto;
+        this.ll = new LatLng(0, 0);
     }
-    
-    /**
-     * This is for prototype model, eg initializing the default SettingMaster and registerations.
-     */
-    public Model() {
-        this(0, null);
-    }
-    
+
     /**
      * Change the latitude and longitude
+     *
      * @param lat latitude
      * @param lng longitude
      */
@@ -115,25 +103,28 @@ public abstract class Model {
         this.ll.latitude = lat;
         this.ll.longitude = lng;
     }
-    
+
     /**
      * Change the latitude and longitude
+     *
      * @param ll LatLng that is the desired position
      */
     public void setLatLng(LatLng ll) {
         this.ll = ll;
     }
-    
+
     /**
      * Get the latitude and longitude as a LatLng
-     * @return 
+     *
+     * @return
      */
     public LatLng getLatLng() {
         return this.ll;
     }
-    
+
     /**
      * How far is this model from another one.
+     *
      * @param m The other model
      * @return distance in km.
      */
@@ -149,9 +140,10 @@ public abstract class Model {
      */
     public void onTickStart(DataFrame last, DataFrame current) {
         // breaking prototype models legs...
-        if(this.proto)
+        if (this.proto || this.needsSM) {
             return;
-        
+        }
+
         // lets check if there is some events waiting to get trough
         // fixes java.util.ConcurrentModificationException
         List<Event> _buf = new ArrayList<>();
@@ -160,18 +152,18 @@ public abstract class Model {
                 _buf.add(i);
             }
         }
-        for(Event i : _buf){
+        for (Event i : _buf) {
             this.onEvent(i, current);
         }
-
+        
         this.onTick(last, current);
         for (Map.Entry pairs : this.extensions.entrySet()) {
-            ((ExtensionModel) pairs.getValue())
-                    .onExtensionTickStart(last, current);
             // lets go trough the events ONCE again... this time for extensions
-            for(Event i : _buf){
+            for (Event i : _buf) {
                 ((ExtensionModel) pairs.getValue()).onEvent(i, current);
             }
+            ((ExtensionModel) pairs.getValue())
+                    .onExtensionTickStart(last, current);
         }
 
         // lets delete the events that we used
@@ -181,7 +173,7 @@ public abstract class Model {
                 it.remove();
             }
         }
-
+        
         this.dumpToDataFrame(current);
     }
 
@@ -246,8 +238,8 @@ public abstract class Model {
     }
 
     /**
-     * Adds a bunch of extension models from a map of strings and classes.
-     * ToDo: respect settings!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * Adds a bunch of extension models from a map of strings and classes. ToDo:
+     * respect settings!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      *
      * @param gm game master
      * @param clss map of strings and classes
@@ -258,11 +250,12 @@ public abstract class Model {
             cls = (Class) pair.getValue();
             Constructor<Model> c;
             try {
-                c = cls.getDeclaredConstructor(int.class, SettingMaster.class);
+                c = cls.getDeclaredConstructor(int.class);
                 c.setAccessible(true);
                 try {
-                    ExtensionModel em = (ExtensionModel) c.newInstance(gm.current_id++, gm.getDefaultSM((Class) pair.getValue()));
+                    ExtensionModel em = (ExtensionModel) c.newInstance(gm.current_id++);
                     em.parent = this;
+                    em.onActualUpdateSettings(gm.getDefaultSM((Class) pair.getValue()));
                     this.addExtension(pair.getKey().toString(), em);
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     Logger.getLogger(GameManager.class.getName())
@@ -275,70 +268,87 @@ public abstract class Model {
         }
     }
 
+    /**
+     * Links this model to another model. Note: This is not two way. You need to
+     * link it in the other way also.
+     *
+     * @param m what to link to
+     * @return true if succeeded, false otherwise
+     */
     public boolean linkModel(Model m) {
         if (this.connections.size() >= this.maxConnections) {
             return false;
         }
-        if (this.allowedNames.size() != 0 && this.allowedNames.contains(m.name)) {
-            return false;
+        if (this.allowedNames.isEmpty() || this.allowedNames.contains(m.name)) {
+            return this.connections.add(m);
         }
-        return this.connections.add(m);
+        return false;
     }
 
-    public boolean delinkModel(Model m) {
+    /**
+     * Removes a link to another model. Note: this is not two way. You need to
+     * unlink it in the other way also.
+     *
+     * @param m what to unlink from
+     * @return True if succeeded, false otherwise
+     */
+    public boolean unlinkModel(Model m) {
         return this.connections.remove(m);
     }
 
     /**
-     * Saves an integer. Will be saved to dataframe. Uses parents data if possible.
-     * 
-     * @param name  name of the integer
-     * @param a     actual integer
+     * Saves an integer. Will be saved to dataframe. Uses parents data if
+     * possible.
+     *
+     * @param name name of the integer
+     * @param a actual integer
      */
     public void saveInt(String name, int a) {
-        if(this.parent != null) {
+        if (this.parent != null) {
             this.parent.saveInt(name, a);
-        }else{
+        } else {
             this.data.put(name, "" + a);
         }
     }
 
     /**
-     * Saves a double. Will be saved to dataframe. Uses parents data if possible.
-     * 
-     * @param name  name of the double
-     * @param a     actual double
+     * Saves a double. Will be saved to dataframe. Uses parents data if
+     * possible.
+     *
+     * @param name name of the double
+     * @param a actual double
      */
     public void saveDouble(String name, double a) {
-        if(this.parent != null) {
+        if (this.parent != null) {
             this.parent.saveDouble(name, a);
-        }else{
+        } else {
             this.data.put(name, "" + a);
         }
     }
 
     /**
-     * Saves a string. Will be saved to dataframe. Uses parents data if possible.
-     * 
-     * @param name  name of the string
-     * @param a     actual string
+     * Saves a string. Will be saved to dataframe. Uses parents data if
+     * possible.
+     *
+     * @param name name of the string
+     * @param a actual string
      */
     public void saveString(String name, String a) {
-        if(this.parent != null) {
+        if (this.parent != null) {
             this.parent.saveString(name, a);
-        }else{
-            this.data.put(name,a);
+        } else {
+            this.data.put(name, a);
         }
     }
 
     /**
      * Gets an integer. Uses parents data if possible.
-     * 
-     * @param name  name of the integer
-     * @return      the integer or null
+     *
+     * @param name name of the integer
+     * @return the integer or null
      */
     public int getInt(String name) {
-        if(this.parent != null) {
+        if (this.parent != null) {
             return this.parent.getInt(name);
         }
         return parseInt(this.data.get(name));
@@ -346,12 +356,12 @@ public abstract class Model {
 
     /**
      * Gets a double. Uses parents data if possible.
-     * 
-     * @param name  name of the double
-     * @return      the double or null
+     *
+     * @param name name of the double
+     * @return the double or null
      */
     public double getDouble(String name) {
-        if(this.parent != null) {
+        if (this.parent != null) {
             return this.parent.getDouble(name);
         }
         return parseDouble(this.data.get(name));
@@ -359,12 +369,12 @@ public abstract class Model {
 
     /**
      * Gets a string. Uses parents data if possible.
-     * 
-     * @param name  name of the string
-     * @return      the string or null
+     *
+     * @param name name of the string
+     * @return the string or null
      */
     public String getString(String name) {
-        if(this.parent != null) {
+        if (this.parent != null) {
             return this.parent.getString(name);
         }
         return (this.data.get(name));
@@ -383,12 +393,14 @@ public abstract class Model {
      * Called when there is a event to handle.
      *
      * @param e event thats handled
+     * @param current current dataframe
      */
     public abstract void onEvent(Event e, DataFrame current);
-    
+
     /**
      * This is called from the GameManager and performs some extra steps before
      * the users own onRegisteration is called.
+     *
      * @param gm
      * @param sm
      */
@@ -401,7 +413,7 @@ public abstract class Model {
 
     /**
      * Called when a particular model is added to the database of possible
-     * models. Add settings here! Useful if you need to, say, register the 
+     * models. Add settings here! Useful if you need to, say, register the
      * current model as a extension to some other model.
      *
      * @param gm game manager
@@ -411,8 +423,27 @@ public abstract class Model {
 
     /**
      * Called when the module is asked for defaults, use save* here.
+     *
      * @param df dataframe
      */
     public abstract void onGenerateDefaults(DataFrame df);
 
+    /**
+     * Called when there is a new SettingMaster and this model needs to be
+     * updated.
+     *
+     * @param sm
+     */
+    public void onActualUpdateSettings(SettingMaster sm) {
+        this.needsSM = false;
+        this.name = sm.name;
+        this.onUpdateSettings(sm);
+    }
+
+    /**
+     * Called when there are settings to be changed, HANDLE THE CHANGES PLEASE.
+     *
+     * @param sm
+     */
+    public abstract void onUpdateSettings(SettingMaster sm);
 }

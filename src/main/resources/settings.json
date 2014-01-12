@@ -1,6 +1,7 @@
 {
     "default_ticks": 20,
     "websocket_port": 8080,
+    "csv_seperator": ",\t",
     "models": [
         {
             "name": "Lake",
