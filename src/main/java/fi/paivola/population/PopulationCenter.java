@@ -14,7 +14,8 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
 public class PopulationCenter extends PointModel {
     private FlowingDistribution populationByAge;
     
-    public void PopulationCenter() {
+    public PopulationCenter(int id) {
+        super(id);
         populationByAge = new FlowingDistribution( Constants.NUM_AGE_GROUPS );
     }
 
@@ -35,6 +36,11 @@ public class PopulationCenter extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

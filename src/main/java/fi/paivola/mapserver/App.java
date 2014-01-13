@@ -6,6 +6,7 @@ import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.population.PopulationCenter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -89,17 +90,20 @@ public class App {
         sm.settings.get("luck").setValue("0.7");
         mg.onActualUpdateSettings(sm);
 
+        Model populationPoint = gm.createModel("populationPoint", sm);
         Model p1 = gm.createModel("examplePoint");
         Model c1 = gm.createModel("exampleConnection");
         Model p2 = gm.createModel("examplePoint");
         Model c2 = gm.createModel("exampleConnection");
         Model p3 = gm.createModel("examplePoint");
         Model c3 = gm.createModel("exampleConnection");
+        Model c4 = gm.createModel("routeA");
 
         // And link!
         gm.linkModelsWith(p1, p2, c1);
         gm.linkModelsWith(p2, p3, c2);
         gm.linkModelsWith(p3, p1, c3);
+        gm.linkModelsWith(populationPoint, p1, c4);
 
         // Print final data in the end?
         if (!profilingRun) {
