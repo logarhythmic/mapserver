@@ -48,7 +48,8 @@ public class FlowingDistribution  {
         for (int i = 0; i != this.quantities.length; ++i) {
             if (i == 0) continue; // nothing flows to the first quantity
             final double dtYears = dt / Constants.WEEKS_IN_YEAR;
-            newQuantities[i] = this.quantities[i] + (this.quantities[i-1] - this.quantities[i]) * annualFlowPc * dtYears;
+            newQuantities[i] = this.quantities[i] + (this.quantities[i-1]
+                    - this.quantities[i]) * annualFlowPc * dtYears;
         }
         this.quantities = newQuantities;
         reassignPointers(); // not sure if actually necessary, dunno java
