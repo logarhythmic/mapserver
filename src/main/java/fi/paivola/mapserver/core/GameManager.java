@@ -44,6 +44,10 @@ public class GameManager {
      */
     private final Map<String, Model> active_models;
     /**
+     * Extensions that are waiting for a while.
+     */
+    private final List<CCs> waiting_extensions;
+    /**
      * How many models are active / where are we going.
      */
     public int current_id;
@@ -64,6 +68,7 @@ public class GameManager {
         this.tick_current = 0;
         this.frames = new ArrayList<>();
         this.active_models = new HashMap<>();
+        this.waiting_extensions = new ArrayList<>();
         this.current_id = 0;
         log.setLevel(Level.FINE);
 
@@ -100,11 +105,11 @@ public class GameManager {
             SettingMaster blank = new SettingMaster();
 
             try {
-                c = cls.getDeclaredConstructor();
+                c = cls.getDeclaredConstructor(int.class);
                 c.setAccessible(true);
                 Model m;
                 try {
-                    m = c.newInstance();
+                    m = c.newInstance(-1);
                     m.onActualRegisteration(this, blank);
                     ((CCs) pair.getValue()).sm = blank;
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -115,6 +120,11 @@ public class GameManager {
                 Logger.getLogger(GameManager.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
+        }
+        for (CCs c : this.waiting_extensions) {
+            SettingMaster sl = this.getDefaultSM(c.cls);
+            this.models.get(c.misc).clss.put(sl.name, c.cls);
+            this.models.get(c.misc).sm.settings.putAll(sl.settings);
         }
     }
 
@@ -156,13 +166,21 @@ public class GameManager {
         }
     }
 
-    public boolean addModel(Model m, String type) {
+    /**
+     * DON'T CALL THIS MANUALLY!
+     *
+     * @param m Model
+     * @param type type of that model
+     * @return true if successful, false otherwise
+     */
+    private boolean addModel(Model m, String type) {
         m.addExtensions(this, models.get(type).clss);
         return (this.active_models.put("" + m.id, m) == null);
     }
 
     /**
-     * Creates a model based on a SettingMaster.
+     * Creates a model based on a SettingMaster and adds that to the active
+     * model pool.
      *
      * @param type name of the models type
      * @param sm
@@ -174,10 +192,11 @@ public class GameManager {
         Model m = null;
         try {
             Constructor<Model> c;
-            c = cls.getDeclaredConstructor(int.class, SettingMaster.class);
+            c = cls.getDeclaredConstructor(int.class);
             c.setAccessible(true);
             try {
-                m = c.newInstance(this.current_id++, sm);
+                m = c.newInstance(this.current_id++);
+                m.onActualUpdateSettings(sm);
             } catch (InstantiationException | IllegalAccessException |
                     IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(GameManager.class.getName())
@@ -187,11 +206,15 @@ public class GameManager {
             Logger.getLogger(GameManager.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
-        return m;
+        if (this.addModel(m, type)) {
+            return m;
+        }
+        return null;
     }
 
     /**
-     * Creates a model with the default SettingMaster for that model.
+     * Creates a model with the default SettingMaster for that model and adds
+     * that to the active model pool.
      *
      * @param type name of the models type
      * @return returns the model if success, null otherwise
@@ -217,6 +240,22 @@ public class GameManager {
         }
 
         return true;
+    }
+
+    /**
+     * Links two models together using a third model.
+     *
+     * @param from first model
+     * @param to second model
+     * @param with model to link with
+     * @return returns true if successful, false otherwise
+     */
+    public boolean linkModelsWith(Model from, Model to, Model with) {
+        if (!this.linkModels(from, with)) {
+            return false;
+        }
+
+        return this.linkModels(with, to);
     }
 
     /**
@@ -273,14 +312,9 @@ public class GameManager {
      *
      * @param m model from where to get the defaults
      * @param df dataframe to populate to
-     * @return returns true
      */
-    public boolean populateDefaults(Model m, DataFrame df) {
-
-        m.onGenerateDefaults(df);
-        m.dumpToDataFrame(df);
-
-        return true;
+    public void populateDefaults(Model m, DataFrame df) {
+        m.onActualGenerateDefaults(df);
     }
 
     /**
@@ -352,11 +386,12 @@ public class GameManager {
      * Adds a extender that will be added to each subsequent target model.
      *
      * @param towhere the models name where to add
-     * @param name name of the extender
      * @param cls the extending class
      */
-    public void registerExtension(String towhere, String name, Object cls) {
-        this.models.get(towhere).clss.put(name, cls);
+    public void registerExtension(String towhere, Class cls) {
+        CCs tmp = new CCs(cls);
+        tmp.misc = towhere;
+        this.waiting_extensions.add(tmp);
     }
 
 }

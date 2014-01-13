@@ -175,7 +175,6 @@ public class WSServer extends WebSocketServer {
             mod.ll.longitude = Double.parseDouble(in.get("lng").toString());
         }
 
-        gt.game.addModel(mod, type);
         out.put("model_id", mod.id);
         success(out);
     }
@@ -289,8 +288,7 @@ public class WSServer extends WebSocketServer {
             return;
         }
 
-        mod.sm = SettingMaster.fromJSON((JSONObject) in.get("settings"));
-        mod.addEvent(new Event("settingsChanged", Event.Type.NOTIFICATION, null), mod);
+        mod.onActualUpdateSettings(SettingMaster.fromJSON((JSONObject) in.get("settings")));
 
         success(out);
     }
