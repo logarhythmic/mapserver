@@ -3,7 +3,7 @@ package fi.paivola.weathermodel;
 import java.util.Random;
 
 /**
- * Rain class.
+ * Temperature class.
  * @author Jaakko Hannikainen
  */
 public class Temperature {
