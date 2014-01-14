@@ -9,8 +9,8 @@ import java.util.Map;
  */
 
 public class Maize extends Crop {
-    public Maize(SettingMaster sm) {
-        super(sm, "Maize", 1.01, 2.07, 3.01,
+    public Maize() {
+        super("Maize", 1.01, 2.07, 3.01,
                             20, 30, 40,
                             42, 45, 70,
                             5.5, 6.25, 7,

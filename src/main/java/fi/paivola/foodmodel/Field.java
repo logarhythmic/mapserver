@@ -9,29 +9,12 @@ import fi.paivola.mapserver.core.setting.*;
 public class Field extends PointModel {
 
     private Edible content;
-
+    
     /**
      * Main constructor for the food model
      */
-    public Field() {
-        super();
-    }
-
-    public Field(int id, SettingMaster sm) {
-        super(id, sm);
-        if(sm.settings.containsKey("content")) {
-            switch(sm.settings.get("content").getValue()) {
-                case "empty":
-                    content = new Empty(sm);
-                    break;
-                case "wheat":
-                    content = new Wheat(sm);
-                    break;
-                default:
-                    content = new Empty(sm);
-                    break;
-            }
-        }
+    public Field(int id) {
+        super(id);
     }
     
     @Override
@@ -58,8 +41,33 @@ public class Field extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        if(content == null)
-            content = new Empty(sm);
+        content = new Empty();
+        content.setArea(1);
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
+        if(sm.settings.containsKey("content")) {
+            switch(sm.settings.get("content").getValue().toLowerCase()) {
+                case "empty":
+                    content = new Empty();
+                    break;
+                case "wheat":
+                    content = new Wheat();
+                    break;
+                case "maize":
+                    content = new Maize();
+                    break;
+                case "sorghum":
+                    content = new Sorghum();
+                    break;
+                default:
+                    // Should this fail or not?
+                    content = new Empty();
+                    break;
+            }
+        }
+        this.content.setArea(Double.parseDouble(sm.settings.get("area").getValue()));
     }
 }
 

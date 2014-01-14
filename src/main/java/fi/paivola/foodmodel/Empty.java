@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public class Empty extends Edible {
 
-    public Empty(SettingMaster sm) {
-        super(sm, "Empty");
+    public Empty() {
+        super("Empty");
     }
 
     @Override

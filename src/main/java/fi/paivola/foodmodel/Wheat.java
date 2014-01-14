@@ -9,8 +9,8 @@ import java.util.Map;
  */
 
 public class Wheat extends Crop {
-    public Wheat(SettingMaster sm) {
-        super(sm, "Wheat", 1.09, 2.17, 3.23,
+    public Wheat() {
+        super("Wheat", 1.09, 2.17, 3.23,
                            19, 22, 25,
                            42, 45, 70,
                            6, 6.5, 7,

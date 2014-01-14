@@ -11,11 +11,9 @@ import java.util.Map;
 
 public abstract class Edible {
 
-    SettingMaster sm;
     String name;
-    public Edible(SettingMaster sm, String name) {
-        this.sm = sm;
-    }
+    private double area;
+    public Edible(String name) { }
     
     /**
      * @return the name
@@ -31,5 +29,20 @@ public abstract class Edible {
         this.name = name;
     }
     
+    /**
+     * @return the area
+     */
+    public double getArea() {
+        return area;
+    }
+
+    /**
+     * @param area the area to set
+     */
+    public void setArea(double area) {
+        this.area = area;
+    }
+    
     abstract double onTick(DataFrame last);
+
 }

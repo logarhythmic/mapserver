@@ -3,6 +3,7 @@ package fi.paivola.foodmodel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.*;
+import fi.paivola.weathermodel.Weather;
 import java.util.Map;
 /**
  * @author Jaakko Hannikainen
@@ -33,11 +34,12 @@ public abstract class Crop extends Edible {
     private Distribution sunlightDistribution;
     private Distribution phDistribution;
 
-    public Crop(SettingMaster sm, String name, double wmin, double wopt, double wmax,
+    /* The constructor is horrible, I'm sorry. */
+    public Crop(String name, double wmin, double wopt, double wmax,
             double tmin, double topt, double tmax, double smin, double sopt,
             double smax, double phmin, double phopt, double phmax, int gtime,
             double yield) {
-        super(sm, name);
+        super(name);
         
         RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
         RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
@@ -122,33 +124,22 @@ public abstract class Crop extends Edible {
         return currentStoredFood;
     }
     
-    // These need data from Weather... assuming random weather for now.
     private double getWaterIndex(DataFrame last) {
-        return waterDistribution.random();
-        //throw new UnsupportedOperationException("Not supported yet.");
+        return waterDistribution.exact(Weather.getRain(last.index));
     }
     
     private double getTemperatureIndex(DataFrame last) {
-        return temperatureDistribution.random();
-        //throw new UnsupportedOperationException("Not supported yet.");
+        return temperatureDistribution.exact(Weather.getTemperature(last.index));
     }
 
     private double getSunshineIndex(DataFrame last) {
         return sunlightDistribution.random();
-        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    // Looks like this won't be coming soon, leaving it to optimal.
     private double getPHIndex(DataFrame last) {
-        return phDistribution.random();
+        return 1;
         //throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * @return the area
-     */
-
-    private double getArea() {
-        return Double.parseDouble(this.sm.settings.get("area").getValue());
     }
 
     private double getMaxYield() {

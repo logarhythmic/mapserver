@@ -9,8 +9,8 @@ import java.util.Map;
  */
 
 public class Sorghum extends Crop {
-    public Sorghum(SettingMaster sm) {
-        super(sm, "Sorghum", 1.33, 2.66, 3.99,
+    public Sorghum() {
+        super("Sorghum", 1.33, 2.66, 3.99,
                                 19, 22, 25,
                                 42, 45, 70,
                                 6, 6.5, 7,
