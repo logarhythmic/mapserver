@@ -5,12 +5,8 @@ import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
-<<<<<<< HEAD
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
-=======
-import fi.paivola.mapserver.core.setting.SettingMaster;
->>>>>>> f925bf349c2f6383b314bde43e521ac554475ed6
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
