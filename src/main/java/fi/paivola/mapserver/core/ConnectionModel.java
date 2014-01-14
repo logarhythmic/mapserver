@@ -11,15 +11,8 @@ public abstract class ConnectionModel extends Model {
 
     public boolean passthrough;
 
-    public ConnectionModel(int id, SettingMaster sm) {
-        super(id, sm);
-        this.type = "connection";
-        this.passthrough = true;
-        this.maxConnections = 2;
-    }
-    
-    public ConnectionModel() {
-        super();
+    public ConnectionModel(int id) {
+        super(id);
         this.type = "connection";
         this.passthrough = true;
         this.maxConnections = 2;
@@ -47,14 +40,16 @@ public abstract class ConnectionModel extends Model {
             super.addEvent(e, m);
         }
     }
-    
+
     /**
      * Get the distance of this connection model.
+     *
      * @return the distance if possible to calculate, otherwise 0
      */
     public double getLength() {
-        if(this.connections.size()>1)
+        if (this.connections.size() > 1) {
             return this.connections.get(0).distanceTo(this.connections.get(1));
+        }
         return 0;
     }
 

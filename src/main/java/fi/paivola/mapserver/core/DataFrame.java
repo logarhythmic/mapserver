@@ -15,7 +15,7 @@ public class DataFrame {
     public int index;
     public boolean locked;
     private final Map<StringPair, Object> data;
-    private static final String dataSeperator = "\t";
+    public static String dataSeperator = ", ";
 
     /**
      * Class constructor.
@@ -53,7 +53,7 @@ public class DataFrame {
      * @param data data itself
      * @return returns true if succeeded
      */
-    public boolean saveGlobalData(String name, String data) {
+    public boolean saveGlobalData(String name, Object data) {
         if (this.locked) {
             return false;
         }
@@ -66,8 +66,38 @@ public class DataFrame {
      * @param name name of the data
      * @return returns the data
      */
-    public String getGlobalData(String name) {
-        return this.data.get(new StringPair(" ", name)).toString();
+    public Object getGlobalData(String name) {
+        return this.data.get(new StringPair(" ", name));
+    }
+
+    /**
+     * Gets a global string.
+     *
+     * @param name name of the data
+     * @return returns the string
+     */
+    public String getGlobalString(String name) {
+        return this.getGlobalData(name).toString();
+    }
+
+    /**
+     * Gets a global integer.
+     *
+     * @param name name of the data
+     * @return returns the integer
+     */
+    public int getGlobalInt(String name) {
+        return Integer.parseInt(this.getGlobalData(name).toString());
+    }
+
+    /**
+     * Gets a global integer.
+     *
+     * @param name name of the data
+     * @return returns the double
+     */
+    public double getGlobalDouble(String name) {
+        return Double.parseDouble(this.getGlobalData(name).toString());
     }
 
     /**
@@ -76,15 +106,15 @@ public class DataFrame {
      * @return An array of CSV strings containing all of the data saved
      */
     public String[] getATonOfStrings() {
-        String[] str = new String[this.data.size()+1];
+        String[] str = new String[this.data.size() + 1];
         int i = 0;
-        str[i++] = "id"+dataSeperator+"name"+dataSeperator+"value";
+        str[i++] = "id" + dataSeperator + "name" + dataSeperator + "value";
         for (Map.Entry pairs : this.data.entrySet()) {
-            str[i++] = ((StringPair)pairs.getKey()).one + dataSeperator + ((StringPair)pairs.getKey()).two + dataSeperator + pairs.getValue();
+            str[i++] = ((StringPair) pairs.getKey()).one + dataSeperator + ((StringPair) pairs.getKey()).two + dataSeperator + pairs.getValue();
         }
         return str;
     }
-    
+
     public static String getFormatted(String key, Object value) {
         return key + dataSeperator + value.toString();
     }
