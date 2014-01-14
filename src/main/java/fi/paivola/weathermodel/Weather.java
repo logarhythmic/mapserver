@@ -24,7 +24,8 @@ public class Weather extends GlobalModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        //current.saveGlobalData("asdness", ""+(parseInt(last.getGlobalData("asdness"))+ 1));
+    	current.saveGlobalData("rain", getRain(current.index));
+    	current.saveGlobalData("temperature", getTemperature(current.index));
     }
 
     @Override
@@ -49,4 +50,7 @@ public class Weather extends GlobalModel {
         return Temperature.getTemperature(week);
     }
 
+    public static double getSunlight(int week) {
+        return Sunlight.getSunlight(week);
+    }
 }
