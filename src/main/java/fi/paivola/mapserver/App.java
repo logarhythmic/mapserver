@@ -5,8 +5,12 @@ import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
+<<<<<<< HEAD
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
+=======
+import fi.paivola.mapserver.core.setting.SettingMaster;
+>>>>>>> f925bf349c2f6383b314bde43e521ac554475ed6
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,62 +20,68 @@ import java.util.logging.LogManager;
 import org.json.simple.parser.ParseException;
 
 public class App {
-    
+
     static final boolean profilingRun = false;
 
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
-        
-        SettingsParser sp = new SettingsParser();
-        
-        if(profilingRun) { // For profiling
-        
+
+        SettingsParser.parse();
+
+        if (profilingRun) { // For profiling
+
             LogManager.getLogManager().reset();
 
-            for(int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 1000; i++) {
                 runTest();
             }
-        
-        }else{
+
+        } else {
 
             WSServer ws = new WSServer(parseInt(SettingsParser.settings.get("websocket_port").toString()));
             ws.start();
 
-            BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
+            BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
             printHelp();
             mainloop:
-            while(true) {
+            while (true) {
                 String in = sysin.readLine();
-                switch(in) {
-                    case "q": case "quit": case "e": case "exit":
+                switch (in) {
+                    case "q":
+                    case "quit":
+                    case "e":
+                    case "exit":
                         ws.stop();
                         break mainloop;
-                    case "t": case "test":
+                    case "t":
+                    case "test":
                         ws.stop();
                         runTest();
                         break mainloop;
-                    case "h": case "help":
+                    case "h":
+                    case "help":
                         printHelp();
                         break;
                     default:
-                        System.out.println("Unknown command ("+in+")");
+                        System.out.println("Unknown command (" + in + ")");
                         printHelp();
                         break;
                 }
             }
         }
     }
-    
+
     static void printHelp() {
         System.out.println("q|e|quit|exit   - Quits the program\n"
-                         + "t|test          - Run the test function\n"
-                         + "h|help          - Display this help");
+                + "t|test          - Run the test function\n"
+                + "h|help          - Display this help");
     }
-    
+
     /**
-     * This function can be used for testing your own models. Please modify this!
+     * This function can be used for testing your own models. Please modify
+     * this!
      */
     static void runTest() {
-        
+
         // How many ticks? Each one is a week.
         GameThread one = new GameThread(17);
         GameManager gm = one.game;

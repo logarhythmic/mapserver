@@ -1,10 +1,15 @@
 {
     "default_ticks": 10,
     "websocket_port": 8080,
+    "csv_seperator": ",\t",
     "models": [
         {
             "name": "Field",
             "class": "fi.paivola.foodmodel.Field"
+        },
+        {
+            "name": "Weather",
+            "class": "fi.paivola.weathermodel.Weather"
         },
     ]
 }
