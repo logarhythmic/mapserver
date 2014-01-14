@@ -59,9 +59,13 @@ public abstract class Model {
      */
     public LatLng ll;
     /**
-     * List of allowed connection tags.
+     * List of allowed connection names.
      */
-    public List<String> allowedTags;
+    public List<String> allowedNames;
+    /**
+     * Name of this model.
+     */
+    public String name;
     
     /**
      * Is this model a prototype model or not?
@@ -84,7 +88,7 @@ public abstract class Model {
         this.events = new ArrayList<>();
         this.data = new HashMap();
         this.extensions = new HashMap();
-        this.allowedTags = new ArrayList<>();
+        this.allowedNames = new ArrayList<>();
         if(sm == null) {
             this.proto = true;
             this.sm = null;
@@ -162,14 +166,12 @@ public abstract class Model {
 
         this.onTick(last, current);
         for (Map.Entry pairs : this.extensions.entrySet()) {
+            // lets go trough the events ONCE again... this time for extensions
+            for(Event i : _buf){
+                ((ExtensionModel) pairs.getValue()).onEvent(i, current);
+            }
             ((ExtensionModel) pairs.getValue())
                     .onExtensionTickStart(last, current);
-            // lets go trough the events ONCE again... this time for extensions
-            for (Event i : this.events) {
-                if (i.frame == last.index) {
-                    ((ExtensionModel) pairs.getValue()).onEvent(i, current);
-                }
-            }
         }
 
         // lets delete the events that we used
@@ -273,14 +275,26 @@ public abstract class Model {
         }
     }
 
+    /**
+     * Links this model to another model. Note: This is not two way. You need to link it in the other way also.
+     * @param m what to link to
+     * @return true if succeeded, false otherwise
+     */
     public boolean linkModel(Model m) {
         if (this.connections.size() >= this.maxConnections) {
             return false;
         }
-        return this.connections.add(m);
+        if (this.allowedNames.isEmpty() || this.allowedNames.contains(m.name))
+            return this.connections.add(m);
+        return false;
     }
 
-    public boolean delinkModel(Model m) {
+    /**
+     * Removes a link to another model. Note: this is not two way. You need to unlink it in the other way also.
+     * @param m what to unlink from
+     * @return True if succeeded, false otherwise
+     */
+    public boolean unlinkModel(Model m) {
         return this.connections.remove(m);
     }
 
@@ -378,6 +392,7 @@ public abstract class Model {
      * Called when there is a event to handle.
      *
      * @param e event thats handled
+     * @param current current dataframe
      */
     public abstract void onEvent(Event e, DataFrame current);
     
@@ -390,7 +405,8 @@ public abstract class Model {
     public void onActualRegisteration(GameManager gm, SettingMaster sm) {
         sm.type = this.type;
         this.onRegisteration(gm, sm);
-        this.allowedTags = sm.allowedTags;
+        this.name = sm.name;
+        this.allowedNames = sm.allowedNames;
     }
 
     /**

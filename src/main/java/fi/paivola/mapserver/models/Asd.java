@@ -22,7 +22,7 @@ public class Asd extends PointModel {
     public int boomcount;
 
     /**
-     * Constructor, this is needed!
+     * Constructor for actual instances of this model.
      * @param id just pass it around.
      * @param sm theoretically you would get your settings from this.
      */
@@ -31,6 +31,9 @@ public class Asd extends PointModel {
         this.boomcount = 0;
     }
     
+    /**
+     * Constructor for the prototype model, just for calling onRegisteration and such.
+     */
     public Asd() {
         super();
         this.boomcount = 0;
@@ -75,7 +78,8 @@ public class Asd extends PointModel {
         sm.color = new Color(255, 128, 64); // What color is displayed in client.
         sm.settings.put("heepo", new SettingInt("Heepo").setRange(0, 17).setDefault("8"));
         sm.settings.put("heepo2", new SettingList("Heppa").addOption("bum").addOption("pam").setDefault("pam"));
-        sm.allowedTags.add("asdConnection"); // The things trying to get connected to this need satisfy atleast one of these tags.
+        sm.allowedNames.add("asdConnection"); // The things trying to get connected to this need satisfy atleast one of these tags.
+        sm.name = "asd";
     }
 
     /**

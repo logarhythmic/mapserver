@@ -1,31 +1,30 @@
-package fi.paivola.mapserver.models;
+package fi.paivola.weathermodel;
 
-import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
+import fi.paivola.mapserver.core.GlobalModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.utils.Color;
 
 /**
- * Example connection model.
- * @author juhani
+ * Weather class.
+ * @author Jaakko Hannikainen
  */
-public class AsdConnection extends ConnectionModel {
+public class Weather extends GlobalModel {
 
-    public AsdConnection(int id, SettingMaster sm) {
+    Rain rain;
+
+    public Weather(int id, SettingMaster sm) {
         super(id, sm);
-        this.passthrough = true;
     }
     
-    public AsdConnection() {
+    public Weather() {
         super();
-        this.passthrough = true;
     }
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-
+        //current.saveGlobalData("asdness", ""+(parseInt(last.getGlobalData("asdness"))+ 1));
     }
 
     @Override
@@ -35,13 +34,19 @@ public class AsdConnection extends ConnectionModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-        sm.color = new Color(64, 128, 256);
-        sm.name = "asdConnection";
+        sm.name = "Weather";
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+    }
 
+    public static double getRain(int week) {
+        return Rain.getRain(week);
+    }
+
+    public static double getTemperature(int week) {
+        return Temperature.getTemperature(week);
     }
 
 }
