@@ -18,6 +18,6 @@ public class Rain {
             throw new IllegalArgumentException("week must be positive");
         week%=52;
         week/=4;
-        return Math.random() * 100 < rainProb[week] ? (rainAvrg[week]:0;
+        return Math.random() * 100 < rainProb[week] ? rainAvrg[week]:0;
     }
 }
