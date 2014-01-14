@@ -12,6 +12,8 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  */
 public class Weather extends GlobalModel {
 
+    Rain rain;
+
     public Weather(int id, SettingMaster sm) {
         super(id, sm);
     }
@@ -37,6 +39,14 @@ public class Weather extends GlobalModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+    }
+
+    public static double getRain(int week) {
+        return Rain.getRain(week);
+    }
+
+    public static double getTemperature(int week) {
+        return Temperature.getTemperature(week);
     }
 
 }
