@@ -90,20 +90,22 @@ public class App {
         sm.settings.get("luck").setValue("0.7");
         mg.onActualUpdateSettings(sm);
 
-        Model populationPoint = gm.createModel("populationPoint", sm);
-        Model p1 = gm.createModel("examplePoint");
-        Model c1 = gm.createModel("exampleConnection");
-        Model p2 = gm.createModel("examplePoint");
-        Model c2 = gm.createModel("exampleConnection");
-        Model p3 = gm.createModel("examplePoint");
-        Model c3 = gm.createModel("exampleConnection");
-        Model c4 = gm.createModel("routeA");
+        int size = 32;
 
-        // And link!
-        gm.linkModelsWith(p1, p2, c1);
-        gm.linkModelsWith(p2, p3, c2);
-        gm.linkModelsWith(p3, p1, c3);
-        gm.linkModelsWith(populationPoint, p1, c4);
+        Model[] points = new Model[size];
+        Model[] conns = new Model[size];
+
+        for (int i = 0; i < size; i++) {
+            points[i] = gm.createModel("examplePoint");
+            conns[i] = gm.createModel("exampleConnection");
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (i > 0) {
+                gm.linkModelsWith(points[i - 1], points[i], conns[i - 1]);
+            }
+        }
+        gm.linkModelsWith(points[size - 1], points[0], conns[size - 1]);
 
         // Print final data in the end?
         if (!profilingRun) {
