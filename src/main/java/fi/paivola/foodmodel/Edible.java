@@ -43,6 +43,6 @@ public abstract class Edible {
         this.area = area;
     }
     
-    abstract double onTick(DataFrame last);
+    abstract double onTick(DataFrame last, DataFrame current);
 
 }

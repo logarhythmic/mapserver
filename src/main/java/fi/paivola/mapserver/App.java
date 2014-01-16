@@ -79,16 +79,17 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread(17);
+        GameThread one = new GameThread(5);
         GameManager gm = one.game;
         
+        gm.createModel("Weather");
+
         SettingMaster sm = one.game.getDefaultSM("Field");
-        sm.settings.put("content", new SettingString("content", "wheat"));
-        
+        sm.settings.get("content").setValue("wheat");
         // Create and add
-        Model m = gm.createModel("Field", sm);
+        Model m = gm.createModel("Field");
         
-        one.game.printOnDone = 1;
+        one.game.printOnDone = 2;
         // Start the gamethread
         one.start();
     }

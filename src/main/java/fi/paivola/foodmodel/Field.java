@@ -19,7 +19,8 @@ public class Field extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        double d = this.content.onTick(last);
+        System.out.println(content);
+        double d = this.content.onTick(last, current);
         this.saveDouble("foodAmount", d);
     }
 
@@ -33,41 +34,41 @@ public class Field extends PointModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
+        System.out.println("Spröl");
         sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
-        if(!sm.settings.containsKey("content"))
-            sm.settings.put("content", new SettingString("content", "empty"));
+        sm.settings.put("content", new SettingString("content", "empty"));
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        content = new Empty();
         content.setArea(1);
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        if(sm.settings.containsKey("content")) {
-            switch(sm.settings.get("content").getValue().toLowerCase()) {
-                case "empty":
-                    content = new Empty();
-                    break;
-                case "wheat":
-                    content = new Wheat();
-                    break;
-                case "maize":
-                    content = new Maize();
-                    break;
-                case "sorghum":
-                    content = new Sorghum();
-                    break;
-                default:
-                    // Should this fail or not?
-                    content = new Empty();
-                    break;
-            }
-        }
+        setContents(sm.settings.get("content").getValue().toLowerCase());
         this.content.setArea(Double.parseDouble(sm.settings.get("area").getValue()));
+    }
+
+    public void setContents(String newContent) {
+        switch(newContent) {
+            case "empty":
+                content = new Empty();
+                break;
+            case "wheat":
+                content = new Wheat();
+                break;
+            case "maize":
+                content = new Maize();
+                break;
+            case "sorghum":
+                content = new Sorghum();
+                break;
+            default:
+                // Should this fail or not?
+                throw new UnsupportedOperationException();
+        }
     }
 }
 

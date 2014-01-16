@@ -104,7 +104,7 @@ public abstract class Crop extends Edible {
     }
 
     @Override
-    public double onTick(DataFrame last) {
+    public double onTick(DataFrame last, DataFrame current) {
         if(this.getCurrentGrowTime() == this.getGrowTime()) {
             currentStoredFood += this.getCurrentIndexMultiplier() /
                     this.getGrowTime() * this.getArea() * this.getMaxYield();
@@ -125,15 +125,15 @@ public abstract class Crop extends Edible {
     }
     
     private double getWaterIndex(DataFrame last) {
-        return waterDistribution.exact(Weather.getRain(last.index));
+        return waterDistribution.exact(last.getGlobalDouble("rain"));
     }
     
     private double getTemperatureIndex(DataFrame last) {
-        return temperatureDistribution.exact(Weather.getTemperature(last.index));
+        return temperatureDistribution.exact(last.getGlobalDouble("temperature"));
     }
 
     private double getSunshineIndex(DataFrame last) {
-        return sunlightDistribution.random();
+        return sunlightDistribution.exact(last.getGlobalDouble("sunlight"));
     }
 
     // Looks like this won't be coming soon, leaving it to optimal.

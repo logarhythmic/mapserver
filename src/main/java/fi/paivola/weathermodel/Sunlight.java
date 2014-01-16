@@ -12,10 +12,10 @@ public class Sunlight {
     private Sunlight() {}
 
     public static double getSunlight(int week) {
-        if(week < 0 || week > 51)
+        if(week < 0)
             throw new IllegalArgumentException("week must be positive");
         week%=52;
-        week/=4;
+        week/=52*12;
         return sunAvg[week];
     }
 }

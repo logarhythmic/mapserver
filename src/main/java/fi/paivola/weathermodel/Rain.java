@@ -14,10 +14,10 @@ public class Rain {
     private Rain() {}
 
     public static double getRain(int week) {
-        if(week < 0 || week > 51)
-            throw new IllegalArgumentException("week must be positive");
+        if(week < 0)
+            throw new IllegalArgumentException("week must be positive (got " + week + ")");
         week%=52;
-        week/=4;
+        week/=52*12;
         return Math.random() * 100 < rainProb[week] ? rainAvrg[week]:0;
     }
 }

@@ -16,10 +16,10 @@ public class Temperature {
     private Temperature() {}
 
     public static double getTemperature(int week) {
-        if(week < 0 || week > 51)
+        if(week < 0)
             throw new IllegalArgumentException("week must be positive");
         week%=52;
-        week/=4;
+        week/=52*12;
         return tempMin[week] + (tempMax[week] - tempMin[week]) / 2;
     }
 }

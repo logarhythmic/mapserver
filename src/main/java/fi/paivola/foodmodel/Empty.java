@@ -11,10 +11,11 @@ public class Empty extends Edible {
 
     public Empty() {
         super("Empty");
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    double onTick(DataFrame last) {
+    double onTick(DataFrame last, DataFrame current) {
         return 0;
     }
     
