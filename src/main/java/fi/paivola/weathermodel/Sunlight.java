@@ -15,6 +15,6 @@ public class Sunlight {
 
     public static double getSunlight(Calendar date) {
         int month = date.get(Calendar.MONTH);
-        return sunAvg[month];
+        return sunAvg[month] * 7;
     }
 }
