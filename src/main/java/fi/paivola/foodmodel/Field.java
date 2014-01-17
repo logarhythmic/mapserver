@@ -9,7 +9,9 @@ import fi.paivola.mapserver.core.setting.*;
 public class Field extends PointModel {
 
     private Edible content;
-    
+    private String contentString;
+    private double area;
+
     /**
      * Main constructor for the food model
      */
@@ -19,7 +21,6 @@ public class Field extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        System.out.println(content);
         double d = this.content.onTick(last, current);
         this.saveDouble("foodAmount", d);
     }
@@ -34,7 +35,6 @@ public class Field extends PointModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-        System.out.println("Spröl");
         sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
         sm.settings.put("content", new SettingString("content", "empty"));
@@ -42,16 +42,19 @@ public class Field extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        content.setArea(1);
+        setContents(contentString);
+        content.setArea(this.area);
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
         setContents(sm.settings.get("content").getValue().toLowerCase());
-        this.content.setArea(Double.parseDouble(sm.settings.get("area").getValue()));
+        this.area = Double.parseDouble(sm.settings.get("area").getValue());
+        this.content.setArea(this.area);
     }
 
     public void setContents(String newContent) {
+        this.contentString = newContent;
         switch(newContent) {
             case "empty":
                 content = new Empty();
