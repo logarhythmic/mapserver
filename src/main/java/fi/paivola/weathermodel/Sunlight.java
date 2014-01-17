@@ -1,5 +1,7 @@
 package fi.paivola.weathermodel;
 
+import java.util.Calendar;
+
 /**
  * Sunlight class.
  * @author Jaakko Hannikainen
@@ -11,11 +13,8 @@ public class Sunlight {
     // XXX: quick dumb implementation
     private Sunlight() {}
 
-    public static double getSunlight(int week) {
-        if(week < 0 || week > 51)
-            throw new IllegalArgumentException("week must be positive");
-        week%=52;
-        week/=4;
-        return sunAvg[week];
+    public static double getSunlight(Calendar date) {
+        int month = date.get(Calendar.MONTH);
+        return sunAvg[month];
     }
 }

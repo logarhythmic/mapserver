@@ -1,5 +1,7 @@
 package fi.paivola.weathermodel;
 
+import java.util.Calendar;
+
 /**
  * Rain class.
  * @author Jaakko Hannikainen
@@ -13,11 +15,8 @@ public class Rain {
     // XXX: quick dumb implementation
     private Rain() {}
 
-    public static double getRain(int week) {
-        if(week < 0 || week > 51)
-            throw new IllegalArgumentException("week must be positive");
-        week%=52;
-        week/=4;
-        return Math.random() * 100 < rainProb[week] ? (rainAvrg[week]:0;
+    public static double getRain(Calendar date) {
+        int month = date.get(Calendar.MONTH);
+        return Math.random() * 100 < rainProb[month] ? rainAvrg[month] / rainProb[month]:0;
     }
 }

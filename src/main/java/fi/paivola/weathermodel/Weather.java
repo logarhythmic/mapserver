@@ -5,6 +5,7 @@ import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GlobalModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import java.util.Calendar;
 
 /**
  * Weather class.
@@ -12,20 +13,15 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  */
 public class Weather extends GlobalModel {
 
-    Rain rain;
-
-    public Weather(int id, SettingMaster sm) {
-        super(id, sm);
-    }
-    
-    public Weather() {
-        super();
+    public Weather(int id) {
+        super(id);
     }
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-    	current.saveGlobalData("rain", getRain(current.index));
-    	current.saveGlobalData("temperature", getTemperature(current.index));
+    	current.saveGlobalData("rain", getRain(current.getDate()));
+    	current.saveGlobalData("temperature", getTemperature(current.getDate()));
+    	current.saveGlobalData("sunlight", getSunlight(current.getDate()));
     }
 
     @Override
@@ -40,17 +36,23 @@ public class Weather extends GlobalModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+    	df.saveGlobalData("rain", getRain(df.getDate()));
+    	df.saveGlobalData("temperature", getTemperature(df.getDate()));
+    	df.saveGlobalData("sunlight", getSunlight(df.getDate()));
     }
 
-    public static double getRain(int week) {
-        return Rain.getRain(week);
+    public void onUpdateSettings(SettingMaster sm) {
     }
 
-    public static double getTemperature(int week) {
-        return Temperature.getTemperature(week);
+    public static double getRain(Calendar date) {
+        return Rain.getRain(date);
     }
 
-    public static double getSunlight(int week) {
-        return Sunlight.getSunlight(week);
+    public static double getTemperature(Calendar date) {
+        return Temperature.getTemperature(date);
+    }
+
+    public static double getSunlight(Calendar date) {
+        return Sunlight.getSunlight(date);
     }
 }
