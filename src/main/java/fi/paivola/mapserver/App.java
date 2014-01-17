@@ -6,7 +6,6 @@ import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.population.PopulationCenter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,24 +78,24 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 2));
         GameManager gm = one.game;
 
         // Create and add
-        Model mg = gm.createModel("exampleGlobal");
+//        Model mg = gm.createModel("exampleGlobal");
 
         // This is how you change a "setting" from the code.
-        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
-        sm.settings.get("luck").setValue("0.7");
-        mg.onActualUpdateSettings(sm);
+//        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
+//        sm.settings.get("luck").setValue("0.7");
+//        mg.onActualUpdateSettings(sm);
 
-        int size = 32;
+        int size = 1;
 
         Model[] points = new Model[size];
         Model[] conns = new Model[size];
 
         for (int i = 0; i < size; i++) {
-            points[i] = gm.createModel("examplePoint");
+            points[i] = gm.createModel("populationPoint");
             conns[i] = gm.createModel("exampleConnection");
         }
 

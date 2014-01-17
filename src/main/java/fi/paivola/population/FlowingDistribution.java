@@ -12,9 +12,7 @@ public class FlowingDistribution  {
     /**
      * distribution-array
      */
-    private Double[]    quantities;
-    private Double      first;
-    private Double      last;
+    private double[]    quantities;
     private double      annualFlowPc; // 0..1
     
     /**
@@ -44,28 +42,21 @@ public class FlowingDistribution  {
      * @param dt Time-step in weeks
      */
     public void step(int dt) {
-        Double[] newQuantities = new Double[ this.quantities.length ];
+        double[] newQuantities = new double[ this.quantities.length ];
         for (int i = 0; i != this.quantities.length; ++i) {
-            if (i == 0) continue; // nothing flows to the first quantity
             final double dtYears = dt / Constants.WEEKS_IN_YEAR;
+            if (i == 0) {
+                newQuantities[0] = this.quantities[i] -
+                    this.quantities[i] * annualFlowPc * dtYears;
+                continue;
+            }
             newQuantities[i] = this.quantities[i] + (this.quantities[i-1]
                     - this.quantities[i]) * annualFlowPc * dtYears;
         }
         this.quantities = newQuantities;
-        reassignPointers(); // not sure if actually necessary, dunno java
     }
     
-    public Double getFirstQuantity()
-    {
-        return first;
-    }
-    
-    public Double getLastQuantity()
-    {
-        return last;
-    }
-    
-    public Double[] getQuantities() {
+    public double[] getQuantities() {
         return this.quantities;
     }
 
@@ -74,16 +65,10 @@ public class FlowingDistribution  {
     }
     
     private void setContentFromDebug(int amQuantities) {
-        this.quantities = new Double[amQuantities];
+        this.quantities = new double[amQuantities];
         for (int i = 0; i != amQuantities; ++i)
         {
-            this.quantities[i] = new Double( 10 * (amQuantities-i) );
+            this.quantities[i] = 10 * (amQuantities-i);
         }
-        reassignPointers();
-    }
-    
-    private void reassignPointers() {
-        this.first = this.quantities[0];
-        this.last = this.quantities[ this.quantities.length - 1 ];
     }
 }
