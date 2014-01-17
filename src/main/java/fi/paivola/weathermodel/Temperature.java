@@ -1,5 +1,6 @@
 package fi.paivola.weathermodel;
 
+import java.util.Calendar;
 import java.util.Random;
 
 /**
@@ -15,11 +16,8 @@ public class Temperature {
     // XXX: quick dumb implementation
     private Temperature() {}
 
-    public static double getTemperature(int week) {
-        if(week < 0)
-            throw new IllegalArgumentException("week must be positive");
-        week%=52;
-        week/=52*12;
-        return tempMin[week] + (tempMax[week] - tempMin[week]) / 2;
+    public static double getTemperature(Calendar date) {
+        int month = date.get(Calendar.MONTH);
+        return tempMin[month] + (tempMax[month] - tempMin[month]) / 2;
     }
 }
