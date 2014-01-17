@@ -51,9 +51,9 @@ public abstract class Crop extends Edible {
         temperatureMinimum = tmin;
         temperatureOptimal = topt;
         temperatureMaximum = tmax;
-        sunlightMinimum = smin/7;
-        sunlightOptimal = sopt/7;
-        sunlightMaximum = smax/7;
+        sunlightMinimum = smin;
+        sunlightOptimal = sopt;
+        sunlightMaximum = smax;
         phMinimum = phmin;
         phOptimal = phopt;
         phMaximum = phmax;
