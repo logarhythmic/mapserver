@@ -74,12 +74,6 @@ public class River extends ConnectionModel
     public void onGenerateDefaults(DataFrame df){
         
     }
-
-    @Override
-    public void addEvent(Event e, Model m) 
-    {
-        super.addEvent(e, m);
-    }
     
     @Override
     public void onUpdateSettings(SettingMaster sm){
