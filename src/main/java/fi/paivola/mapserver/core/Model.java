@@ -8,7 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -35,13 +34,9 @@ public abstract class Model {
      */
     public List<Model> connections;
     /**
-     * List of events waiting.
-     */
-    public List<Event> events;
-    /**
      * All data that are automatically saved to a DataFrame.
      */
-    public Map<String, String> data;
+    public Map<String, Object> data;
     /**
      * Extension models that are active.
      */
@@ -50,10 +45,6 @@ public abstract class Model {
      * Maximum connections.
      */
     public int maxConnections;
-    /**
-     * Who is your daddy.
-     */
-    public Model parent = null;
     /**
      * Latitude & Longitude
      */
@@ -84,13 +75,13 @@ public abstract class Model {
     public Model(int id) {
         this.id = id;
         this.connections = new ArrayList<>();
-        this.events = new ArrayList<>();
         this.data = new HashMap();
         this.extensions = new HashMap();
         this.allowedNames = new ArrayList<>();
         this.proto = id == -1;
         this.needsSM = !this.proto;
         this.ll = new LatLng(0, 0);
+        this.name = "";
     }
 
     /**
@@ -144,36 +135,24 @@ public abstract class Model {
             return;
         }
 
-        // lets check if there is some events waiting to get trough
-        // fixes java.util.ConcurrentModificationException
-        List<Event> _buf = new ArrayList<>();
-        for (Event i : this.events) {
-            if (i.frame == last.index) {
-                _buf.add(i);
-            }
-        }
-        for (Event i : _buf) {
+        List<Event> events = last.getEventsFor(this);
+
+        for (Event i : events) {
             this.onEvent(i, current);
         }
-        
+
         this.onTick(last, current);
         for (Map.Entry pairs : this.extensions.entrySet()) {
             // lets go trough the events ONCE again... this time for extensions
-            for (Event i : _buf) {
+            ((ExtensionModel) pairs.getValue()).data = data;
+            for (Event i : events) {
                 ((ExtensionModel) pairs.getValue()).onEvent(i, current);
             }
             ((ExtensionModel) pairs.getValue())
-                    .onExtensionTickStart(last, current);
+                    .onTickStart(last, current);
+            data = ((ExtensionModel) pairs.getValue()).data;
         }
 
-        // lets delete the events that we used
-        Iterator<Event> it = this.events.iterator();
-        while (it.hasNext()) {
-            if (it.next().frame == last.index) {
-                it.remove();
-            }
-        }
-        
         this.dumpToDataFrame(current);
     }
 
@@ -190,26 +169,21 @@ public abstract class Model {
     }
 
     /**
-     * Adds an event to this model
-     *
-     * @param e event to add
-     * @param m model from where the event originates
-     */
-    public void addEvent(Event e, Model m) {
-        this.events.add(e);
-    }
-
-    /**
-     * Adds a event to all connections.
+     * Adds a event to specific model. If that model is a pass through
+     * connection, it will be added forward.
      *
      * @param model the target of the event
      * @param frame dataframe of when it's added
      * @param e event thats added
      */
     public void addEventTo(Model model, DataFrame frame, Event e) {
-        e.frame = frame.index;
+        Model target = model;
+        while (target instanceof ConnectionModel && ((ConnectionModel) target).passthrough) {
+            target = ((ConnectionModel) target).other(this);
+        }
         e.sender = this;
-        model.addEvent(e, this);
+        e.target = target;
+        frame.addEvent(e);
     }
 
     /**
@@ -219,10 +193,8 @@ public abstract class Model {
      * @param e event thats added
      */
     public void addEventToAll(DataFrame frame, Event e) {
-        e.frame = frame.index;
-        e.sender = this;
         for (Model i : this.connections) {
-            i.addEvent(e, this);
+            this.addEventTo(i, frame, new Event(e));
         }
     }
 
@@ -297,87 +269,87 @@ public abstract class Model {
     }
 
     /**
-     * Saves an integer. Will be saved to dataframe. Uses parents data if
-     * possible.
+     * Saves an integer. Will be saved to dataframe.
      *
      * @param name name of the integer
      * @param a actual integer
+     * @return
      */
-    public void saveInt(String name, int a) {
-        if (this.parent != null) {
-            this.parent.saveInt(name, a);
-        } else {
-            this.data.put(name, "" + a);
-        }
+    public boolean saveInt(String name, int a) {
+        return this.data.put(name, "" + a) == null;
     }
 
     /**
-     * Saves a double. Will be saved to dataframe. Uses parents data if
-     * possible.
+     * Saves a double. Will be saved to dataframe.
      *
      * @param name name of the double
      * @param a actual double
+     * @return
      */
-    public void saveDouble(String name, double a) {
-        if (this.parent != null) {
-            this.parent.saveDouble(name, a);
-        } else {
-            this.data.put(name, "" + a);
-        }
+    public boolean saveDouble(String name, double a) {
+        return this.data.put(name, "" + a) == null;
     }
 
     /**
-     * Saves a string. Will be saved to dataframe. Uses parents data if
-     * possible.
+     * Saves a string. Will be saved to dataframe.
      *
      * @param name name of the string
      * @param a actual string
+     * @return
      */
-    public void saveString(String name, String a) {
-        if (this.parent != null) {
-            this.parent.saveString(name, a);
-        } else {
-            this.data.put(name, a);
-        }
+    public boolean saveString(String name, String a) {
+        return this.data.put(name, a) == null;
     }
 
     /**
-     * Gets an integer. Uses parents data if possible.
+     * Saves a object. Will be saved to dataframe.
+     *
+     * @param name
+     * @param a
+     * @return
+     */
+    public boolean saveData(String name, Object a) {
+        return this.data.put(name, a) == null;
+    }
+
+    /**
+     * Gets an integer.
      *
      * @param name name of the integer
      * @return the integer or null
      */
     public int getInt(String name) {
-        if (this.parent != null) {
-            return this.parent.getInt(name);
-        }
-        return parseInt(this.data.get(name));
+        return parseInt(getData(name).toString());
     }
 
     /**
-     * Gets a double. Uses parents data if possible.
+     * Gets a double.
      *
      * @param name name of the double
      * @return the double or null
      */
     public double getDouble(String name) {
-        if (this.parent != null) {
-            return this.parent.getDouble(name);
-        }
-        return parseDouble(this.data.get(name));
+        return parseDouble(getData(name).toString());
     }
 
     /**
-     * Gets a string. Uses parents data if possible.
+     * Gets a string.
      *
      * @param name name of the string
      * @return the string or null
      */
     public String getString(String name) {
-        if (this.parent != null) {
-            return this.parent.getString(name);
-        }
-        return (this.data.get(name));
+        return getData(name).toString();
+    }
+
+    /**
+     * Gets a object.
+     *
+     * @param name name of the object
+     * @return the object or null
+     */
+    public Object getData(String name) {
+        return this.data.get(name);
     }
 
     /**
@@ -407,8 +379,13 @@ public abstract class Model {
     public void onActualRegisteration(GameManager gm, SettingMaster sm) {
         sm.type = this.type;
         this.onRegisteration(gm, sm);
-        this.name = sm.name;
+        if (this.name.isEmpty()) {
+            this.name = sm.name;
+        } else if (sm.name.isEmpty()) {
+            sm.name = this.name;
+        }
         this.allowedNames = sm.allowedNames;
+
     }
 
     /**
@@ -420,6 +397,22 @@ public abstract class Model {
      * @param sm setting master
      */
     public abstract void onRegisteration(GameManager gm, SettingMaster sm);
+
+    /**
+     * Called when there is a need for default values (for step 0). Calls
+     * onGenerateDefaults on this and children.
+     *
+     * @param df
+     */
+    public void onActualGenerateDefaults(DataFrame df) {
+        this.onGenerateDefaults(df);
+        for (Map.Entry pairs : this.extensions.entrySet()) {
+            ((ExtensionModel) pairs.getValue()).data = data;
+            ((ExtensionModel) pairs.getValue()).onGenerateDefaults(df);
+            data = ((ExtensionModel) pairs.getValue()).data;
+        }
+        this.dumpToDataFrame(df);
+    }
 
     /**
      * Called when the module is asked for defaults, use save* here.
@@ -436,8 +429,14 @@ public abstract class Model {
      */
     public void onActualUpdateSettings(SettingMaster sm) {
         this.needsSM = false;
-        this.name = sm.name;
+        if (this.name.isEmpty()) {
+            this.name = sm.name;
+        }
         this.onUpdateSettings(sm);
+
+        for (Map.Entry pairs : this.extensions.entrySet()) {
+            ((ExtensionModel) pairs.getValue()).onActualUpdateSettings(sm);
+        }
     }
 
     /**
@@ -446,4 +445,5 @@ public abstract class Model {
      * @param sm
      */
     public abstract void onUpdateSettings(SettingMaster sm);
+
 }
