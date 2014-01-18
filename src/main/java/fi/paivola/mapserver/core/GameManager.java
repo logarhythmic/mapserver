@@ -1,6 +1,5 @@
 package fi.paivola.mapserver.core;
 
-import fi.paivola.mapserver.core.setting.Setting;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.utils.CCs;
 import java.io.IOException;
@@ -12,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
@@ -44,7 +47,10 @@ public class GameManager {
      * All of the active models, EG. objects.
      */
     private final Map<String, Model> active_models;
-    private SettingsParser sp;
+    /**
+     * Extensions that are waiting for a while.
+     */
+    private final List<CCs> waiting_extensions;
     /**
      * How many models are active / where are we going.
      */
@@ -53,9 +59,11 @@ public class GameManager {
      * Should we print final data when done?
      */
     public int printOnDone = 0;
-    
+
     private final static Logger log = Logger.getLogger("mapserver");
-    
+
+    private ExecutorService es;
+
     /**
      * Are we done?
      */
@@ -66,17 +74,22 @@ public class GameManager {
         this.tick_current = 0;
         this.frames = new ArrayList<>();
         this.active_models = new HashMap<>();
+        this.waiting_extensions = new ArrayList<>();
         this.current_id = 0;
+
         log.setLevel(Level.FINE);
 
-        try {
-            this.sp = new SettingsParser(settings_file);
-            this.models = this.sp.getModels();
-        } catch (IOException | ParseException ex) {
-            Logger.getLogger(GameManager.class.getName())
-                    .log(Level.SEVERE, null, ex);
+        if (SettingsParser.settings == null) {
+            try {
+                SettingsParser.parse();
+            } catch (IOException | ParseException ex) {
+                Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
+        this.models = SettingsParser.getModels();
+
+        DataFrame.dataSeperator = SettingsParser.settings.get("csv_seperator").toString();
         clearFrames();
         runRegisterations();
     }
@@ -95,15 +108,15 @@ public class GameManager {
             cls = (Class) ((CCs) pair.getValue()).cls;
             Constructor<Model> c;
             log.log(Level.FINE, "Registering {0}", pair.getKey());
-            
+
             SettingMaster blank = new SettingMaster();
-            
+
             try {
-                c = cls.getDeclaredConstructor();
+                c = cls.getDeclaredConstructor(int.class);
                 c.setAccessible(true);
                 Model m;
                 try {
-                    m = c.newInstance();
+                    m = c.newInstance(-1);
                     m.onActualRegisteration(this, blank);
                     ((CCs) pair.getValue()).sm = blank;
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -115,33 +128,38 @@ public class GameManager {
                         .log(Level.SEVERE, null, ex);
             }
         }
+        for (CCs c : this.waiting_extensions) {
+            SettingMaster sl = this.getDefaultSM(c.cls);
+            this.models.get(c.misc).clss.put(sl.name, c.cls);
+            this.models.get(c.misc).sm.settings.putAll(sl.settings);
+        }
     }
-    
+
     /**
      * Get all of the default SettingMasters.
-     * 
-     * @return 
+     *
+     * @return
      */
     public Map<String, JSONObject> getSettings() {
         Map<String, JSONObject> settings = new HashMap<>();
         for (Map.Entry pair : this.models.entrySet()) {
-            settings.put(pair.getKey().toString(), ((CCs)pair.getValue()).sm.getJSONObject());
+            settings.put(pair.getKey().toString(), ((CCs) pair.getValue()).sm.getJSONObject());
         }
         return settings;
     }
-    
+
     /**
      * Get all of the data formatted somehow.
-     * 
-     * @return 
+     *
+     * @return
      */
     public Map<String, String[]> getData() {
         Map<String, String[]> data = new HashMap<>();
-        
+
         for (int i = 0; i < this.tick_amount; i++) {
-            data.put(""+i, this.frames.get(i).getATonOfStrings());
+            data.put("" + i, this.frames.get(i).getATonOfStrings());
         }
-        
+
         return data;
     }
 
@@ -155,15 +173,24 @@ public class GameManager {
         }
     }
 
-    public boolean addModel(Model m, String type) {
+    /**
+     * DON'T CALL THIS MANUALLY!
+     *
+     * @param m Model
+     * @param type type of that model
+     * @return true if successful, false otherwise
+     */
+    private boolean addModel(Model m, String type) {
         m.addExtensions(this, models.get(type).clss);
-        return (this.active_models.put(""+m.id, m) == null);
+        return (this.active_models.put("" + m.id, m) == null);
     }
 
     /**
-     * Creates a model based on a SettingMaster.
+     * Creates a model based on a SettingMaster and adds that to the active
+     * model pool.
      *
      * @param type name of the models type
+     * @param sm
      * @return returns the model if success, null otherwise
      */
     public Model createModel(String type, SettingMaster sm) {
@@ -172,10 +199,11 @@ public class GameManager {
         Model m = null;
         try {
             Constructor<Model> c;
-            c = cls.getDeclaredConstructor(int.class, SettingMaster.class);
+            c = cls.getDeclaredConstructor(int.class);
             c.setAccessible(true);
             try {
-                m = c.newInstance(this.current_id++, sm);
+                m = c.newInstance(this.current_id++);
+                m.onActualUpdateSettings(sm);
             } catch (InstantiationException | IllegalAccessException |
                     IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(GameManager.class.getName())
@@ -185,11 +213,16 @@ public class GameManager {
             Logger.getLogger(GameManager.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
-        return m;
+        if (this.addModel(m, type)) {
+            return m;
+        }
+        return null;
     }
-    
+
     /**
-     * Creates a model with the default SettingMaster for that model.
+     * Creates a model with the default SettingMaster for that model and adds
+     * that to the active model pool.
+     *
      * @param type name of the models type
      * @return returns the model if success, null otherwise
      */
@@ -215,40 +248,56 @@ public class GameManager {
 
         return true;
     }
-    
+
+    /**
+     * Links two models together using a third model.
+     *
+     * @param from first model
+     * @param to second model
+     * @param with model to link with
+     * @return returns true if successful, false otherwise
+     */
+    public boolean linkModelsWith(Model from, Model to, Model with) {
+        if (!this.linkModels(from, with)) {
+            return false;
+        }
+
+        return this.linkModels(with, to);
+    }
+
     /**
      * Do we know a model by this id. ToDo: Better way :-)
-     * 
+     *
      * @param id id of the model
-     * @return   Returns true if contains, false otherwise
+     * @return Returns true if contains, false otherwise
      */
     public boolean containsModel(int id) {
-        return id<this.current_id;
+        return id < this.current_id;
     }
-    
+
     /**
      * Gets a model by id.
-     * 
+     *
      * @param id id of the model
-     * @return   Returns the model
+     * @return Returns the model
      */
     public Model getActive(String id) {
         return this.active_models.get(id);
     }
-    
+
     /**
      * Gets the default SettingMaster for specified model type.
-     * 
+     *
      * @param type what model type are you looking for
      * @return SettingMaster
      */
     public SettingMaster getDefaultSM(String type) {
         return this.models.get(type).sm;
     }
-    
+
     /**
      * Gets the default SettingMaster for specified class.
-     * 
+     *
      * @param cls what model type are you looking for
      * @return SettingMaster
      */
@@ -257,8 +306,8 @@ public class GameManager {
          * Lets find our name...
          */
         String type = "";
-        for(Entry<String, CCs> e : this.models.entrySet()) {
-            if(cls.equals(e.getValue().cls)) {
+        for (Entry<String, CCs> e : this.models.entrySet()) {
+            if (cls.equals(e.getValue().cls)) {
                 type = e.getKey();
             }
         }
@@ -270,14 +319,9 @@ public class GameManager {
      *
      * @param m model from where to get the defaults
      * @param df dataframe to populate to
-     * @return returns true
      */
-    public boolean populateDefaults(Model m, DataFrame df) {
-
-        m.onGenerateDefaults(df);
-        m.dumpToDataFrame(df);
-
-        return true;
+    public void populateDefaults(Model m, DataFrame df) {
+        m.onActualGenerateDefaults(df);
     }
 
     /**
@@ -286,27 +330,31 @@ public class GameManager {
      * @return returns true
      */
     public boolean stepTrough() {
-        
+
         log.log(Level.FINE, "Stepping trough");
+
+        this.es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         while (this.tick_current <= this.tick_amount) {
             this.step();
-            if(this.printOnDone == 2) {
+            if (this.printOnDone == 2) {
                 String[] tmparr = this.frames.get(this.tick_current - 1).getATonOfStrings();
-                System.out.println("TICK: "+(this.tick_current - 1));
+                System.out.println("TICK: " + (this.tick_current - 1));
                 for (String s : tmparr) {
                     System.out.println(s);
                 }
             }
         }
-        
+
+        this.es.shutdown();
+
         this.ready = true;
         log.log(Level.FINE, "Stepped trough");
-        
-        if(this.printOnDone == 1) {
-            for(Entry<String, String[]> e : this.getData().entrySet()) {
-                System.out.println("TICK: "+e.getKey());
-                for(String s : e.getValue()) {
+
+        if (this.printOnDone == 1) {
+            for (Entry<String, String[]> e : this.getData().entrySet()) {
+                System.out.println("TICK: " + e.getKey());
+                for (String s : e.getValue()) {
                     System.out.println(s);
                 }
             }
@@ -326,18 +374,30 @@ public class GameManager {
 
         DataFrame current = this.frames.get(this.tick_current);
         current.locked = false;
+
+        CountDownLatch latch = new CountDownLatch(this.active_models.size());
+
         if (this.tick_current > 0) {
             DataFrame last = this.frames.get(this.tick_current - 1);
             for (Model value : this.active_models.values()) {
-                value.onTickStart(last, current);
+                es.execute(new ModelRunner(latch, value, last, current, false));
+                //value.onTickStart(last, current);
             }
         } else { //step 0 needs to use default values
             log.log(Level.FINE, "Generating defaults ({0})", this.active_models.size());
             for (Model value : this.active_models.values()) {
-                this.populateDefaults(value, current);
+                es.execute(new ModelRunner(latch, value, null, current, true));
+                //this.populateDefaults(value, current);
             }
             log.log(Level.FINE, "Done");
         }
+
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GameManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         current.locked = true;
 
         this.tick_current++;
@@ -349,11 +409,12 @@ public class GameManager {
      * Adds a extender that will be added to each subsequent target model.
      *
      * @param towhere the models name where to add
-     * @param name name of the extender
      * @param cls the extending class
      */
-    public void registerExtension(String towhere, String name, Object cls) {
-        this.models.get(towhere).clss.put(name, cls);
+    public void registerExtension(String towhere, Class cls) {
+        CCs tmp = new CCs(cls);
+        tmp.misc = towhere;
+        this.waiting_extensions.add(tmp);
     }
 
 }
