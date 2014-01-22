@@ -11,6 +11,8 @@ public class Field extends PointModel {
     private Edible content;
     private String contentString;
     private double area;
+    private double lastfood = 0;
+    private int index = 1;
 
     /**
      * Main constructor for the food model
@@ -22,12 +24,20 @@ public class Field extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         double d = this.content.onTick(last, current);
+        if(d != lastfood) {
+            this.saveDouble("avgFood", d/index++);
+            lastfood = d;
+            addEventToAll(current, new Event("cropReady", Event.Type.DOUBLE,
+                        d));
+        }
         this.saveDouble("foodAmount", d);
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
         switch(e.name) {
+            case "gather":
+                break;
             default:
                 break;
         }

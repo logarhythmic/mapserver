@@ -5,6 +5,7 @@ import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.*;
 import fi.paivola.weathermodel.Weather;
 import java.util.Map;
+import java.util.Calendar;
 /**
  * @author Jaakko Hannikainen
  * Generic class for field products, eg. maize.
@@ -103,8 +104,17 @@ public abstract class Crop extends Edible {
                                                   getPHMaximum());
     }
 
+    public void resetCrop() {
+        this.setCurrentGrowTime(0);
+        this.setCurrentIndexMultiplier(0);
+    }
+
     @Override
     public double onTick(DataFrame last, DataFrame current) {
+        int month = current.getDate().get(Calendar.MONTH);
+        if(month == 1 || month == 2 || month == 12)
+            resetCrop();
+
         if(this.getCurrentGrowTime() == this.getGrowTime()) {
             currentStoredFood += this.getCurrentIndexMultiplier() /
                     this.getGrowTime() * this.getArea() * this.getMaxYield();
@@ -120,6 +130,16 @@ public abstract class Crop extends Edible {
         return currentStoredFood;
     }
    
+    public double gather(double max) {
+        double ret = getCurrentStoredFood();
+        if(max < 0 || max > ret) {
+            currentStoredFood = 0;
+            return ret;
+        }
+        currentStoredFood -= max;
+        return d - currentStoredFood;
+    }
+
     public double getCurrentStoredFood() {
         return currentStoredFood;
     }

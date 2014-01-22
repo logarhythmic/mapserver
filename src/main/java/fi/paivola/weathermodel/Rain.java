@@ -17,6 +17,11 @@ public class Rain {
 
     public static double getRain(Calendar date) {
         int month = date.get(Calendar.MONTH);
-        return Math.random() * 100 < rainProb[month] ? rainAvrg[month] / rainProb[month]:0;
+        double r = 0;
+        for(int i = 0; i < 7; i++) {
+            if(Math.random() * 100 < rainProb[month])
+                r += rainAvrg[month] / date.getActualMaximum(Calendar.DAY_OF_MONTH);
+        }
+        return r;
     }
 }
