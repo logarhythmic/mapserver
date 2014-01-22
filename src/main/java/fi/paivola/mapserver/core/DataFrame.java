@@ -1,8 +1,12 @@
 package fi.paivola.mapserver.core;
 
 import fi.paivola.mapserver.utils.StringPair;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * DataFrame is used for saving data permanently. Either for other models to get
@@ -14,8 +18,10 @@ public class DataFrame {
 
     public int index;
     public boolean locked;
-    private final Map<StringPair, Object> data;
+    private final ConcurrentHashMap<StringPair, Object> data;
     public static String dataSeperator = ", ";
+    private final List<Event> events;
+    private Calendar date;
 
     /**
      * Class constructor.
@@ -24,8 +30,12 @@ public class DataFrame {
      */
     public DataFrame(int index) {
         this.index = index;
-        this.data = new HashMap();
+        this.data = new ConcurrentHashMap();
+        this.events = new ArrayList<>();
         this.locked = true;
+        this.date = Calendar.getInstance();
+        this.date.set(Calendar.WEEK_OF_YEAR, index%52+1);
+        this.date.add(Calendar.YEAR, (int)index/52);
     }
 
     /**
@@ -123,4 +133,45 @@ public class DataFrame {
         return this.data;
     }
 
+    /**
+     * Adds a event to this dataframe.
+     *
+     * @param e
+     */
+    public synchronized void addEvent(Event e) {
+        if (this.locked) {
+            return;
+        }
+        this.events.add(e);
+    }
+
+    /**
+     * Gets all of the events for a model.
+     *
+     * @param m Model to get the events for.
+     * @return List of events.
+     */
+    public List<Event> getEventsFor(Model m) {
+        List<Event> search = new ArrayList<>();
+        Iterator<Event> it = events.iterator();
+        while (it.hasNext()) {
+            Event e = it.next();
+            if (e == null) {
+                continue;
+            }
+            if (e.target.id == m.id) {
+                search.add(e);
+            }
+        }
+        return search;
+    }
+
+    /**
+     * Get the current date.
+     * @return current date
+     */
+    public Calendar getDate() {
+        return this.date;
+    }
+    
 }

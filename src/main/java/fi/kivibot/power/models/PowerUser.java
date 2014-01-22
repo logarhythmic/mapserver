@@ -11,6 +11,9 @@ import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  *
@@ -29,14 +32,7 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        Object o = new Object[]{new Object[]{usage}, Double.valueOf(0)};
-        Event e = new Event("energy-req", Event.Type.OBJECT, o);
-        for (Model m : this.connections) {
-            if (m.name.equals("Power connection")) {
-                this.addEventTo(m, current, e);
-            }
-        }
-        pogo = 0;
+        System.out.println(this.findSources().size());
     }
 
     @Override
@@ -58,6 +54,33 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
+    }
+
+    private List<PowerPlant> findSources() {
+        List<PowerPlant> sources = new LinkedList<>();
+        List<Model> visited = new LinkedList<>();
+        Queue<Model> next = new LinkedList<>();
+
+        for (Model m : this.connections) {
+            if (m.name.equals("Power connection")) {
+                next.add(m);
+            }
+        }
+        Model m;
+        while ((m = next.poll()) != null) {
+            if (!visited.contains(m)) {
+                visited.add(m);
+                for (Model m2 : m.connections) {
+                    if (m2.name.equals("Power connection")) {
+                        next.add(m2);
+                    } else if (m2 instanceof PowerPlant) {
+                        sources.add((PowerPlant) m2);
+                    }
+                }
+            }
+        }
+
+        return sources;
     }
 
 }

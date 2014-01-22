@@ -20,11 +20,6 @@ public class App {
 
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
 
-        App.runTest();
-        if (true) {
-            return;
-        }
-
         SettingsParser.parse();
 
         if (profilingRun) { // For profiling
@@ -34,6 +29,7 @@ public class App {
             for (int i = 0; i < 1000; i++) {
                 runTest();
             }
+
         } else {
 
             WSServer ws = new WSServer(parseInt(SettingsParser.settings.get("websocket_port").toString()));
@@ -81,23 +77,29 @@ public class App {
      */
     static void runTest() {
 
+        // How many ticks? Each one is a week.
         GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
-        Model m1 = gm.createModel("Power plant");
-        Model m12 = gm.createModel("Power plant");
+        int size = 32;
 
-        m1.getLatLng().latitude = 4;
-        m12.getLatLng().latitude = 10;
+        Model mp0 = gm.createModel("Power plant");
+        Model mc0 = gm.createModel("Power connection");
+        Model mu0 = gm.createModel("Power user");
+        
+        
+        Model mc1 = gm.createModel("Power connection");
+        Model mp1 = gm.createModel("Power plant");
+        
 
-        Model m2 = gm.createModel("Power connection");
-        Model m22 = gm.createModel("Power connection");
+        gm.linkModelsWith(mp0, mu0, mc0);
+        gm.linkModelsWith(mc0, mp1, mc1);
+        
+        if (!profilingRun) {
+            gm.printOnDone = 2;
+        }
 
-        Model m3 = gm.createModel("Power user");
-
-        gm.linkModelsWith(m1, m3, m2);
-        gm.linkModelsWith(m3, m12, m22);
-
+        // Start the gamethread
         one.start();
     }
 }

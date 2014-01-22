@@ -41,34 +41,6 @@ public class PowerConnection extends ConnectionModel {
     public void onGenerateDefaults(DataFrame df) {
     }
 
-    /**
-     * EVIL CODE - DO NOT COPY
-     *
-     * @param e
-     * @param m
-     */
-    @Override
-    public void addEvent(Event e, Model m) {
-
-        switch (e.name) {
-            case "energy-req":
-                Object[] os = (Object[]) e.value;
-                Object[] val = (Object[]) os[0];
-                Double l = (Double) os[1];
-                double len = l.doubleValue() + this.connections.get(0).distanceTo(this.connections.get(1));
-                l = Double.valueOf(len);
-                Object out = new Object[]{val, l};
-                Event oe = e;
-                e = new Event(oe.name, oe.type, oe.value);
-                e.frame = oe.frame;
-                e.sender = oe.sender;
-                e.value = out;
-                break;
-        }
-
-        super.addEvent(e, m);
-    }
-
     @Override
     public void onUpdateSettings(SettingMaster sm) {
 
