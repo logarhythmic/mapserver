@@ -18,6 +18,10 @@
         {
             "name": "exampleGlobal",
             "class": "fi.paivola.mapserver.models.ExampleGlobal"
+        },
+        {
+            "name": "Road",
+            "class": "fi.paivola.mapserver.models.RoadModel"
         }
     ]
 }

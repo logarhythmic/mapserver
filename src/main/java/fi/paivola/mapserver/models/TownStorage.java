@@ -43,8 +43,8 @@ public class TownStorage extends ExtensionModel {
      * Creates a new storage unit
      * @param maxCapacity sets the maximum storage capacity for the storage unit
      */
-    public TownStorage(double maxCapacity, SettingMaster sm){
-        super(5, sm);
+    public TownStorage(double maxCapacity){
+        super(5);
         this.maxCapacity = maxCapacity;
         storage = new ArrayList<>();
     }
@@ -144,13 +144,8 @@ public class TownStorage extends ExtensionModel {
     }
 
     @Override
-    public void onExtensionTick(DataFrame last, DataFrame current) {
-        //rat algorithm
-    }
-
-    @Override
-    public void onEvent(Event e) {
-        //nothing, since events move between towns and not within
+    public void onEvent(Event e, DataFrame d) {
+        //idk
     }
 
     @Override
@@ -160,6 +155,18 @@ public class TownStorage extends ExtensionModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
+        //idk lol
+    }
+
+    @Override
+    public void onTick(DataFrame last, DataFrame current) {
+        for (Supplies s : storage){
+            s.amount*=s.edible?0.7:1;  //our highly advanced rat algorithm
+        }
+    }
+
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
         //idk lol
     }
 }
