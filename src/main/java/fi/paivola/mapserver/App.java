@@ -81,19 +81,23 @@ public class App {
         GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
-        int size = 32;
 
         Model mp0 = gm.createModel("Power plant");
         Model mc0 = gm.createModel("Power connection");
         Model mu0 = gm.createModel("Power user");
-        
-        
         Model mc1 = gm.createModel("Power connection");
+        
+        Model mn0 = gm.createModel("Power node");
+        
+        mn0.setLatLng(1, 0);
+        
+        Model mc2 = gm.createModel("Power connection");
         Model mp1 = gm.createModel("Power plant");
         
 
-        gm.linkModelsWith(mp0, mu0, mc0);
-        gm.linkModelsWith(mc0, mp1, mc1);
+        gm.linkModelsWith(mu0, mn0, mc0);
+        gm.linkModelsWith(mp0, mn0, mc1);
+        gm.linkModelsWith(mp1, mn0, mc2);
         
         if (!profilingRun) {
             gm.printOnDone = 2;

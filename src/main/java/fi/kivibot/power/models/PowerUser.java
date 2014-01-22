@@ -5,6 +5,7 @@
  */
 package fi.kivibot.power.models;
 
+import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
@@ -21,27 +22,19 @@ import java.util.Queue;
  */
 public class PowerUser extends PointModel {
 
-    private double usage = 0.3;
-    private boolean online = true;
-
-    private double pogo = 0;
-
     public PowerUser(int id) {
         super(id);
+        this.name = "Power user";
+        this.saveDouble("usage", 10);
     }
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        System.out.println(this.findSources().size());
+        System.out.println(this.findSources().get(0).getDist());
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
-        switch (e.name) {
-            case "energy-get":
-                pogo += e.getDouble();
-                break;
-        }
     }
 
     @Override
@@ -56,31 +49,53 @@ public class PowerUser extends PointModel {
     public void onUpdateSettings(SettingMaster sm) {
     }
 
-    private List<PowerPlant> findSources() {
-        List<PowerPlant> sources = new LinkedList<>();
+    /**
+     * Threadsafe
+     *
+     * @param l
+     */
+    private synchronized void getPower(List<PowerPlant> l) {
+    }
+
+    private List<PowerSourceInfo> findSources() {
+        List<PowerSourceInfo> sources = new LinkedList<>();
         List<Model> visited = new LinkedList<>();
-        Queue<Model> next = new LinkedList<>();
+        Queue<PowerSourceInfo> next = new LinkedList<>();
 
         for (Model m : this.connections) {
             if (m.name.equals("Power connection")) {
-                next.add(m);
+                Model mo = getOther((ConnectionModel) m, this);
+                next.add(new PowerSourceInfo(mo, this.distanceTo(mo)));
             }
         }
-        Model m;
-        while ((m = next.poll()) != null) {
+        PowerSourceInfo psi;
+        while ((psi = next.poll()) != null) {
+            Model m = psi.getPowerPlant();
             if (!visited.contains(m)) {
                 visited.add(m);
-                for (Model m2 : m.connections) {
-                    if (m2.name.equals("Power connection")) {
-                        next.add(m2);
-                    } else if (m2 instanceof PowerPlant) {
-                        sources.add((PowerPlant) m2);
+                if (m.name.equals("Power plant")) {
+                    sources.add(psi);
+                } else if(m.name.equals("Power node")){
+                    for (Model m2 : m.connections) {
+                        if (m2.name.equals("Power connection")) {
+                            Model mo = getOther((ConnectionModel) m2, m);
+                            next.add(new PowerSourceInfo(mo, psi.getDist() + m.distanceTo(mo)));
+                        }
                     }
                 }
             }
         }
 
         return sources;
+    }
+
+    private Model getOther(ConnectionModel cm, Model not) {
+        for (Model m : cm.connections) {
+            if (!m.equals(not)) {
+                return m;
+            }
+        }
+        return null;
     }
 
 }

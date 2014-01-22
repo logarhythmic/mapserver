@@ -16,6 +16,10 @@
             "class": "fi.kivibot.power.models.PowerUser"
         },
         {
+            "name": "Power node",
+            "class": "fi.kivibot.power.models.PowerNode"
+        },
+        {
             "name": "examplePoint",
             "class": "fi.paivola.mapserver.models.ExamplePoint"
         },

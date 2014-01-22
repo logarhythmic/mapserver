@@ -24,6 +24,7 @@ public class PowerPlant extends PointModel {
 
     public PowerPlant(int id) {
         super(id);
+        this.name = "Power plant";
     }
 
     @Override
