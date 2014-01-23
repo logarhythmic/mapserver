@@ -10,7 +10,6 @@ import fi.paivola.mapserver.models.ExampleGlobal;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Double.parseDouble;
-import static java.lang.Integer.parseInt;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +40,10 @@ public class PopulationExtender extends ExtensionModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         populationByAge.step( 1 );
-        current.saveData(this, "populationByAge", populationByAge.getQuantities().toString());
+        double[] quantities = populationByAge.getQuantities();
+        for (int i = 0; i != quantities.length; ++i) {
+            this.saveData("populationByAge" + i, quantities[i]);
+        }
         /*
         System.out.println( "AGES_0TO4:\t" + (long)populationByAge.getQuantities()[0] );
         System.out.println( "AGES_5TO9:\t" + (long)populationByAge.getQuantities()[1] );
@@ -64,14 +66,17 @@ public class PopulationExtender extends ExtensionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-//        this.saveData("populationByAge", populationByAge.getQuantities());
+        double[] quantities = populationByAge.getQuantities();
+        for (int i = 0; i != quantities.length; ++i) {
+            this.saveData("populationByAge" + i, quantities[i]);
+        }
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
     }
     
-    private void parseInitialAgeStructure(double[] ageStructure, String filename) {
+    private void parseInitialAgeStructure(double[] ageGroups, String filename) {
         try {
             CSVReader reader = new CSVReader(new InputStreamReader(PopulationExtender.class.getClassLoader().getResourceAsStream(filename)));
             String[] nextLine;

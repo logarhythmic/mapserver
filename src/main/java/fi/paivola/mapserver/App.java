@@ -82,12 +82,12 @@ public class App {
         GameManager gm = one.game;
 
         // Create and add
-//        Model mg = gm.createModel("exampleGlobal");
+        Model mg = gm.createModel("exampleGlobal");
 
         // This is how you change a "setting" from the code.
-//        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
-//        sm.settings.get("cats").setValue("2");
-//        mg.onActualUpdateSettings(sm);
+        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
+        sm.settings.get("cats").setValue("2");
+        mg.onActualUpdateSettings(sm);
 
         int size = 30;
 
