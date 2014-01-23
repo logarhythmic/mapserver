@@ -81,7 +81,6 @@ public class App {
         GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
-
         Model mp0 = gm.createModel("Power plant");
         Model mc0 = gm.createModel("Power connection");
         Model mu0 = gm.createModel("Power user");
