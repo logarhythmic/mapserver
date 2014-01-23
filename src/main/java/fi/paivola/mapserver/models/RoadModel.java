@@ -10,6 +10,7 @@ import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import java.util.ArrayList;
 
 /**
  *
@@ -27,18 +28,18 @@ public class RoadModel extends ConnectionModel {
     private static double RAIN_MOD = -0.1;
 
     private int transport_type, road_type;
+    
+    public double remainingCapacityThisTick;
+    private double stealage = 0.1;
+    public ArrayList<Supplies> stolenGoods;
 
     public RoadModel(int id, SettingMaster sm) {
-        super(id, sm);
-    }
-
-    public RoadModel() {
-        super();
+        super(id);
     }
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        remainingCapacityThisTick = calcMaxStuff(calcTrips(TICK_TIME));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class RoadModel extends ConnectionModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        stolenGoods = new ArrayList<Supplies>();
     }
 
     @Override
@@ -85,5 +86,17 @@ public class RoadModel extends ConnectionModel {
         }
         return true;
     }
+    
+    public Supplies[] calcDelivery(Supplies sent){
+        Supplies lost = new Supplies(sent.id, sent.amount * stealage);
+        stolenGoods.add(lost);
+        Supplies delivered = new Supplies(sent.id, Math.min(sent.amount - lost.amount, remainingCapacityThisTick));
+        remainingCapacityThisTick -= delivered.amount;
+        return new Supplies[] {lost, delivered};
+    }
 
+    @Override
+    public void onUpdateSettings(SettingMaster sm) {
+        
+    }
 }

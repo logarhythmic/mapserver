@@ -60,6 +60,10 @@ public class PopCenter extends PointModel {
         return sendSupplies(sent, (PopCenter) e.sender, d);
     }
     
+    private RoadModel[] getRouteTo(PopCenter target){
+        return null;
+    }
+    
     /**
      * Sends supplies from this PopCenter to another. The Transport model is queried for information on how the delivery went. (todo)
      * @param s Supplies to send
