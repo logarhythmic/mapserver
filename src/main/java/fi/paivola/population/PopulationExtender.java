@@ -28,21 +28,7 @@ public class PopulationExtender extends ExtensionModel {
         
         // Parse initial age-structure from file
         double[] ageGroups = new double[Constants.NUM_AGE_GROUPS];
-        try {
-            CSVReader reader = new CSVReader(new InputStreamReader(PopulationExtender.class.getClassLoader().getResourceAsStream("populationByAge_2010.csv")));
-            String[] nextLine;
-            int line = 0;
-            while ((nextLine = reader.readNext()) != null) {
-                if (line > 0) {
-                    for (int i = 0; i != Constants.NUM_AGE_GROUPS; ++i) {
-                        ageGroups[i] = parseDouble(nextLine[i]);
-                    }
-                }
-                line++;
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(ExampleGlobal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        parseInitialAgeStructure(ageGroups, "populationByAge_2010.csv");
         this.populationByAge = new PopulationDistribution(ageGroups, mortalityModel);
         
         // 20% of people age 5 years annually 
@@ -83,5 +69,23 @@ public class PopulationExtender extends ExtensionModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
+    }
+    
+    private void parseInitialAgeStructure(double[] ageStructure, String filename) {
+        try {
+            CSVReader reader = new CSVReader(new InputStreamReader(PopulationExtender.class.getClassLoader().getResourceAsStream(filename)));
+            String[] nextLine;
+            int line = 0;
+            while ((nextLine = reader.readNext()) != null) {
+                if (line > 0) {
+                    for (int i = 0; i != Constants.NUM_AGE_GROUPS; ++i) {
+                        ageGroups[i] = parseDouble(nextLine[i]);
+                    }
+                }
+                line++;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ExampleGlobal.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
