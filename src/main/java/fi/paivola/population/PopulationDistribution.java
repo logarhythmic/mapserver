@@ -30,6 +30,17 @@ public class PopulationDistribution  {
         this.mortalityModel = mortalityModel;
         setContentFromDebug(amQuantities);
     }
+    
+    /*
+     * Initializes PopulationDistribution quantities from double[]
+     */
+    public PopulationDistribution(double[] quantities, MortalityModel mortalityModel) {
+        this.annualFlowPc = 0.2;
+        this.birthsPc = 0.05; // default
+        this.mortalityModel = mortalityModel;
+        this.quantities = quantities;
+        this.deaths = new double[Constants.NUM_AGE_GROUPS];
+    }
 
     /**
      * Initializes PopulationDistribution from a .csv-file
