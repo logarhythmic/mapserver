@@ -20,10 +20,6 @@
             "class": "fi.paivola.mapserver.models.ExampleGlobal"
         },
 		{
-			"name": "populationPoint",
-			"class": "fi.paivola.population.PopulationPoint"
-		}
-		{
 			"name": "populationExtender",
 			"class": "fi.paivola.population.PopulationExtender"
 		}

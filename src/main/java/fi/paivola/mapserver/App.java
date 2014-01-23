@@ -78,7 +78,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 2));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 10)); // ten years
         GameManager gm = one.game;
 
         // Create and add
@@ -89,13 +89,13 @@ public class App {
 //        sm.settings.get("cats").setValue("2");
 //        mg.onActualUpdateSettings(sm);
 
-        int size = 1;
+        int size = 30;
 
         Model[] points = new Model[size];
         Model[] conns = new Model[size];
 
         for (int i = 0; i < size; i++) {
-            points[i] = gm.createModel("populationPoint");
+            points[i] = gm.createModel("examplePoint");
             conns[i] = gm.createModel("exampleConnection");
         }
 
