@@ -23,6 +23,8 @@ public class PowerConnection extends ConnectionModel {
         this.passthrough = true;
         this.name = "Power connection";
         this.maxConnections = 2;
+        
+        this.saveDouble("losspkm", 0.000035);
     }
 
     @Override

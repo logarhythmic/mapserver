@@ -14,11 +14,12 @@ import fi.paivola.mapserver.core.Model;
 public class PowerSourceInfo {
 
     private Model pp;
-    private double dist;
+    private double dist, loss;
 
-    public PowerSourceInfo(Model p, double d) {
+    public PowerSourceInfo(Model p, double d, double l) {
         pp = p;
         dist = d;
+        loss = l;
     }
 
     public Model getPowerPlant() {
@@ -27,6 +28,10 @@ public class PowerSourceInfo {
 
     public double getDist() {
         return dist;
+    }
+
+    public double getLoss() {
+        return loss;
     }
 
 }

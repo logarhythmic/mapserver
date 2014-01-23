@@ -12,6 +12,8 @@ import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -21,30 +23,33 @@ import java.util.Queue;
  * @author kivi
  */
 public class PowerUser extends PointModel {
-
+    
     public PowerUser(int id) {
         super(id);
         this.name = "Power user";
         this.saveDouble("usage", 10);
     }
-
+    
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        System.out.println(this.findSources().get(0).getDist());
+        List<PowerSourceInfo> l = this.sort_loss(this.findSources());
+        for (PowerSourceInfo psi : l) {
+            System.out.println(">>> " + psi.getLoss());
+        }
     }
-
+    
     @Override
     public void onEvent(Event e, DataFrame current) {
     }
-
+    
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
     }
-
+    
     @Override
     public void onGenerateDefaults(DataFrame df) {
     }
-
+    
     @Override
     public void onUpdateSettings(SettingMaster sm) {
     }
@@ -54,18 +59,33 @@ public class PowerUser extends PointModel {
      *
      * @param l
      */
-    private synchronized void getPower(List<PowerPlant> l) {
+    private synchronized void getPower(List<PowerSourceInfo> l) {
     }
-
+    
+    private List<PowerSourceInfo> sort_loss(List<PowerSourceInfo> l) {
+        Collections.sort(l, new Comparator() {
+            
+            @Override
+            public int compare(Object o1, Object o2) {
+                double a = ((PowerSourceInfo) o1).getLoss();
+                double b = ((PowerSourceInfo) o2).getLoss();
+                return a == b ? 0 : a < b ? 1 : -1;
+            }
+        });
+        
+        return l;
+    }
+    
     private List<PowerSourceInfo> findSources() {
         List<PowerSourceInfo> sources = new LinkedList<>();
         List<Model> visited = new LinkedList<>();
         Queue<PowerSourceInfo> next = new LinkedList<>();
-
+        
         for (Model m : this.connections) {
             if (m.name.equals("Power connection")) {
                 Model mo = getOther((ConnectionModel) m, this);
-                next.add(new PowerSourceInfo(mo, this.distanceTo(mo)));
+                double d = this.distanceTo(mo);
+                next.add(new PowerSourceInfo(mo, d, d * m.getDouble("losspkm")));
             }
         }
         PowerSourceInfo psi;
@@ -75,20 +95,21 @@ public class PowerUser extends PointModel {
                 visited.add(m);
                 if (m.name.equals("Power plant")) {
                     sources.add(psi);
-                } else if(m.name.equals("Power node")){
+                } else if (m.name.equals("Power node")) {
                     for (Model m2 : m.connections) {
                         if (m2.name.equals("Power connection")) {
                             Model mo = getOther((ConnectionModel) m2, m);
-                            next.add(new PowerSourceInfo(mo, psi.getDist() + m.distanceTo(mo)));
+                            double d = m.distanceTo(mo);
+                            next.add(new PowerSourceInfo(mo, psi.getDist() + d, psi.getLoss() + (d * m2.getDouble("losspkm"))));
                         }
                     }
                 }
             }
         }
-
+        
         return sources;
     }
-
+    
     private Model getOther(ConnectionModel cm, Model not) {
         for (Model m : cm.connections) {
             if (!m.equals(not)) {
@@ -97,5 +118,5 @@ public class PowerUser extends PointModel {
         }
         return null;
     }
-
+    
 }

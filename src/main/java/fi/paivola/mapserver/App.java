@@ -91,6 +91,8 @@ public class App {
         
         mn0.setLatLng(1, 0);
         
+        mp0.setLatLng(1, 3);
+        
         Model mc2 = gm.createModel("Power connection");
         Model mp1 = gm.createModel("Power plant");
         
