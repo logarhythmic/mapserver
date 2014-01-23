@@ -5,9 +5,11 @@ import fi.paivola.mapserver.utils.Color;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
+import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.Icon;
+import java.util.ArrayList;
 
 /**
  *
@@ -60,8 +62,56 @@ public class PopCenter extends PointModel {
         return sendSupplies(sent, (PopCenter) e.sender, d);
     }
     
-    private RoadModel[] getRouteTo(PopCenter target){
-        return null;
+    private RoadModel[] getRouteTo(PointModel target, Supplies s){
+        ArrayList<RoadModel[]> routes = new ArrayList<>();
+        ArrayList<RoadModel> primary = new ArrayList<>();
+        for (Model m : this.connections){
+            if (m.getClass().equals(RoadModel.class)) {
+                RoadModel mr = (RoadModel)m;
+                if(mr.remainingCapacityThisTick <= s.amount)
+                    primary.add(mr);
+            }
+        }
+        for (RoadModel mr : primary){
+            for(Model t : mr.connections){
+                if (t.id == target.id){
+                    routes.add(new RoadModel[] {mr});
+                }
+                else if (t.id != this.id){
+                    for(Model mm : t.connections){
+                        if (mm.getClass().equals(RoadModel.class)) {
+                            RoadModel mmr = (RoadModel)mm;
+                            if(mmr.remainingCapacityThisTick <= s.amount){
+                                for (Model tt : mmr.connections){
+                                    if (tt.id == target.id){
+                                        routes.add(new RoadModel[] {mr, mmr});
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (routes.isEmpty())
+            return null;
+        RoadModel[] bestRoute = routes.get(0);
+        double highestLowestCapacity = 0;
+        for (RoadModel r : bestRoute){
+            highestLowestCapacity = Math.min(highestLowestCapacity, r.remainingCapacityThisTick);
+        }
+        double maybeHighestLowestCap;
+        for (RoadModel[] r : routes){
+            maybeHighestLowestCap = r[0].remainingCapacityThisTick;
+            for (RoadModel ro : bestRoute){
+                maybeHighestLowestCap = Math.min(maybeHighestLowestCap, ro.remainingCapacityThisTick);
+            }
+            if (maybeHighestLowestCap > highestLowestCapacity){
+                highestLowestCapacity = maybeHighestLowestCap;
+                bestRoute = r;
+            }
+        }
+        return bestRoute;
     }
     
     /**
@@ -86,7 +136,8 @@ public class PopCenter extends PointModel {
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.setIcon(Icon.TOWN);
         sm.color = new Color(255, 128, 64);
-        this.addExtension("storehouse", new TownStorage(1000));
+        sm.name = "popCenter";
+        this.addExtension("storehouse", new TownStorage());
     }
 
     @Override

@@ -28,7 +28,9 @@ import fi.paivola.mapserver.core.Event;
 import java.util.ArrayList;
 import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
+import fi.paivola.mapserver.core.setting.SettingDouble;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.utils.RangeDouble;
 
 /**
  * Defines a storage unit for a single town.
@@ -41,11 +43,10 @@ public class TownStorage extends ExtensionModel {
     
     /**
      * Creates a new storage unit
-     * @param maxCapacity sets the maximum storage capacity for the storage unit
      */
-    public TownStorage(double maxCapacity){
+    public TownStorage(){
         super(5);
-        this.maxCapacity = maxCapacity;
+        this.maxCapacity = 0;
         storage = new ArrayList<>();
     }
     
@@ -150,12 +151,15 @@ public class TownStorage extends ExtensionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        //idk lol
+        this.saveDouble("Items in storage", this.currentCapacity);
+        this.saveDouble("Storage fullness", this.currentCapacity / this.maxCapacity);
     }
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-        //idk lol
+        sm.name = "townStorage";
+        sm.exts = "popCenter";
+        sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 10000, new RangeDouble(1, 1000000000)));
     }
 
     @Override
@@ -167,6 +171,6 @@ public class TownStorage extends ExtensionModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        //idk lol
+        this.maxCapacity = Double.parseDouble(sm.settings.get("maxCap").getValue());
     }
 }
