@@ -1,0 +1,150 @@
+package fi.paivola.foodmodel;
+
+import fi.paivola.mapserver.core.DataFrame;
+import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.*;
+import fi.paivola.weathermodel.Weather;
+import java.util.Map;
+import java.util.Calendar;
+/**
+ * @author Jaakko Hannikainen
+ * Generic class for field products, eg. maize.
+ */
+
+public abstract class Crop extends Edible {
+
+    private double waterMinimum;
+    private double waterOptimal;
+    private double waterMaximum;
+    private double temperatureMinimum;
+    private double temperatureOptimal;
+    private double temperatureMaximum;
+    private double sunlightMinimum;
+    private double sunlightOptimal;
+    private double sunlightMaximum;
+    private double pHMinimum;
+    private double pHOptimal;
+    private double pHMaximum;
+    private double maxYield;
+    private int growTime;
+    private int currentGrowTime;
+    private double currentIndexMultiplier;
+    private double currentStoredFood;
+    private Distribution waterDistribution;
+    private Distribution temperatureDistribution;
+    private Distribution sunlightDistribution;
+    private Distribution pHDistribution;
+    private double storedWater;
+
+    /* The constructor is horrible, I'm sorry. */
+    public Crop(String name, double wmin, double wopt, double wmax,
+            double tmin, double topt, double tmax, double smin, double sopt,
+            double smax, double phmin, double phopt, double phmax, int gtime,
+            double yield) {
+        super(name);
+        
+        RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
+        RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
+        
+        this.name = name;
+        waterMinimum = wmin;
+        waterOptimal = wopt;
+        waterMaximum = wmax;
+        temperatureMinimum = tmin;
+        temperatureOptimal = topt;
+        temperatureMaximum = tmax;
+        sunlightMinimum = smin;
+        sunlightOptimal = sopt;
+        sunlightMaximum = smax;
+        pHMinimum = phmin;
+        pHOptimal = phopt;
+        pHMaximum = phmax;
+        growTime = gtime;
+        maxYield = yield;
+        currentStoredFood = 0;
+        currentIndexMultiplier = 0;
+        storedWater = 0;
+        this.waterDistribution = new Distribution(waterMinimum,
+                                                  waterOptimal,
+                                                  waterMaximum);
+        this.temperatureDistribution = new Distribution(temperatureMinimum,
+                                                  temperatureOptimal,
+                                                  temperatureMaximum);
+        this.sunlightDistribution = new Distribution(sunlightMinimum,
+                                                  sunlightOptimal,
+                                                  sunlightMaximum);
+        this.pHDistribution = new Distribution(pHMinimum,
+                                                  pHOptimal,
+                                                  pHMaximum);
+    }
+
+    public void resetCrop() {
+        currentGrowTime = 0;
+        currentIndexMultiplier = 0;
+    }
+
+    @Override
+    public double onTick(DataFrame last, DataFrame current) {
+        int month = current.getDate().get(Calendar.MONTH);
+        if(month == 1 || month == 2 || month == 12)
+            resetCrop();
+
+        if(currentGrowTime == growTime) {
+            currentStoredFood += currentIndexMultiplier /
+                    growTime * getArea() * maxYield;
+            resetCrop();
+        }
+        else {
+            currentGrowTime++;
+            currentIndexMultiplier += this.getWaterIndex(last) *
+                this.getTemperatureIndex(last) * this.getSunshineIndex(last) * 
+                this.getPHIndex(last);
+        }
+        /* XXX: constant multiplier */
+        return currentStoredFood * 3;
+    }
+   
+    public double harvest(double max) {
+        double ret = getCurrentStoredFood();
+        if(max < 0 || max > ret) {
+            currentStoredFood = 0;
+            return ret;
+        }
+        currentStoredFood -= max;
+        return ret - currentStoredFood;
+    }
+
+    public double getCurrentStoredFood() {
+        return currentStoredFood;
+    }
+    
+    private double getWaterIndex(DataFrame last) {
+        double d = waterDistribution.exact(last.getGlobalDouble("rain"));
+        if(d < 1) {
+            if(storedWater > d * getArea()) {
+                storedWater -= d * getArea();
+                return 1;
+            }
+            else {
+                double m = storedWater;
+                storedWater = 0;
+                return d + storedWater/getArea();
+            }
+        }
+        return d;
+    }
+    
+    private double getTemperatureIndex(DataFrame last) {
+        return temperatureDistribution.exact(last.getGlobalDouble("temperature"));
+    }
+
+    private double getSunshineIndex(DataFrame last) {
+        return sunlightDistribution.exact(last.getGlobalDouble("sunlight"));
+    }
+
+    // Looks like this won't be coming soon, leaving it to optimal.
+    private double getPHIndex(DataFrame last) {
+        return 1;
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+}

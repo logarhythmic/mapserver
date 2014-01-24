@@ -7,10 +7,10 @@ import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
+import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.models.PopCenter;
-import fi.paivola.mapserver.models.TownStorage;
-import fi.paivola.mapserver.utils.Supplies;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -85,9 +85,12 @@ public class App {
         // How many ticks? Each one is a week.
         GameThread one = new GameThread((int) Math.floor(52.177457 * 100));
         GameManager gm = one.game;
-
-        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
         
+        gm.createModel("Weather");
+
+        SettingMaster sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        Model m = gm.createModel("Field");
         // Create and add
         Model town1 = gm.createModel("PopCenter");
         Model town2 = gm.createModel("PopCenter");
@@ -114,8 +117,66 @@ public class App {
         }
         
         ((PopCenter)town1).DebugFoodSource = true;
+
+        Model mg = gm.createModel("exampleGlobal");
+
+        // This is how you change a "setting" from the code.
+        SettingMaster sm2 = gm.getDefaultSM("exampleGlobal");
+        sm2.settings.get("cats").setValue("2");
+        mg.onActualUpdateSettings(sm2);
+
+        int size = 30;
         
-        // Print final data in the end?
+        Model[] points = new Model[size];
+        Model[] conns = new Model[size];
+
+        for (int i = 0; i < size; i++) {
+            points[i] = gm.createModel("examplePoint");
+            conns[i] = gm.createModel("exampleConnection");
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (i > 0) {
+                gm.linkModelsWith(points[i - 1], points[i], conns[i - 1]);
+            }
+        }
+        gm.linkModelsWith(points[size - 1], points[0], conns[size - 1]);
+
+        Model mp0 = gm.createModel("Power plant");
+        Model mc0 = gm.createModel("Power connection");
+        Model mu0 = gm.createModel("Power user");
+        Model mc1 = gm.createModel("Power connection");
+
+        Model mn0 = gm.createModel("Power node");
+
+        mn0.setLatLng(1, 0);
+        mp0.setLatLng(1, 3);
+
+        Model mc2 = gm.createModel("Power connection");
+        Model mp1 = gm.createModel("Solar plant");
+
+        Model mu1 = gm.createModel("Power user");
+        Model mc3 = gm.createModel("Power connection");
+
+        
+        gm.linkModelsWith(mu0, mn0, mc0);
+        gm.linkModelsWith(mp0, mn0, mc1);
+        gm.linkModelsWith(mp1, mn0, mc2);
+        gm.linkModelsWith(mu1, mn0, mc3);
+
+        // Create and add
+        Model l1 = gm.createModel("Lake");
+        Model l2 = gm.createModel("Lake");
+        Model r1 = gm.createModel("River");
+        Model r2 = gm.createModel("River");
+        Model l3 = gm.createModel("Lake");
+        Model r3 = gm.createModel("River");
+        Model s1 = gm.createModel("Sea");
+
+        gm.linkModelsWith(l1, l3, r1);
+        gm.linkModelsWith(l2, l3, r2);
+        gm.linkModelsWith(l3, s1, r3);
+
         if (!profilingRun) {
             gm.printOnDone = 2;
         }

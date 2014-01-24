@@ -1,8 +1,28 @@
 {
-    "default_ticks": 10,
+    "default_ticks": 20,
     "websocket_port": 8080,
     "csv_seperator": ",\t",
     "models": [
+        {
+            "name": "Power plant",
+            "class": "fi.kivibot.power.models.PowerPlant"
+        },
+        {
+            "name": "Solar plant",
+            "class": "fi.kivibot.power.models.SolarPlant"
+        },
+        {
+            "name": "Power connection",
+            "class": "fi.kivibot.power.models.PowerConnection"
+        },
+        {
+            "name": "Power user",
+            "class": "fi.kivibot.power.models.PowerUser"
+        },
+        {
+            "name": "Power node",
+            "class": "fi.kivibot.power.models.PowerNode"
+        },
         {
             "name": "examplePoint",
             "class": "fi.paivola.mapserver.models.ExamplePoint"
@@ -20,6 +40,34 @@
             "class": "fi.paivola.mapserver.models.ExampleGlobal"
         },
         {
+            "name": "Lake",
+            "class": "fi.paivola.water.Lake"
+        },
+        {
+            "name": "River",
+            "class": "fi.paivola.water.River"
+        },
+        {
+            "name": "Sea",
+            "class": "fi.paivola.water.Sea"
+        },
+        {
+            "name": "Groundwater",
+            "class": "fi.paivola.water.Groundwater"
+        },
+        {
+            "name": "populationExtender",
+            "class": "fi.paivola.population.PopulationExtender"
+        },
+        {
+            "name": "Field",
+            "class": "fi.paivola.foodmodel.Field"
+        },
+        {
+            "name": "Weather",
+            "class": "fi.paivola.weathermodel.Weather"
+		},
+		{
             "name": "Road",
             "class": "fi.paivola.mapserver.models.RoadModel"
         },

@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
@@ -130,7 +129,6 @@ public class GameManager {
         }
         for (CCs c : this.waiting_extensions) {
             SettingMaster sl = this.getDefaultSM(c.cls);
-            this.models.get(c.misc).clss.put(sl.name, c.cls);
             this.models.get(c.misc).sm.settings.putAll(sl.settings);
         }
     }
@@ -369,7 +367,6 @@ public class GameManager {
      * @return true
      */
     public boolean step() {
-
         log.log(Level.FINE, "Running step {0}", this.tick_current);
 
         DataFrame current = this.frames.get(this.tick_current);
