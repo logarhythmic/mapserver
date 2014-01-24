@@ -25,6 +25,7 @@ public class ExampleGlobal extends GlobalModel {
     private int cats = 0;
     private final double[] activity;
 
+
     public ExampleGlobal(int id) {
         super(id);
         activity = new double[53];
