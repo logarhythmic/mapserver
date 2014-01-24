@@ -14,7 +14,7 @@ public class SolarPlant extends PowerPlant {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        String sunstr = (String) current.getGlobalData("sunlight");
+        String sunstr = (String) last.getGlobalData("sunlight");
         if (sunstr == null) {
             super.onTick(last, current);
         } else {
