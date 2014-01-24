@@ -100,7 +100,7 @@ public class River extends ConnectionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-
+        waterAmount = width*length*startDepth;
     }
 
     @Override
