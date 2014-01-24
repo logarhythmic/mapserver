@@ -66,6 +66,18 @@
         {
             "name": "Weather",
             "class": "fi.paivola.weathermodel.Weather"
+		},
+		{
+            "name": "Road",
+            "class": "fi.paivola.mapserver.models.RoadModel"
+        },
+        {
+            "name": "PopCenter",
+            "class": "fi.paivola.mapserver.models.PopCenter"
+        },
+        {
+            "name": "TownStorage",
+            "class": "fi.paivola.mapserver.models.TownStorage"
         }
     ]
 }

@@ -1,5 +1,7 @@
 package fi.paivola.mapserver;
 
+import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
@@ -7,6 +9,7 @@ import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
+import fi.paivola.mapserver.core.setting.SettingMaster;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,7 +82,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 10)); // ten years
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 1));
         GameManager gm = one.game;
         
         gm.createModel("Weather");
