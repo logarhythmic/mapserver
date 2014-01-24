@@ -22,28 +22,29 @@ public class Lake extends PointModel {
     //(Näsijärvi)
 
     // General stuff
-    //CSVWriter writer = null;
+    CSVWriter writer = null;
+    int order = 0;
 
     // PET variables
-    float evapotranspiration;               // mm/day
-    float airHumidity;                      // mb
-    float temperature = 30;                 // 'C
-    float k = 1;                            // Hamon coefficient
-    float daytimeLength = 1;                // x/12h
+    double evapotranspiration;               // mm/day
+    double airHumidity;                      // mb
+    double temperature = 30;                 // 'C
+    double k = 1;                            // Hamon coefficient
+    double daytimeLength = 1;                // x/12h
 
     // Lake dimensions and water amount 
-    float surfaceArea = 256120000f;         // m^2
-    float depth = 14.1f;                    // m    TODO rename to fit its actual role as the depth of the lake "bowl"
-    float floodDepth = 20;
-    float waterAmount = 3480000000f;        // m^3
+    double surfaceArea = 256120000f;         // m^2
+    double depth = 14.1f;                    // m       flood water level
+    double waterAmount = 3132000000.0;        // m^3
 
     // Flows
-    float C;                                // Chezy variable
+    double C;                                // Chezy variable
+    double h = 0.91;                          // When does the lake start to flow?   
 
     // Rain
-    float basinArea = 7642000000f;           // m^2
-    float rainfall = 0;
-    float terrainCoefficient = 0.5f;          // unitless, how much of the rainfall ends up to the lake
+    double basinArea = 7642000000f;           // m^2
+    double rainfall = 0;                      // m^3
+    double terrainCoefficient = 0.5f;         // unitless, how much of the rainfall ends up to the lake
 
     // Weather
     public Lake(int id) {
@@ -58,7 +59,7 @@ public class Lake extends PointModel {
         daytimeLength = Float.parseFloat(last.getGlobalString("sunlight"));
 
         // calculate the air humidity and the evapotranspiration for it
-        airHumidity = (float) (6.108f * Math.exp((17.27f * temperature) / (temperature + 273.3)));
+        airHumidity = (double) (6.108f * Math.exp((17.27f * temperature) / (temperature + 273.3)));
         evapotranspiration = k * 0.165f * 216.7f * daytimeLength * (airHumidity / (temperature + 273.3f)) * 7 / 1000000 * surfaceArea;
 
         // substract the evaporation from our current water reserves and check that we won't end up having negative amounts of water
@@ -70,29 +71,29 @@ public class Lake extends PointModel {
 
         String[] entries;
 
-        rainfall = Float.parseFloat(last.getGlobalString("rain")) * 1000;
-        float actualRainfall = basinArea * rainfall / 1000 * terrainCoefficient;
+        rainfall = Float.parseFloat(last.getGlobalString("rain")) / 1000;
+        double actualRainfall = basinArea * rainfall * terrainCoefficient;
         waterAmount += actualRainfall;
 
-        float flow = 0;
+        double flow = 0;
 
         //if the water level is over the boundaries of the lake, count the overflowing amount water
-        if (waterAmount > depth * surfaceArea) {
+        if (waterAmount > depth*h * surfaceArea) {
             // the depth of the overflowing water
-            float currentDepth = (waterAmount - surfaceArea * depth) / surfaceArea;
+            double currentDepth = (waterAmount - surfaceArea * depth*h) / surfaceArea;
             // calculate the chezy variable used in the chezy flow speed equation
-            C = (float) ((1 / 0.03f) * Math.pow(currentDepth, 1 / 6));
+            C = (double) ((1 / 0.03f) * Math.pow(currentDepth, 1 / 6));
             // calculate the speed of the overflowing watermass
-            float speed = (float) (C * Math.sqrt(180 * currentDepth));
+            double speed = (double) (C * Math.sqrt(0.05 * currentDepth));
             // calculate the amount of water that is going to leave
-            flow = speed * (float) Math.sqrt(surfaceArea) * currentDepth;
+            flow = speed * (double) Math.sqrt(surfaceArea) * currentDepth;
             // substract the flow from the water in the lake if we have any rivers connected to this lake
 
             if (this.connections.size() > 0) {
                 List<Model> rivers = new ArrayList<Model>();
 
                 for (Model m : this.connections) {
-                    if ((m.type == "River" || m.type == "Sea") && m.id > this.id) {
+                    if ((m.type == "River") && m.getInt("order") > this.order) {
                         rivers.add(m);
                     }
                 }
@@ -111,33 +112,39 @@ public class Lake extends PointModel {
             }
         }
 
-        // write the data to a .csv - file
-        entries = (waterAmount / 1000000000 + "#" + evapotranspiration / 1000000000 + "#" + temperature + "#" + actualRainfall / 1000000000 + "#" + flow / 1000000000).split("#");
-        /*
+        // write the data to a .csv - file -- wateramount, actual rainfall and flow in km^3
+        
+        Event e;
+        Boolean flood = false;
+        if(waterAmount > surfaceArea*depth)
+        {
+            flood = true;
+            e = new Event("Flood",Event.Type.OBJECT, flood);
+            this.addEventToAll(current, e);
+        }
+        entries = (waterAmount/1000000000 + "#" + evapotranspiration/1000000 + "#" + temperature + "#" + actualRainfall/1000000000+ "#" + flow/1000000+"#"+(flood?1:0)).split("#");
+        
         for (int i = 0; i < entries.length; i++) {
             entries[i] = entries[i].trim();
         }
 
         if (writer != null) {
             writer.writeNext(entries);
-        }*/
-        Event e;
-        if(waterAmount > surfaceArea*floodDepth)
-        {
-            Boolean flood = true;
-            e = new Event("Flood",Event.Type.OBJECT, flood);
-            this.addEventToAll(current, e);
         }
-        this.saveData("waterAmount", waterAmount);
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
-
+        if (e.sender.type == "River" && e.name.equals("Flow") && e.sender.getInt("order") < this.order) {
+            this.saveDouble("before", waterAmount);
+            waterAmount += Double.parseDouble(e.getString());
+            this.saveDouble("after", waterAmount);
+        }
     }
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
+        sm.settings.put("order", new SettingInt("Position in the hydrodynamic chain", 0, new RangeInt(0, 100)));
         sm.color = new Color(0, 0, 255);
         sm.name = "Lake";
         sm.type = "Lake";
@@ -150,12 +157,17 @@ public class Lake extends PointModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-       /* if (writer == null) {
+        if(Integer.parseInt(sm.settings.get("order").getValue()) != this.order)
+        {
+            this.order = Integer.parseInt(sm.settings.get("order").getValue());
+            this.saveInt("order", order);
+        }
+       if (writer == null) {
             try {
                 writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
             } catch (IOException e) {
                 System.out.println(e.toString());
             }
-        }*/
+        }
     }
 }

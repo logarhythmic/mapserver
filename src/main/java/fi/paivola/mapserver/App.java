@@ -78,7 +78,7 @@ public class App {
     /**
      * This function can be used for testing your own models. Please modify
      * this!
-     */
+     */ 
     static void runTest() {
 
         // How many ticks? Each one is a week.
@@ -112,13 +112,46 @@ public class App {
         gm.linkModelsWith(PP1, PU1, PC1);
 
         // water
-        Model Lake1 = gm.createModel("Lake");
-        Model Lake2 = gm.createModel("Lake");
-        Model River1 = gm.createModel("River");
-        Model River2 = gm.createModel("River");
-        Model Sea1 = gm.createModel("Sea");
-        gm.linkModelsWith(Lake1, Lake2, River1);
-        gm.linkModelsWith(Lake2, Sea1, River2);
+        Model l1 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("1");
+        l1.onActualUpdateSettings(sm);
+        
+        Model l2 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("1");
+        l2.onActualUpdateSettings(sm);
+        
+        Model r1 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("2");
+        r1.onActualUpdateSettings(sm);
+        
+        Model r2 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("2");
+        r2.onActualUpdateSettings(sm);
+        
+        Model l3 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("3");
+        l3.onActualUpdateSettings(sm);
+        
+        Model r3 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("4");
+        r3.onActualUpdateSettings(sm);
+        
+        Model s1 = gm.createModel("Sea");
+        sm = gm.getDefaultSM("Sea");
+        sm.settings.get("order").setValue("5");
+        s1.onActualUpdateSettings(sm);
+        
+        Model weather = gm.createModel("Weather");
+        
+        gm.linkModelsWith(l1, l3, r1);
+        gm.linkModelsWith(l2, l3, r2);
+        gm.linkModelsWith(l3, s1, r3);
 
         if (!profilingRun) {
             gm.printOnDone = 2;
