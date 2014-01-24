@@ -4,10 +4,6 @@
     "csv_seperator": ",\t",
     "models": [
         {
-            "name": "Power plant",
-            "class": "fi.kivibot.power.models.PowerPlant"
-        },
-        {
             "name": "Solar plant",
             "class": "fi.kivibot.power.models.SolarPlant"
         },
@@ -24,12 +20,12 @@
             "class": "fi.kivibot.power.models.PowerConnection"
         },
         {
-            "name": "Power user",
-            "class": "fi.kivibot.power.models.PowerUser"
-        },
-        {
             "name": "Power node",
             "class": "fi.kivibot.power.models.PowerNode"
+        },
+        {
+            "name": "Factory",
+            "class": "fi.kivibot.power.models.Factory"
         },
         {
             "name": "examplePoint",

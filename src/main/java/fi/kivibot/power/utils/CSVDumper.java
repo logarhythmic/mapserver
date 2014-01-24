@@ -1,13 +1,11 @@
 package fi.kivibot.power.utils;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,25 +18,29 @@ import java.util.logging.Logger;
  */
 public class CSVDumper {
 
+    public static final String csv_separator = ";";
+    public static final String decimal_separator = ",";
+
     private class asd {
 
         private Model m;
         private String s;
+        private String o;
 
         public asd(Model mo, String st) {
             m = mo;
             s = st;
+            o = m.id + ",\t" + s + ",\t";
         }
 
         @Override
         public String toString() {
-            return m.id + ",\t" + s + ",\t";
+            return o;
         }
 
     }
 
-    private List<asd> lines = new LinkedList<>();
-
+    private final List<asd> lines = new LinkedList<>();
     private PrintWriter out = null;
 
     public CSVDumper() {
@@ -49,10 +51,20 @@ public class CSVDumper {
         }
     }
 
+    /**
+     *
+     * @param m The model to find
+     * @param prop The name of the property such as "production"
+     */
     public void add(Model m, String prop) {
         lines.add(new asd(m, prop));
     }
 
+    /**
+     * Saves the data from <b>gm</b> to dump.csv
+     *
+     * @param gm Current GameManager
+     */
     public void save(GameManager gm) {
         this.saveHead();
         Map<String, String[]> map = gm.getData();
@@ -72,16 +84,9 @@ public class CSVDumper {
         write(data.toArray());
     }
 
-//    private String[] hax(Object[] o) {
-//        String[] ss = new String[o.length];
-//        for (int i = 0; i < ss.length; i++) {
-//            ss[i] = o[i].toString();
-//        }
-//        return ss;
-//    }
     private void write(Object[] ss) {
         for (Object s : ss) {
-            out.print((s + ";").replace(".", ","));
+            out.print((s + csv_separator).replace(".", decimal_separator));
         }
         out.println();
     }

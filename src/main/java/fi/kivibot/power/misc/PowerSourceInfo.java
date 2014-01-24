@@ -8,8 +8,8 @@ import fi.paivola.mapserver.core.Model;
  */
 public class PowerSourceInfo {
 
-    private Model pp;
-    private double dist, loss;
+    private final Model pp;
+    private final double dist, loss;
 
     public PowerSourceInfo(Model p, double d, double l) {
         pp = p;

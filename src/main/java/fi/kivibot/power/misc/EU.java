@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class EU {
 
-    private static HashMap<DataFrame, HashMap<Model, EU>> hm = new HashMap<>();
+    private static final HashMap<DataFrame, HashMap<Model, EU>> hm = new HashMap<>();
     private double asd;
 
     public EU(double e) {

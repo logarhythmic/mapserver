@@ -1,7 +1,7 @@
-package fi.kivibot.power.models;
+package fi.kivibot.power.models.base;
 
-import fi.kivibot.power.misc.PowerSourceInfo;
 import fi.kivibot.power.misc.EU;
+import fi.kivibot.power.misc.PowerSourceInfo;
 import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
@@ -9,7 +9,6 @@ import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.utils.StringPair;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -20,7 +19,7 @@ import java.util.Queue;
  *
  * @author kivi
  */
-public class PowerUser extends PointModel {
+public abstract class PowerUser extends PointModel {
 
     public PowerUser(int id) {
         super(id);
@@ -31,9 +30,6 @@ public class PowerUser extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         getPower(this.findSources(), last, this);
-        if (this.getDouble("power") == 0) {
-            System.exit(id);
-        }
     }
 
     @Override
@@ -141,5 +137,5 @@ public class PowerUser extends PointModel {
         }
         return null;
     }
-
+    
 }

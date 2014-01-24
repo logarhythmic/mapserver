@@ -1,5 +1,7 @@
 package fi.kivibot.power.models;
 
+import fi.kivibot.power.models.base.PowerPlant;
+
 /**
  *
  * @author kivi

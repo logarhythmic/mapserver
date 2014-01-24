@@ -1,5 +1,6 @@
 package fi.kivibot.power.models;
 
+import fi.kivibot.power.models.base.PowerPlant;
 import fi.kivibot.power.misc.EU;
 import fi.paivola.mapserver.core.DataFrame;
 

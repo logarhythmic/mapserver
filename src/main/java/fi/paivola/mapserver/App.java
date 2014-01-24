@@ -85,9 +85,9 @@ public class App {
         GameThread one = new GameThread((int) Math.floor(52.177457 * 3));
         GameManager gm = one.game;
 
-        Model mp0 = gm.createModel("Solar plant");
+        Model mp0 = gm.createModel("Aggregate");
         Model mc0 = gm.createModel("Power connection");
-        Model mu0 = gm.createModel("Power user");
+        Model mu0 = gm.createModel("Factory");
         Model mc1 = gm.createModel("Power connection");
 
         Model mn0 = gm.createModel("Power node");
@@ -99,7 +99,7 @@ public class App {
         Model mc2 = gm.createModel("Power connection");
         Model mp1 = gm.createModel("Aggregate");
 
-        Model mu1 = gm.createModel("Power user");
+        Model mu1 = gm.createModel("Factory");
         Model mc3 = gm.createModel("Power connection");
 
         gm.linkModelsWith(mu0, mn0, mc0);

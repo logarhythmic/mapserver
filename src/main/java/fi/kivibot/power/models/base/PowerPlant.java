@@ -1,4 +1,4 @@
-package fi.kivibot.power.models;
+package fi.kivibot.power.models.base;
 
 import fi.kivibot.power.misc.EU;
 import fi.paivola.mapserver.core.DataFrame;
