@@ -66,6 +66,8 @@ public class TownStorage extends ExtensionModel {
     }
     
     Supplies findSupplies(int id){
+        if (storage.isEmpty())
+            return null;
         for (Supplies s : storage){
             if (s.id == id)
                 return s;
@@ -79,15 +81,18 @@ public class TownStorage extends ExtensionModel {
      * @return if the storage filled up, this is how much was left of the item
      */
     public double Store(Supplies in){
+        if (in == null)
+            return 0;
         Supplies found = findSupplies(in.id);
         if (found == null){
             storage.add(new Supplies(in.id, in.amount+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.amount));
+            currentCapacity += in.amount+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.amount;
         } else {
             found.amount = (found.amount+(in.amount+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.amount));
+            currentCapacity += (in.amount+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.amount);
         }
         double overflow = currentCapacity+in.amount-maxCapacity;
         overflow = overflow<0?0:overflow;
-        Update();
         return overflow;
     }
     
@@ -132,12 +137,16 @@ public class TownStorage extends ExtensionModel {
     
     void Update(){
         currentCapacity = 0;
-        for (Supplies s:storage){
-            if (s.amount== 0){
-                storage.remove(s);
+        ArrayList<Supplies> scopy = new ArrayList<>(storage);
+        for (int i = scopy.size()-1; i >= 0; i--){
+            if (scopy.get(i) != null ){
+                if (scopy.get(i).amount == 0){
+                    storage.remove(scopy.get(i));
+                }
+                currentCapacity += scopy.get(i).amount;
             }
-            currentCapacity += s.amount;
         }
+        
         if (currentCapacity > maxCapacity){
             System.out.println("Storage had more goods than could fit inside. "
                               +"This should not happen. "
@@ -161,8 +170,13 @@ public class TownStorage extends ExtensionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        this.saveDouble("Items in storage", this.currentCapacity);
-        this.saveDouble("Storage fullness", this.currentCapacity / this.maxCapacity);
+        ((PopCenter)this.parent).storehouse = this;
+        if (((PopCenter)this.parent).DebugFoodSource){
+            while(Store(new Supplies(0,1000)) == 0){}
+        }
+        this.saveDouble("Food in storage", this.countFood());
+        //this.saveDouble("Items in storage", this.currentCapacity);
+        //this.saveDouble("Storage fullness", this.currentCapacity / this.maxCapacity);
     }
 
     @Override
@@ -174,11 +188,15 @@ public class TownStorage extends ExtensionModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        for (Supplies s : storage){
-            s.amount*=s.edible?0.7:1;  //our highly advanced rat algorithm
+        ArrayList<Supplies> scopy = new ArrayList<>(storage);
+        for (int i = 0; i < scopy.size(); i++){
+            if (scopy.get(i) != null && scopy.get(i).amount > 0 && scopy.get(i).edible && storage.size() > 0)
+                storage.get(i).amount*=0.7;  //our highly advanced rat algorithm
         }
-        this.saveDouble("Items in storage", this.currentCapacity);
-        this.saveDouble("Storage fullness", this.currentCapacity / this.maxCapacity);
+        Update();
+        this.saveDouble("Food in storage", this.countFood());
+        //this.saveDouble("Items in storage", this.currentCapacity);
+        //this.saveDouble("Storage fullness", this.currentCapacity / this.maxCapacity);
     }
 
     @Override

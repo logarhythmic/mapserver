@@ -12,7 +12,6 @@ import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.Icon;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *
@@ -32,7 +31,7 @@ public class PopCenter extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         if(storehouse.countFood() < 100){
-                requestSupplies(new Supplies(0, 100 - storehouse.countFood()), current);
+                requestSupplies(new Supplies(0, Math.min(50, 100 - storehouse.countFood())), current);
         }
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
@@ -47,8 +46,8 @@ public class PopCenter extends PointModel {
         }
         
         if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
-           Supplies received = (Supplies) e.value;
-           storehouse.Store(received);
+            Supplies received = (Supplies) e.value;
+            storehouse.Store(received);
         }
     }
     
@@ -79,6 +78,7 @@ public class PopCenter extends PointModel {
      */
     public Supplies answerToRequest(Event e, DataFrame d){
         Supplies sent = (Supplies) e.value;
+        sent = storehouse.Take(sent.id, sent.amount);
         return sendSupplies(sent, (PopCenter) e.sender, d);
     }
     
@@ -88,8 +88,9 @@ public class PopCenter extends PointModel {
         for (Model m : this.connections){
             if (m.getClass().equals(RoadModel.class)) {
                 RoadModel mr = (RoadModel)m;
-                if(mr.remainingCapacityThisTick <= s.amount)
+                if(mr.remainingCapacityThisTick >= s.amount){
                     primary.add(mr);
+                }
             }
         }
         for (RoadModel mr : primary){
@@ -101,7 +102,7 @@ public class PopCenter extends PointModel {
                     for(Model mm : t.connections){
                         if (mm.getClass().equals(RoadModel.class)) {
                             RoadModel mmr = (RoadModel)mm;
-                            if(mmr.remainingCapacityThisTick <= s.amount){
+                            if(mmr.remainingCapacityThisTick >= s.amount){
                                 for (Model tt : mmr.connections){
                                     if (tt.id == target.id){
                                         routes.add(new RoadModel[] {mr, mmr});
@@ -113,8 +114,9 @@ public class PopCenter extends PointModel {
                 }
             }
         }
-        if (routes.isEmpty())
+        if (routes.isEmpty()){
             return null;
+        }
         RoadModel[] bestRoute = routes.get(0);
         double highestLowestCapacity = 0;
         for (RoadModel r : bestRoute){
@@ -135,7 +137,7 @@ public class PopCenter extends PointModel {
     }
     
     /**
-     * Sends supplies from this PopCenter to another. The Transport model is queried for information on how the delivery went. (todo)
+     * Sends supplies from this PopCenter to another. The Transport model is queried for information on how the delivery went.
      * @param s Supplies to send
      * @param target PopCenter to send supplies to
      * @param d the dataframe for the event
@@ -143,6 +145,8 @@ public class PopCenter extends PointModel {
      */
     public Supplies sendSupplies(Supplies s, PopCenter target, DataFrame d){
         RoadModel[] route = getRouteTo(target, s);
+        if (route == null)
+            return s;
         Supplies destroyed = new Supplies(s.id, 0);
         Supplies delivered = new Supplies(s.id, s.amount);
         for (RoadModel r : route){
@@ -166,10 +170,6 @@ public class PopCenter extends PointModel {
     
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        storehouse = (TownStorage) this.extensions.get("storehouse");
-        if (DebugFoodSource){
-            while(storehouse.Store(new Supplies(0,1000)) == 0){}
-        }
         outgoing = new ArrayList<>();
     }
 

@@ -107,7 +107,7 @@ public class RoadModel extends ConnectionModel {
     }
 
     private double calcMaxStuff(double trips) {
-        return possible()?0:trips * A_MOD[transport_type];
+        return possible()?trips * A_MOD[transport_type]:0;
     }
 
     private boolean possible() {

@@ -83,29 +83,18 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 1));
         GameManager gm = one.game;
 
         SettingMaster sm = gm.getDefaultSM("exampleGlobal");
         
         // Create and add
         Model town1 = gm.createModel("PopCenter");
-        ExtensionModel s1 = (ExtensionModel) gm.createModel("TownStorage");
-        town1.addExtension("storehouse", s1);
         Model town2 = gm.createModel("PopCenter");
-        ExtensionModel s2 = (ExtensionModel) gm.createModel("TownStorage");
-        town2.addExtension("storehouse", s2);
         Model town3 = gm.createModel("PopCenter");
-        ExtensionModel s3 = (ExtensionModel) gm.createModel("TownStorage");
-        town3.addExtension("storehouse", s3);
         Model town4 = gm.createModel("PopCenter");
-        ExtensionModel s4 = (ExtensionModel) gm.createModel("TownStorage");
-        town4.addExtension("storehouse", s4);
         Model town5 = gm.createModel("PopCenter");
-        ExtensionModel s5 = (ExtensionModel) gm.createModel("TownStorage");
-        town5.addExtension("storehouse", s5);
         
-        Model[] towns = new Model[]{town1,town2,town3,town4,town5};
         Model road12 = gm.createModel("Road");
         Model road23 = gm.createModel("Road");
         Model road34 = gm.createModel("Road");
