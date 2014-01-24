@@ -39,7 +39,7 @@ public class RoadModel extends ConnectionModel {
     
     private double deliveredThisTick;
     public double remainingCapacityThisTick;
-    private double stealage = 0.1; // get from crime team
+    private double stealage = 0; // get from crime team
     public ArrayList<Supplies> stolenGoods;
     
     boolean roadBlocked;
