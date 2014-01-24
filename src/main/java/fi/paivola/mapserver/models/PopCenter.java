@@ -10,6 +10,7 @@ import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.Icon;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -17,20 +18,24 @@ import java.util.ArrayList;
  */
 public class PopCenter extends PointModel {
 
+    ArrayList<Event> outgoing;
+    
     public PopCenter(String name, int id){
         super(id);
     }
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        
+        for (Event e : outgoing){
+            Supplies retrieved = answerToRequest(e, current);
+            ((TownStorage)(this.extensions.get("storehouse"))).Store(retrieved);
+        }
     }
 
     @Override
     public void onEvent(Event e, DataFrame d) {
         if (e.name.equals("request_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
-            Supplies retrieved = answerToRequest(e, d);
-            ((TownStorage)(this.extensions.get("storehouse"))).Store(retrieved);
+            outgoing.add(e);
         }
         
         if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
@@ -122,9 +127,14 @@ public class PopCenter extends PointModel {
      * @return Supplies sent back from delivery due to failure to deliver
      */
     public Supplies sendSupplies(Supplies s, PopCenter target, DataFrame d){
-        Supplies[] destroyed_and_delivered = new Supplies[]{new Supplies(s.id, 0), new Supplies(s.id, s.amount)}; //TODO: query supplies successfully transported during transit from transport
-        Supplies destroyed = destroyed_and_delivered[0];
-        Supplies delivered = destroyed_and_delivered[1];
+        RoadModel[] route = getRouteTo(target, s);
+        Supplies destroyed = new Supplies(s.id, 0);
+        Supplies delivered = new Supplies(s.id, s.amount);
+        for (RoadModel r : route){
+            Supplies[] destroyed_and_delivered = r.calcDelivery(delivered);
+            destroyed.setAmount(destroyed.getAmount() + destroyed_and_delivered[0].amount);
+            delivered = destroyed_and_delivered[1];
+        }
         Event e = new Event("receive_supplies", Event.Type.OBJECT, delivered);
         e.sender = this;
         addEventTo(target, d, e);
@@ -138,8 +148,9 @@ public class PopCenter extends PointModel {
         sm.color = new Color(255, 128, 64);
         sm.name = "popCenter";
         this.addExtension("storehouse", new TownStorage());
+        outgoing = new ArrayList<>();
     }
-
+    
     @Override
     public void onGenerateDefaults(DataFrame df) {
         //idk lol
