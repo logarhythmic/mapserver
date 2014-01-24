@@ -5,19 +5,19 @@
     "models": [
         {
             "name": "Lake",
-            "class": "fi.water.Lake"
+            "class": "fi.paivola.water.Lake"
         },
         {
             "name": "River",
-            "class": "fi.water.River"
+            "class": "fi.paivola.water.River"
         },
         {
             "name": "Weather",
-            "class": "fi.weathermodel.Weather"
+            "class": "fi.paivola.weathermodel.Weather"
         },
         {
             "name": "Sea",
-            "class": "fi.water.Sea"
+            "class": "fi.paivola.water.Sea"
         }
     ]
 }
