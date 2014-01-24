@@ -1,6 +1,6 @@
 package fi.paivola.water;
 
-import au.com.bytecode.opencsv.CSVWriter;
+//import au.com.bytecode.opencsv.CSVWriter;
 import fi.paivola.mapserver.utils.Color;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
@@ -23,11 +23,12 @@ import java.util.*;
  */
 public class River extends ConnectionModel {
 
-    CSVWriter writer;
+    // CSVWriter writer;
     // General (dimensions and stuff
     double waterAmount = 0;              //  m^3
     double width = 100;                   //  m
     double length = 1000000;             //  m
+    double startDepth = 0;
     double floodDepth = 10;
     double flowDepth = 0.5;
     double slope = 45;
@@ -72,6 +73,7 @@ public class River extends ConnectionModel {
                 this.addEventToAll(current, e);
             }
         }
+        /*
         String[] entries = (waterAmount/1000000000 + "#" + flow/1000000+"#"+(flood?1:0)).split("#");
         for (int i = 0; i < entries.length; i++) {
             entries[i] = entries[i].trim();
@@ -79,6 +81,7 @@ public class River extends ConnectionModel {
         if (writer != null) {
             writer.writeNext(entries);
         }
+                */
     }
 
     @Override
@@ -106,13 +109,13 @@ public class River extends ConnectionModel {
         {
             this.order = Integer.parseInt(sm.settings.get("order").getValue());
             this.saveInt("order", order);
-        }
+        }/*
         if (writer == null) {
             try {
                 writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
             } catch (IOException e) {
                 System.out.println(e.toString());
             }
-        }
+        }*/
     }
 }
