@@ -85,21 +85,25 @@ public class App {
         Model mc0 = gm.createModel("Power connection");
         Model mu0 = gm.createModel("Power user");
         Model mc1 = gm.createModel("Power connection");
-        
+
         Model mn0 = gm.createModel("Power node");
-        
+
         mn0.setLatLng(1, 0);
-        
+
         mp0.setLatLng(1, 3);
-        
+
         Model mc2 = gm.createModel("Power connection");
         Model mp1 = gm.createModel("Power plant");
-        
 
+        Model mu1 = gm.createModel("Power user");
+        Model mc3 = gm.createModel("Power connection");
+
+        
         gm.linkModelsWith(mu0, mn0, mc0);
         gm.linkModelsWith(mp0, mn0, mc1);
         gm.linkModelsWith(mp1, mn0, mc2);
-        
+        gm.linkModelsWith(mu1, mn0, mc3);
+
         if (!profilingRun) {
             gm.printOnDone = 2;
         }

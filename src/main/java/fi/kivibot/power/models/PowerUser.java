@@ -12,6 +12,7 @@ import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.utils.StringPair;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -23,33 +24,33 @@ import java.util.Queue;
  * @author kivi
  */
 public class PowerUser extends PointModel {
-    
+
     public PowerUser(int id) {
         super(id);
         this.name = "Power user";
-        this.saveDouble("usage", 10);
+        this.saveDouble("usage", 5);
     }
-    
+
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        List<PowerSourceInfo> l = this.sort_loss(this.findSources());
-        for (PowerSourceInfo psi : l) {
-            System.out.println(">>> " + psi.getLoss());
+        getPower(this.findSources(), last, this);
+        if (this.getDouble("power") == 0) {
+            System.exit(id);
         }
     }
-    
+
     @Override
     public void onEvent(Event e, DataFrame current) {
     }
-    
+
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
     }
-    
+
     @Override
     public void onGenerateDefaults(DataFrame df) {
     }
-    
+
     @Override
     public void onUpdateSettings(SettingMaster sm) {
     }
@@ -59,12 +60,36 @@ public class PowerUser extends PointModel {
      *
      * @param l
      */
-    private synchronized void getPower(List<PowerSourceInfo> l) {
+    private static synchronized void getPower(List<PowerSourceInfo> l, DataFrame df, Model th) {
+        double ce = 0;
+        l = sort_loss(l);
+
+        for (PowerSourceInfo psi : l) {
+            if (ce >= th.getDouble("usage")) {
+                break;
+            }
+            double a = th.getDouble("usage") - ce;
+            double loss = psi.getLoss();
+            double req = a / (1 - loss);
+
+            Model m = psi.getPowerPlant();
+
+            EU eu = EU.getEU(df, m);
+
+            double cpm = eu.get();
+
+            double sub = Math.min(cpm, req);
+
+            eu.set(cpm - sub);
+            ce += sub * (1.0 - loss);
+
+        }
+        th.saveDouble("power", ce / th.getDouble("usage"));
     }
-    
-    private List<PowerSourceInfo> sort_loss(List<PowerSourceInfo> l) {
+
+    private static List<PowerSourceInfo> sort_loss(List<PowerSourceInfo> l) {
         Collections.sort(l, new Comparator() {
-            
+
             @Override
             public int compare(Object o1, Object o2) {
                 double a = ((PowerSourceInfo) o1).getLoss();
@@ -72,15 +97,15 @@ public class PowerUser extends PointModel {
                 return a == b ? 0 : a < b ? 1 : -1;
             }
         });
-        
+
         return l;
     }
-    
+
     private List<PowerSourceInfo> findSources() {
         List<PowerSourceInfo> sources = new LinkedList<>();
         List<Model> visited = new LinkedList<>();
         Queue<PowerSourceInfo> next = new LinkedList<>();
-        
+
         for (Model m : this.connections) {
             if (m.name.equals("Power connection")) {
                 Model mo = getOther((ConnectionModel) m, this);
@@ -106,10 +131,10 @@ public class PowerUser extends PointModel {
                 }
             }
         }
-        
+
         return sources;
     }
-    
+
     private Model getOther(ConnectionModel cm, Model not) {
         for (Model m : cm.connections) {
             if (!m.equals(not)) {
@@ -118,5 +143,5 @@ public class PowerUser extends PointModel {
         }
         return null;
     }
-    
+
 }

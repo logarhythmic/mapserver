@@ -20,7 +20,7 @@ import fi.paivola.mapserver.utils.Icon;
  */
 public class PowerPlant extends PointModel {
 
-    private double energy = 0;
+    private double energy = 10;
 
     public PowerPlant(int id) {
         super(id);
@@ -29,28 +29,13 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        this.energy = 0.25;
+        EU eu = new EU(energy);
+        EU.saveEU(current, this, eu);
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
-        switch (e.name) {
-            case "energy-req":
-                Object[] dat = (Object[]) e.value;
-                Object[] amo = (Object[]) dat[0];
-                double am = ((Double) amo[0]).doubleValue();
-                double es = energy;
-                if (energy >= am) {
-                    es = am;
-                }
-                energy -= es;
-                amo[0] = Double.valueOf(am - es);
-                Event ev = new Event("energy-get", Event.Type.OBJECT, "" + es);
-                this.addEventTo(e.sender, current, ev);
-                break;
-            default:
-                break;
-        }
+
     }
 
     @Override
@@ -61,6 +46,8 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        EU eu = new EU(energy);
+        EU.saveEU(df, this, eu);
     }
 
     @Override
