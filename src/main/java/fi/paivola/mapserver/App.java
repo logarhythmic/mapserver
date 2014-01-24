@@ -83,7 +83,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 100));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 10));
         GameManager gm = one.game;
         
         gm.createModel("Weather");

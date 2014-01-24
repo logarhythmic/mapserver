@@ -10,6 +10,7 @@ import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.Icon;
+import fi.paivola.mapserver.utils.RangeDouble;
 import java.util.ArrayList;
 
 /**
@@ -18,12 +19,17 @@ import java.util.ArrayList;
  */
 public class PopCenter extends PointModel {
 
+    double STORAGE_RAT_RAVENOUSNESS;
+    
+    ArrayList<Supplies> storage;
+    double maxStorageCapacity;
+    double currentStorageCapacity;
+    
     public boolean DebugFoodSource;
     private int requestsReceivedThisTick = 0;
     private int requestsServedThisTick = 0;
     
     ArrayList<Event> outgoing;
-    public TownStorage storehouse;
     ArrayList<PopCenter> otherTowns;
     
     public PopCenter(int id){
@@ -32,18 +38,27 @@ public class PopCenter extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        if(storehouse.countFood() < 3000){
-                requestSuppliesFromAll(new Supplies(0, Math.min(50, 3000 - storehouse.countFood())), current);
+        if(countFood() < 300){
+            requestSuppliesFromAll(new Supplies(0, Math.min(50, 3000 - countFood())), current);
         }
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
-            storehouse.Store(retrieved);
+            Store(retrieved);
         }
         outgoing.clear();
         this.saveInt("Shipments sent", requestsServedThisTick);
         requestsServedThisTick = 0;
         this.saveInt("Shipments requested", requestsReceivedThisTick);
         requestsReceivedThisTick = 0;
+        ArrayList<Supplies> scopy = new ArrayList<>(storage);
+        for (int i = 0; i < scopy.size(); i++){
+            if (scopy.get(i) != null && scopy.get(i).amount > 0 && scopy.get(i).edible && storage.size() > 0)
+                storage.get(i).amount*=(1 - STORAGE_RAT_RAVENOUSNESS);  //our highly advanced rat algorithm
+        }
+        UpdateStorage();
+        this.saveDouble("Food in storage", this.countFood());
+        //this.saveDouble("Items in storage", this.currentStorageCapacity);
+        //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
 
     @Override
@@ -55,7 +70,7 @@ public class PopCenter extends PointModel {
         
         if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
             Supplies received = (Supplies) e.value;
-            storehouse.Store(received);
+            Store(received);
         }
     }
     
@@ -73,7 +88,7 @@ public class PopCenter extends PointModel {
     
     public void requestSuppliesFromAll(Supplies s, DataFrame d){
         for(PopCenter p : otherTowns){
-            if (p.storehouse.currentCapacity > 0)
+            if (p.currentStorageCapacity > 0)
                 requestSuppliesFrom(s, p, d);
         }
     }
@@ -85,7 +100,7 @@ public class PopCenter extends PointModel {
      * @return Supplies sent back from delivery due to failure to deliver
      */
     public Supplies answerToRequest(Event e, DataFrame d){
-        Supplies sent = storehouse.Take(((Supplies)e.value).id, ((Supplies)e.value).amount);
+        Supplies sent = Take(((Supplies)e.value).id, ((Supplies)e.value).amount);
         return sendSupplies(sent, (PopCenter) e.sender, d);
     }
     
@@ -174,13 +189,23 @@ public class PopCenter extends PointModel {
         sm.setIcon(Icon.TOWN);
         sm.color = new Color(255, 128, 64);
         sm.name = "PopCenter";
+        sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 10000, new RangeDouble(1, 1000000000)));
+        sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0, new RangeDouble(0, 1)));
     }
     
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        System.out.println("OGD called on village "+this.id+" at "+df.index);
+        storage = new ArrayList<>();
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
         findOthers();
+        if (DebugFoodSource){
+            while(Store(new Supplies(0,1000)) == 0){}
+        }
+        this.saveDouble("Food in storage", this.countFood());
+        //this.saveDouble("Items in storage", this.currentStorageCapacity);
+        //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
     
     void findOthers(){
@@ -210,7 +235,109 @@ public class PopCenter extends PointModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        //idk lol
+        this.maxStorageCapacity = Double.parseDouble(sm.settings.get("maxCap").getValue());
+        this.STORAGE_RAT_RAVENOUSNESS = Double.parseDouble(sm.settings.get("ratRavenousness").getValue());
     }
+    
+    Supplies findSupplies(int id){
+        if (storage.isEmpty())
+            return null;
+        for (Supplies s : storage){
+            if (s.id == id)
+                return s;
+        }
+        return null;
+    }
+    
+    /**
+     * Stores the given supplies item into the storage
+     * @param in what to store
+     * @return if the storage filled up, this is how much was left of the item
+     */
+    public double Store(Supplies in){
+        if (in == null)
+            return 0;
+        Supplies found = findSupplies(in.id);
+        if (found == null){
+            storage.add(new Supplies(in.id, in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount));
+            currentStorageCapacity += in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount;
+        } else {
+            found.amount = (found.amount+(in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount));
+            currentStorageCapacity += (in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount);
+        }
+        double overflow = currentStorageCapacity+in.amount-maxStorageCapacity;
+        overflow = overflow<0?0:overflow;
+        return overflow;
+    }
+    
+    
+    
+    /**
+     * @param id the identifier for the type of supplies
+     * @return how much of that we have in stock
+     */
+    public double QuerySupplies(int id){
+        Supplies found = findSupplies(id);
+        if (found == null)
+            return 0;
+        else return found.amount;
+    }
+    
+    /**
+     * @return how much stuff is in stock
+     */
+    public double QueryCapacity(){
+        return currentStorageCapacity;
+    }
+    
+    public double QuerySpace(){
+        return maxStorageCapacity - currentStorageCapacity;
+    }
+    
+    /**
+     * Takes a supply item out of the storage
+     * @param id which supplies
+     * @param amount how much
+     * @return the created Supplies item
+     */
+    public Supplies Take(int id, double amount){
+        Supplies found = findSupplies(id);
+        if (found == null){
+            return new Supplies(id, 0);
+        } else {
+            double taken = Math.min(amount, found.amount);
+            found.amount = (found.amount - taken);
+            return new Supplies(id, taken);
+        }
+    }
+    
+    void UpdateStorage(){
+        currentStorageCapacity = 0;
+        ArrayList<Supplies> scopy = new ArrayList<>(storage);
+        for (int i = scopy.size()-1; i >= 0; i--){
+            if (scopy.get(i) != null ){
+                if (scopy.get(i).amount == 0){
+                    storage.remove(scopy.get(i));
+                }
+                currentStorageCapacity += scopy.get(i).amount;
+            }
+        }
+        
+        if (currentStorageCapacity > maxStorageCapacity){
+            System.out.println("Storage had more goods than could fit inside. "
+                              +"This should not happen. "
+                              +"Please use the Store method to store items.");
+        }
+    }
+
+    public double countFood(){
+        double ret = 0;
+        for (Supplies s: storage){
+            ret += s.edible?s.amount:0;
+        }
+        
+        return ret;
+    }
+    
     
 }

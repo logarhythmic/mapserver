@@ -76,10 +76,6 @@
             "class": "fi.paivola.mapserver.models.PopCenter"
         },
         {
-            "name": "TownStorage",
-            "class": "fi.paivola.mapserver.models.TownStorage"
-        },
-        {
             "name": "PhoneLine",
             "class": "fi.paivola.mapserver.models.PhoneLine"
         }
