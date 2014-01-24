@@ -78,28 +78,24 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(1000));
+        GameThread one = new GameThread((int) Math.floor(2000));
         GameManager gm = one.game;
 
         // Create and add
         Model l1 = gm.createModel("Lake");
-        SettingMaster sm = gm.getDefaultSM("Lake");
-        sm.settings.get("height").setValue("1");
-        l1.onActualUpdateSettings(sm);
-
-        /*
         Model l2 = gm.createModel("Lake");
-        sm = gm.getDefaultSM("Lake");
-        sm.settings.get("height").setValue("2");
-        l2.onActualUpdateSettings(sm);
-        
         Model r1 = gm.createModel("River");
-        sm = gm.getDefaultSM("River");
-        sm.settings.get("height").setValue("3");
-        r1.onActualUpdateSettings(sm);
+        Model r2 = gm.createModel("River");
+        Model l3 = gm.createModel("Lake");
+        Model r3 = gm.createModel("River");
+        Model s1 = gm.createModel("Sea");
         
-        gm.linkModelsWith(l1, l2, r1);
-                */
+        Model weather = gm.createModel("Weather");
+        
+        gm.linkModelsWith(l1, l3, r1);
+        gm.linkModelsWith(l2, l3, r2);
+        gm.linkModelsWith(l3, s1, r3);
+
         
         if (!profilingRun) {
             gm.printOnDone = 2;

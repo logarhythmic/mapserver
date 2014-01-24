@@ -10,6 +10,14 @@
         {
             "name": "River",
             "class": "fi.water.River"
+        },
+        {
+            "name": "Weather",
+            "class": "fi.weathermodel.Weather"
+        },
+        {
+            "name": "Sea",
+            "class": "fi.water.Sea"
         }
     ]
 }
