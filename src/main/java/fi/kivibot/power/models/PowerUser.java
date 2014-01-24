@@ -49,6 +49,7 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        this.saveDouble("power", 0);
     }
 
     @Override

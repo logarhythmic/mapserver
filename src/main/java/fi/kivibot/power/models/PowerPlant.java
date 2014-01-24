@@ -14,7 +14,7 @@ import fi.paivola.mapserver.utils.Icon;
  */
 public class PowerPlant extends PointModel {
 
-    private double energy = 70;
+    protected double energy = 70;
 
     public PowerPlant(int id) {
         super(id);
@@ -30,7 +30,6 @@ public class PowerPlant extends PointModel {
 
     @Override
     public void onEvent(Event e, DataFrame current) {
-
     }
 
     @Override
@@ -42,6 +41,7 @@ public class PowerPlant extends PointModel {
     @Override
     public void onGenerateDefaults(DataFrame df) {
         EU eu = new EU(energy);
+        this.saveString("production", eu.toString());
         EU.saveEU(df, this, eu);
     }
 

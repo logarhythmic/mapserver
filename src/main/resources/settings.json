@@ -12,6 +12,14 @@
             "class": "fi.kivibot.power.models.SolarPlant"
         },
         {
+            "name": "Wind plant",
+            "class": "fi.kivibot.power.models.WindPlant"
+        },
+        {
+            "name": "Aggregate",
+            "class": "fi.kivibot.power.models.Aggregate"
+        },
+        {
             "name": "Power connection",
             "class": "fi.kivibot.power.models.PowerConnection"
         },

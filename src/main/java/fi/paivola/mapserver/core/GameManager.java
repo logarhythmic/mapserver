@@ -415,5 +415,13 @@ public class GameManager {
         tmp.misc = towhere;
         this.waiting_extensions.add(tmp);
     }
+    
+    /**
+     * 
+     * @return Is it ready?
+     */
+    public boolean isReady(){
+        return ready;
+    }
 
 }

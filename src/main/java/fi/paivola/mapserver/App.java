@@ -1,5 +1,6 @@
 package fi.paivola.mapserver;
 
+import fi.kivibot.power.utils.CSVDumper;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
@@ -11,7 +12,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Integer.parseInt;
 import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import org.json.simple.parser.ParseException;
 
 public class App {
@@ -78,7 +82,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 0.2));
         GameManager gm = one.game;
 
         Model mp0 = gm.createModel("Power plant");
@@ -93,12 +97,11 @@ public class App {
         mp0.setLatLng(1, 3);
 
         Model mc2 = gm.createModel("Power connection");
-        Model mp1 = gm.createModel("Solar plant");
+        Model mp1 = gm.createModel("Aggregate");
 
         Model mu1 = gm.createModel("Power user");
         Model mc3 = gm.createModel("Power connection");
 
-        
         gm.linkModelsWith(mu0, mn0, mc0);
         gm.linkModelsWith(mp0, mn0, mc1);
         gm.linkModelsWith(mp1, mn0, mc2);
@@ -110,5 +113,18 @@ public class App {
 
         // Start the gamethread
         one.start();
+        
+        while(!gm.isReady()){
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        CSVDumper d = new CSVDumper();
+        d.add(mp0, "production");
+        d.add(mu0, "power");
+        d.save(gm);
     }
 }
