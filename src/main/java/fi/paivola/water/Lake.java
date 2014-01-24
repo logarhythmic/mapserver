@@ -35,11 +35,13 @@ public class Lake extends PointModel {
     // Lake dimensions and water amount 
     double surfaceArea = 256120000f;         // m^2
     double depth = 14.1f;                    // m       flood water level
-    double waterAmount = 3132000000.0;        // m^3
+    double waterAmount = 0;                 // m^3
+
+    double startAmount = 0.9;
+    double flowAmount = 0.91;
 
     // Flows
-    double C;                                // Chezy variable
-    double h = 0.91;                          // When does the lake start to flow?   
+    double C;                                // Chezy variable  
 
     // Rain
     double basinArea = 7642000000f;           // m^2
@@ -78,9 +80,9 @@ public class Lake extends PointModel {
         double flow = 0;
 
         //if the water level is over the boundaries of the lake, count the overflowing amount water
-        if (waterAmount > depth*h * surfaceArea) {
+        if (waterAmount > depth * flowAmount * surfaceArea) {
             // the depth of the overflowing water
-            double currentDepth = (waterAmount - surfaceArea * depth*h) / surfaceArea;
+            double currentDepth = (waterAmount - surfaceArea * depth * flowAmount) / surfaceArea;
             // calculate the chezy variable used in the chezy flow speed equation
             C = (double) ((1 / 0.03f) * Math.pow(currentDepth, 1 / 6));
             // calculate the speed of the overflowing watermass
@@ -113,25 +115,23 @@ public class Lake extends PointModel {
         }
 
         // write the data to a .csv - file -- wateramount, actual rainfall and flow in km^3
-        
         Event e;
         Boolean flood = false;
-        if(waterAmount > surfaceArea*depth)
-        {
+        if (waterAmount > surfaceArea * depth) {
             flood = true;
-            e = new Event("Flood",Event.Type.OBJECT, flood);
+            e = new Event("Flood", Event.Type.OBJECT, flood);
             this.addEventToAll(current, e);
         }
         /*
-        entries = (waterAmount/1000000000 + "#" + evapotranspiration/1000000 + "#" + temperature + "#" + actualRainfall/1000000000+ "#" + flow/1000000+"#"+(flood?1:0)).split("#");
+         entries = (waterAmount/1000000000 + "#" + evapotranspiration/1000000 + "#" + temperature + "#" + actualRainfall/1000000000+ "#" + flow/1000000+"#"+(flood?1:0)).split("#");
         
-        for (int i = 0; i < entries.length; i++) {
-            entries[i] = entries[i].trim();
-        }
+         for (int i = 0; i < entries.length; i++) {
+         entries[i] = entries[i].trim();
+         }
 
-        if (writer != null) {
-            writer.writeNext(entries);
-        }*/
+         if (writer != null) {
+         writer.writeNext(entries);
+         }*/
     }
 
     @Override
@@ -153,22 +153,22 @@ public class Lake extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-
+        waterAmount = surfaceArea * startAmount;
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        if(Integer.parseInt(sm.settings.get("order").getValue()) != this.order)
-        {
+        if (Integer.parseInt(sm.settings.get("order").getValue()) != this.order) {
             this.order = Integer.parseInt(sm.settings.get("order").getValue());
             this.saveInt("order", order);
         }/*
-       if (writer == null) {
-            try {
-                writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
-            } catch (IOException e) {
-                System.out.println(e.toString());
-            }
-        }*/
+         if (writer == null) {
+         try {
+         writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
+         } catch (IOException e) {
+         System.out.println(e.toString());
+         }
+         }*/
+
     }
 }
