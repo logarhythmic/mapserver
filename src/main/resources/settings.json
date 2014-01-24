@@ -4,6 +4,22 @@
     "csv_seperator": ",\t",
     "models": [
         {
+            "name": "examplePoint",
+            "class": "fi.paivola.mapserver.models.ExamplePoint"
+        },
+        {
+            "name": "exampleExtender",
+            "class": "fi.paivola.mapserver.models.ExampleExtender"
+        },
+        {
+            "name": "exampleConnection",
+            "class": "fi.paivola.mapserver.models.ExampleConnection"
+        },
+        {
+            "name": "exampleGlobal",
+            "class": "fi.paivola.mapserver.models.ExampleGlobal"
+        },
+        {
             "name": "Power plant",
             "class": "fi.kivibot.power.models.PowerPlant"
         },
@@ -24,22 +40,6 @@
             "class": "fi.kivibot.power.models.PowerNode"
         },
         {
-            "name": "examplePoint",
-            "class": "fi.paivola.mapserver.models.ExamplePoint"
-        },
-        {
-            "name": "exampleExtender",
-            "class": "fi.paivola.mapserver.models.ExampleExtender"
-        },
-        {
-            "name": "exampleConnection",
-            "class": "fi.paivola.mapserver.models.ExampleConnection"
-        },
-        {
-            "name": "exampleGlobal",
-            "class": "fi.paivola.mapserver.models.ExampleGlobal"
-        },
-        {
             "name": "Lake",
             "class": "fi.paivola.water.Lake"
         },
@@ -50,10 +50,6 @@
         {
             "name": "Sea",
             "class": "fi.paivola.water.Sea"
-        },
-        {
-            "name": "Groundwater",
-            "class": "fi.paivola.water.Groundwater"
         },
         {
             "name": "populationExtender",
@@ -78,6 +74,10 @@
         {
             "name": "TownStorage",
             "class": "fi.paivola.mapserver.models.TownStorage"
+        },
+        {
+            "name": "PhoneLine",
+            "class": "fi.paivola.mapserver.models.PhoneLine"
         }
     ]
 }

@@ -38,6 +38,8 @@ import fi.paivola.mapserver.utils.RangeDouble;
  * @author Allan Palmu <allan.palmu@gmail.com>
  */
 public class TownStorage extends ExtensionModel {
+    double RAT_RAVENOUSNESS;
+    
     ArrayList<Supplies> storage;
     double maxCapacity;
     double currentCapacity;
@@ -184,6 +186,7 @@ public class TownStorage extends ExtensionModel {
         sm.name = "townStorage";
         sm.exts = "PopCenter";
         sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 10000, new RangeDouble(1, 1000000000)));
+        sm.settings.put("ratRavenousness", new SettingDouble("How much of the stored food will be eaten by rats in a week", 0.3, new RangeDouble(0, 1)));
     }
 
     @Override
@@ -191,7 +194,7 @@ public class TownStorage extends ExtensionModel {
         ArrayList<Supplies> scopy = new ArrayList<>(storage);
         for (int i = 0; i < scopy.size(); i++){
             if (scopy.get(i) != null && scopy.get(i).amount > 0 && scopy.get(i).edible && storage.size() > 0)
-                storage.get(i).amount*=0.7;  //our highly advanced rat algorithm
+                storage.get(i).amount*=(1 - RAT_RAVENOUSNESS);  //our highly advanced rat algorithm
         }
         Update();
         this.saveDouble("Food in storage", this.countFood());
@@ -202,5 +205,6 @@ public class TownStorage extends ExtensionModel {
     @Override
     public void onUpdateSettings(SettingMaster sm) {
         this.maxCapacity = Double.parseDouble(sm.settings.get("maxCap").getValue());
+        this.RAT_RAVENOUSNESS = Double.parseDouble(sm.settings.get("ratRavenousness").getValue());
     }
 }

@@ -82,7 +82,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 1));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 100));
         GameManager gm = one.game;
 
         // globalit
@@ -98,7 +98,8 @@ public class App {
         Model Town2 = gm.createModel("PopCenter");
         Model Road1 = gm.createModel("Road");
         gm.linkModelsWith(Town1, Town2, Road1);
-        
+        gm.linkModelsWith(Town1, Town2, gm.createModel("PhoneLine"));
+
         // ruoka x kaupungit
         Model Road2 = gm.createModel("Road");
         gm.linkModelsWith(Field1, Town1, Road2);
