@@ -34,11 +34,11 @@ public class Lake extends PointModel {
     // Lake dimensions and water amount 
     float surfaceArea = 256120000f;         // m^2
     float depth = 14.1f;                    // m    TODO rename to fit its actual role as the depth of the lake "bowl"
+    float floodDepth = 20;
     float waterAmount = 3480000000f;        // m^3
 
     // Flows
     float C;                                // Chezy variable
-    boolean flood = false;
 
     // Rain
     float basinArea = 7642000000f;           // m^2
@@ -113,16 +113,22 @@ public class Lake extends PointModel {
 
         // write the data to a .csv - file
         entries = (waterAmount / 1000000000 + "#" + evapotranspiration / 1000000000 + "#" + temperature + "#" + actualRainfall / 1000000000 + "#" + flow / 1000000000).split("#");
-
-        /*for (int i = 0; i < entries.length; i++) {
+        /*
+        for (int i = 0; i < entries.length; i++) {
             entries[i] = entries[i].trim();
         }
 
         if (writer != null) {
             writer.writeNext(entries);
         }*/
-        this.saveData(this.id+"waterAmount", waterAmount);
-        this.saveData(this.id+"flooding", flood);
+        Event e;
+        if(waterAmount > surfaceArea*floodDepth)
+        {
+            Boolean flood = true;
+            e = new Event("Flood",Event.Type.OBJECT, flood);
+            this.addEventToAll(current, e);
+        }
+        this.saveData("waterAmount", waterAmount);
     }
 
     @Override
@@ -144,7 +150,7 @@ public class Lake extends PointModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        /*if (writer == null) {
+       /* if (writer == null) {
             try {
                 writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
             } catch (IOException e) {

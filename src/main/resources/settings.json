@@ -18,6 +18,10 @@
         {
             "name": "Sea",
             "class": "fi.paivola.water.Sea"
+        },
+        {
+            "name": "Groundwater",
+            "class": "fi.paivola.water.Groundwater"
         }
     ]
 }
