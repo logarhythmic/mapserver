@@ -22,9 +22,9 @@ public abstract class Crop extends Edible {
     private double sunlightMinimum;
     private double sunlightOptimal;
     private double sunlightMaximum;
-    private double phMinimum;
-    private double phOptimal;
-    private double phMaximum;
+    private double pHMinimum;
+    private double pHOptimal;
+    private double pHMaximum;
     private double maxYield;
     private int growTime;
     private int currentGrowTime;
@@ -33,7 +33,8 @@ public abstract class Crop extends Edible {
     private Distribution waterDistribution;
     private Distribution temperatureDistribution;
     private Distribution sunlightDistribution;
-    private Distribution phDistribution;
+    private Distribution pHDistribution;
+    private double storedWater;
 
     /* The constructor is horrible, I'm sorry. */
     public Crop(String name, double wmin, double wopt, double wmax,
@@ -55,58 +56,31 @@ public abstract class Crop extends Edible {
         sunlightMinimum = smin;
         sunlightOptimal = sopt;
         sunlightMaximum = smax;
-        phMinimum = phmin;
-        phOptimal = phopt;
-        phMaximum = phmax;
+        pHMinimum = phmin;
+        pHOptimal = phopt;
+        pHMaximum = phmax;
         growTime = gtime;
         maxYield = yield;
         currentStoredFood = 0;
-        /*
-        this.sm.settings.put("name", new SettingString("name", this.name));
-        this.sm.settings.put("minwater", new SettingDouble("water minimum"
-                + "(cm/week)", getWaterMinimum(), r));
-        this.sm.settings.put("optwater", new SettingDouble("water optimum"
-                + "(cm/week)", getWaterOptimal(), r));
-        this.sm.settings.put("maxwater", new SettingDouble("water maximum"
-                + "(cm/week)", getWaterMaximum(), r));
-        this.sm.settings.put("mintemp", new SettingDouble("minimum average "
-                + "temperature (C)", getTemperatureMinimum(), r));
-        this.sm.settings.put("opttemp", new SettingDouble("optimal average "
-                + "temperature (C)", getTemperatureOptimal(), r));
-        this.sm.settings.put("maxtemp", new SettingDouble("maximum average "
-                + "temperature (C)", getTemperatureMaximum(), r));
-        this.sm.settings.put("minsun", new SettingDouble("minimum sunlight "
-                + "(hours / day)", getSunlightMinimum(), r));
-        this.sm.settings.put("optsun", new SettingDouble("optimal sunlight "
-                + "(hours / day)", getSunlightOptimal(), r));
-        this.sm.settings.put("maxsun", new SettingDouble("maximum sunlight "
-                + "(hours / day)", getSunlightMaximum(), r));
-        this.sm.settings.put("minph", new SettingDouble("minimum ph",
-                    getPHMinimum(), r));
-        this.sm.settings.put("optph", new SettingDouble("optimal ph", 
-                    getPHOptimal(), r));
-        this.sm.settings.put("maxph", new SettingDouble("maximum ph",
-                    getPHMaximum(), r));
-        this.sm.settings.put("growtime", new SettingInt("growing time",
-                    getGrowTime(), i));
-        */
-        this.waterDistribution = new Distribution(getWaterMinimum(),
-                                                  getWaterOptimal(),
-                                                  getWaterMaximum());
-        this.temperatureDistribution = new Distribution(getTemperatureMinimum(),
-                                                  getTemperatureOptimal(),
-                                                  getTemperatureMaximum());
-        this.sunlightDistribution = new Distribution(getSunlightMinimum(),
-                                                  getSunlightOptimal(),
-                                                  getSunlightMaximum());
-        this.phDistribution = new Distribution(getPHMinimum(),
-                                                  getPHOptimal(),
-                                                  getPHMaximum());
+        currentIndexMultiplier = 0;
+        storedWater = 0;
+        this.waterDistribution = new Distribution(waterMinimum,
+                                                  waterOptimal,
+                                                  waterMaximum);
+        this.temperatureDistribution = new Distribution(temperatureMinimum,
+                                                  temperatureOptimal,
+                                                  temperatureMaximum);
+        this.sunlightDistribution = new Distribution(sunlightMinimum,
+                                                  sunlightOptimal,
+                                                  sunlightMaximum);
+        this.pHDistribution = new Distribution(pHMinimum,
+                                                  pHOptimal,
+                                                  pHMaximum);
     }
 
     public void resetCrop() {
-        this.setCurrentGrowTime(0);
-        this.setCurrentIndexMultiplier(0);
+        currentGrowTime = 0;
+        currentIndexMultiplier = 0;
     }
 
     @Override
@@ -115,29 +89,29 @@ public abstract class Crop extends Edible {
         if(month == 1 || month == 2 || month == 12)
             resetCrop();
 
-        if(this.getCurrentGrowTime() == this.getGrowTime()) {
-            currentStoredFood += this.getCurrentIndexMultiplier() /
-                    this.getGrowTime() * this.getArea() * this.getMaxYield();
-            this.setCurrentGrowTime(0);
-            this.setCurrentIndexMultiplier(0);
+        if(currentGrowTime == growTime) {
+            currentStoredFood += currentIndexMultiplier /
+                    growTime * getArea() * maxYield;
+            resetCrop();
         }
         else {
-            this.setCurrentGrowTime(this.getCurrentGrowTime() + 1);
-            this.setCurrentIndexMultiplier(this.getCurrentIndexMultiplier() +
-                    this.getWaterIndex(last) * this.getTemperatureIndex(last)
-                    * this.getSunshineIndex(last) * this.getPHIndex(last));            
+            currentGrowTime++;
+            currentIndexMultiplier += this.getWaterIndex(last) *
+                this.getTemperatureIndex(last) * this.getSunshineIndex(last) * 
+                this.getPHIndex(last);
         }
-        return currentStoredFood;
+        /* XXX: constant multiplier */
+        return currentStoredFood * 3;
     }
    
-    public double gather(double max) {
+    public double harvest(double max) {
         double ret = getCurrentStoredFood();
         if(max < 0 || max > ret) {
             currentStoredFood = 0;
             return ret;
         }
         currentStoredFood -= max;
-        return d - currentStoredFood;
+        return ret - currentStoredFood;
     }
 
     public double getCurrentStoredFood() {
@@ -145,7 +119,19 @@ public abstract class Crop extends Edible {
     }
     
     private double getWaterIndex(DataFrame last) {
-        return waterDistribution.exact(last.getGlobalDouble("rain"));
+        double d = waterDistribution.exact(last.getGlobalDouble("rain"));
+        if(d < 1) {
+            if(storedWater > d * getArea()) {
+                storedWater -= d * getArea();
+                return 1;
+            }
+            else {
+                double m = storedWater;
+                storedWater = 0;
+                return d + storedWater/getArea();
+            }
+        }
+        return d;
     }
     
     private double getTemperatureIndex(DataFrame last) {
@@ -160,219 +146,5 @@ public abstract class Crop extends Edible {
     private double getPHIndex(DataFrame last) {
         return 1;
         //throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    private double getMaxYield() {
-        return maxYield;
-    }
-
-    /**
-     * @return the waterMinimum
-     */
-    public final double getWaterMinimum() {
-        return waterMinimum;
-    }
-
-    /**
-     * @param waterMinimum the waterMinimum to set
-     */
-    public final void setWaterMinimum(double waterMinimum) {
-        this.waterMinimum = waterMinimum;
-    }
-
-    /**
-     * @return the waterOptimal
-     */
-    public final double getWaterOptimal() {
-        return waterOptimal;
-    }
-
-    /**
-     * @param waterOptimal the waterOptimal to set
-     */
-    public final void setWaterOptimal(double waterOptimal) {
-        this.waterOptimal = waterOptimal;
-    }
-
-    /**
-     * @return the waterMaximum
-     */
-    public final double getWaterMaximum() {
-        return waterMaximum;
-    }
-
-    /**
-     * @param waterMaximum the waterMaximum to set
-     */
-    public final void setWaterMaximum(double waterMaximum) {
-        this.waterMaximum = waterMaximum;
-    }
-
-    /**
-     * @return the temperatureMinimum
-     */
-    public final double getTemperatureMinimum() {
-        return temperatureMinimum;
-    }
-
-    /**
-     * @param temperatureMinimum the temperatureMinimum to set
-     */
-    public final void setTemperatureMinimum(double temperatureMinimum) {
-        this.temperatureMinimum = temperatureMinimum;
-    }
-
-    /**
-     * @return the temperatureOptimal
-     */
-    public final double getTemperatureOptimal() {
-        return temperatureOptimal;
-    }
-
-    /**
-     * @param temperatureOptimal the temperatureOptimal to set
-     */
-    public final void setTemperatureOptimal(double temperatureOptimal) {
-        this.temperatureOptimal = temperatureOptimal;
-    }
-
-    /**
-     * @return the temperatureMaximum
-     */
-    public final double getTemperatureMaximum() {
-        return temperatureMaximum;
-    }
-
-    /**
-     * @param temperatureMaximum the temperatureMaximum to set
-     */
-    public final void setTemperatureMaximum(double temperatureMaximum) {
-        this.temperatureMaximum = temperatureMaximum;
-    }
-
-    /**
-     * @return the sunlightMinimum
-     */
-    public final double getSunlightMinimum() {
-        return sunlightMinimum;
-    }
-
-    /**
-     * @param sunlightMinimum the sunlightMinimum to set
-     */
-    public final void setSunlightMinimum(double sunlightMinimum) {
-        this.sunlightMinimum = sunlightMinimum;
-    }
-
-    /**
-     * @return the sunlightOptimal
-     */
-    public final double getSunlightOptimal() {
-        return sunlightOptimal;
-    }
-
-    /**
-     * @param sunlightOptimal the sunlightOptimal to set
-     */
-    public final void setSunlightOptimal(double sunlightOptimal) {
-        this.sunlightOptimal = sunlightOptimal;
-    }
-
-    /**
-     * @return the sunlightMaximum
-     */
-    public final double getSunlightMaximum() {
-        return sunlightMaximum;
-    }
-
-    /**
-     * @param sunlightMaximum the sunlightMaximum to set
-     */
-    public final void setSunlightMaximum(double sunlightMaximum) {
-        this.sunlightMaximum = sunlightMaximum;
-    }
-
-    /**
-     * @return the phMinimum
-     */
-    public final double getPHMinimum() {
-        return phMinimum;
-    }
-
-    /**
-     * @param phMinimum the phMinimum to set
-     */
-    public final void setPHMinimum(double phMinimum) {
-        this.phMinimum = phMinimum;
-    }
-
-    /**
-     * @return the phOptimal
-     */
-    public final double getPHOptimal() {
-        return phOptimal;
-    }
-
-    /**
-     * @param phOptimal the phOptimal to set
-     */
-    public final void setPHOptimal(double phOptimal) {
-        this.phOptimal = phOptimal;
-    }
-
-    /**
-     * @return the phMaximum
-     */
-    public final double getPHMaximum() {
-        return phMaximum;
-    }
-
-    /**
-     * @param phMaximum the phMaximum to set
-     */
-    public final void setPHMaximum(double phMaximum) {
-        this.phMaximum = phMaximum;
-    }
-
-    /**
-     * @return the growTime
-     */
-    public final int getGrowTime() {
-        return growTime;
-    }
-
-    /**
-     * @param growTime the growTime (in weeks) to set
-     */
-    public final void setGrowTime(int growTime) {
-        this.growTime = growTime;
-    }
-
-    /**
-     * @return the currentGrowTime
-     */
-    public int getCurrentGrowTime() {
-        return currentGrowTime;
-    }
-
-    /**
-     * @param currentGrowTime the currentGrowTime to set
-     */
-    public void setCurrentGrowTime(int currentGrowTime) {
-        this.currentGrowTime = currentGrowTime;
-    }
-    
-    /**
-     * @return the currentIndexMultiplier
-     */
-    public double getCurrentIndexMultiplier() {
-        return currentIndexMultiplier;
-    }
-
-    /**
-     * @param currentIndexMultiplier the currentIndexMultiplier to set
-     */
-    public void setCurrentIndexMultiplier(double currentIndexMultiplier) {
-        this.currentIndexMultiplier = currentIndexMultiplier;
     }
 }

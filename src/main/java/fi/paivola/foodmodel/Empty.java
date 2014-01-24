@@ -19,4 +19,7 @@ public class Empty extends Edible {
         return 0;
     }
     
+    double harvest(double max) {
+        return 0;
+    }
 }

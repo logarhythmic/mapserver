@@ -44,5 +44,6 @@ public abstract class Edible {
     }
     
     abstract double onTick(DataFrame last, DataFrame current);
+    abstract double harvest(double max);
 
 }

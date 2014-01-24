@@ -18,6 +18,7 @@ public class Temperature {
 
     public static double getTemperature(Calendar date) {
         int month = date.get(Calendar.MONTH);
-        return tempMin[month] + (tempMax[month] - tempMin[month]) / 2;
+        return tempMin[month] + (tempMax[month] - tempMin[month]) / 2 - 1 +
+            (int)(Math.random()*3);
     }
 }
