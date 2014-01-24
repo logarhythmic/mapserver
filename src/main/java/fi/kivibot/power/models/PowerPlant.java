@@ -14,7 +14,7 @@ import fi.paivola.mapserver.utils.Icon;
  */
 public class PowerPlant extends PointModel {
 
-    protected double energy = 70;
+    protected double energy = 1700;
 
     public PowerPlant(int id) {
         super(id);

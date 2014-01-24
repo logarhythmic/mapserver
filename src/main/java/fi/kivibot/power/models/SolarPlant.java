@@ -18,10 +18,19 @@ public class SolarPlant extends PowerPlant {
         if (sunstr == null) {
             super.onTick(last, current);
         } else {
-            EU eu = new EU((Double) sunstr);
+            EU eu = new EU(sun2eu((Double) sunstr));
             this.saveString("production", eu.toString());
             EU.saveEU(current, this, eu);
         }
+    }
+
+    /**
+     * 
+     * @param convert sun light into power
+     * @return 
+     */
+    private double sun2eu(double s) {
+        return 2000 * s;
     }
 
 }

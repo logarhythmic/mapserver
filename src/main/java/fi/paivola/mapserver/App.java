@@ -82,10 +82,10 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 0.2));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 3));
         GameManager gm = one.game;
 
-        Model mp0 = gm.createModel("Power plant");
+        Model mp0 = gm.createModel("Solar plant");
         Model mc0 = gm.createModel("Power connection");
         Model mu0 = gm.createModel("Power user");
         Model mc1 = gm.createModel("Power connection");
