@@ -1,9 +1,11 @@
 
 package fi.paivola.mapserver.models;
 
+import fi.paivola.mapserver.utils.Supplies;
 import fi.paivola.mapserver.utils.Color;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
@@ -19,16 +21,20 @@ import java.util.HashMap;
 public class PopCenter extends PointModel {
 
     ArrayList<Event> outgoing;
+    public TownStorage storehouse;
     
-    public PopCenter(String name, int id){
+    public PopCenter(int id){
         super(id);
     }
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
+        if(storehouse.countFood() < 100){
+                requestSupplies(new Supplies(0, 100 - storehouse.countFood()), current);
+        }
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
-            ((TownStorage)(this.extensions.get("storehouse"))).Store(retrieved);
+            storehouse.Store(retrieved);
         }
     }
 
@@ -40,7 +46,7 @@ public class PopCenter extends PointModel {
         
         if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
            Supplies received = (Supplies) e.value;
-           ((TownStorage)(this.extensions.get("storehouse"))).Store(received);
+           storehouse.Store(received);
         }
     }
     
@@ -50,10 +56,17 @@ public class PopCenter extends PointModel {
      * @param target who to bug
      * @param d the dataframe for the event
      */
-    public void requestSupplies(Supplies s, PopCenter target, DataFrame d){
+    public void requestSuppliesFrom(Supplies s, PopCenter target, DataFrame d){
         Event request = new Event("request_supplies", Event.Type.OBJECT, s);
         request.sender = this;
         target.answerToRequest(request, d);
+    }
+    
+    public void requestSupplies(Supplies s, DataFrame d){
+        s.amount = s.amount / this.connections.size();
+        Event request = new Event("request_supplies", Event.Type.OBJECT, s);
+        request.sender = this;
+        this.addEventToAll(d, request);
     }
     
     /**
@@ -132,7 +145,7 @@ public class PopCenter extends PointModel {
         Supplies delivered = new Supplies(s.id, s.amount);
         for (RoadModel r : route){
             Supplies[] destroyed_and_delivered = r.calcDelivery(delivered);
-            destroyed.setAmount(destroyed.getAmount() + destroyed_and_delivered[0].amount);
+            destroyed.amount += destroyed_and_delivered[0].amount;
             delivered = destroyed_and_delivered[1];
         }
         Event e = new Event("receive_supplies", Event.Type.OBJECT, delivered);
@@ -147,7 +160,9 @@ public class PopCenter extends PointModel {
         sm.setIcon(Icon.TOWN);
         sm.color = new Color(255, 128, 64);
         sm.name = "popCenter";
-        this.addExtension("storehouse", new TownStorage());
+        ExtensionModel m = (ExtensionModel) gm.createModel("TownStorage");
+        this.addExtension("storehouse", m);
+        storehouse = (TownStorage) this.extensions.get("storehouse");
         outgoing = new ArrayList<>();
     }
     

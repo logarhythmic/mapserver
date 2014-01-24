@@ -22,6 +22,14 @@
         {
             "name": "Road",
             "class": "fi.paivola.mapserver.models.RoadModel"
+        },
+        {
+            "name": "Town",
+            "class": "fi.paivola.mapserver.models.PopCenter"
+        },
+        {
+            "name": "TownStorage",
+            "class": "fi.paivola.mapserver.models.TownStorage"
         }
     ]
 }

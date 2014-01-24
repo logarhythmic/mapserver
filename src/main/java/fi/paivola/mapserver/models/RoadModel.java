@@ -5,6 +5,7 @@
  */
 package fi.paivola.mapserver.models;
 
+import fi.paivola.mapserver.utils.Supplies;
 import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
@@ -36,6 +37,7 @@ public class RoadModel extends ConnectionModel {
 
     private int transport_type, road_type;
     
+    private double deliveredThisTick;
     public double remainingCapacityThisTick;
     private double stealage = 0.1; // get from crime team
     public ArrayList<Supplies> stolenGoods;
@@ -43,7 +45,7 @@ public class RoadModel extends ConnectionModel {
     boolean roadBlocked;
     boolean raining;
     
-    public RoadModel(int id, SettingMaster sm) {
+    public RoadModel(int id) {
         super(id);
     }
 
@@ -57,7 +59,8 @@ public class RoadModel extends ConnectionModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        
+        this.saveDouble("Supplies delivered through this road", deliveredThisTick);
+        deliveredThisTick = 0;
     }
 
     @Override
@@ -79,8 +82,8 @@ public class RoadModel extends ConnectionModel {
         sm.settings.put("baseSpeed", new SettingDouble("This is the base speed of vehicles on this road, km/h", 80, new RangeDouble(1, 1000)));
         sm.settings.put("tripRest", new SettingDouble("This is how long drivers rest after deliveries, hours", 12, new RangeDouble(0, 48)));
         sm.settings.put("rainMod", new SettingDouble("This is how much deliveries are slowed down by rain", 0.1, new RangeDouble(0, 1)));
-        sm.settings.put("transportType", new SettingInt("Type of transportation vehicles available on this road, 0:truck, 1:jeep, 2:donkey, 3:boat", 1, new RangeInt(0,3)));
-        sm.settings.put("roadType", new SettingInt("Type of this road, 0:paved, 1:unpaved, 2:water", 1, new RangeInt(0,2)));
+        sm.settings.put("transportType", new SettingInt("Type of transportation vehicles available on this road, 0:truck, 1:small truck, 2:pickup, 3:donkey", 1, new RangeInt(0,3)));
+        sm.settings.put("roadType", new SettingInt("Type of this road, 0:paved, 1:unpaved, 2:footpath", 1, new RangeInt(0,2)));
     }
 
     @Override
@@ -115,7 +118,7 @@ public class RoadModel extends ConnectionModel {
         if (road_type == 2 && transport_type != 3) {
             return false;
         }
-        return road_type == 2 || !roadBlocked;
+        return !roadBlocked;
     }
     
     public Supplies[] calcDelivery(Supplies sent){
@@ -123,6 +126,7 @@ public class RoadModel extends ConnectionModel {
         stolenGoods.add(lost);
         Supplies delivered = new Supplies(sent.id, Math.min(sent.amount - lost.amount, remainingCapacityThisTick));
         remainingCapacityThisTick -= delivered.amount;
+        deliveredThisTick += delivered.amount;
         return new Supplies[] {lost, delivered};
     }
 

@@ -23,6 +23,7 @@
  */
 
 package fi.paivola.mapserver.models;
+import fi.paivola.mapserver.utils.Supplies;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import java.util.ArrayList;
@@ -44,8 +45,8 @@ public class TownStorage extends ExtensionModel {
     /**
      * Creates a new storage unit
      */
-    public TownStorage(){
-        super(5);
+    public TownStorage(int id){
+        super(id);
         this.maxCapacity = 0;
         storage = new ArrayList<>();
     }
@@ -80,11 +81,11 @@ public class TownStorage extends ExtensionModel {
     public double Store(Supplies in){
         Supplies found = findSupplies(in.id);
         if (found == null){
-            storage.add(new Supplies(in.id, in.getAmount()+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.getAmount()));
+            storage.add(new Supplies(in.id, in.amount+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.amount));
         } else {
-            found.setAmount(found.getAmount()+(in.getAmount()+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.getAmount()));
+            found.amount = (found.amount+(in.amount+currentCapacity>maxCapacity?maxCapacity-currentCapacity:in.amount));
         }
-        double overflow = currentCapacity+in.getAmount()-maxCapacity;
+        double overflow = currentCapacity+in.amount-maxCapacity;
         overflow = overflow<0?0:overflow;
         Update();
         return overflow;
@@ -98,7 +99,7 @@ public class TownStorage extends ExtensionModel {
         Supplies found = findSupplies(id);
         if (found == null)
             return 0;
-        else return found.getAmount();
+        else return found.amount;
     }
     
     /**
@@ -123,8 +124,8 @@ public class TownStorage extends ExtensionModel {
         if (found == null){
             return new Supplies(id, 0);
         } else {
-            double taken = Math.min(amount, found.getAmount());
-            found.setAmount(found.getAmount() - taken);
+            double taken = Math.min(amount, found.amount);
+            found.amount = (found.amount - taken);
             return new Supplies(id, taken);
         }
     }
@@ -132,10 +133,10 @@ public class TownStorage extends ExtensionModel {
     void Update(){
         currentCapacity = 0;
         for (Supplies s:storage){
-            if (s.getAmount() == 0){
+            if (s.amount== 0){
                 storage.remove(s);
             }
-            currentCapacity += s.getAmount();
+            currentCapacity += s.amount;
         }
         if (currentCapacity > maxCapacity){
             System.out.println("Storage had more goods than could fit inside. "
@@ -144,6 +145,15 @@ public class TownStorage extends ExtensionModel {
         }
     }
 
+    public double countFood(){
+        double ret = 0;
+        for (Supplies s: storage){
+            ret += s.edible?s.amount:0;
+        }
+        
+        return ret;
+    }
+    
     @Override
     public void onEvent(Event e, DataFrame d) {
         //idk
@@ -167,6 +177,8 @@ public class TownStorage extends ExtensionModel {
         for (Supplies s : storage){
             s.amount*=s.edible?0.7:1;  //our highly advanced rat algorithm
         }
+        this.saveDouble("Items in storage", this.currentCapacity);
+        this.saveDouble("Storage fullness", this.currentCapacity / this.maxCapacity);
     }
 
     @Override

@@ -1,11 +1,15 @@
 package fi.paivola.mapserver;
 
+import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.models.PopCenter;
+import fi.paivola.mapserver.models.TownStorage;
+import fi.paivola.mapserver.utils.Supplies;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -81,31 +85,30 @@ public class App {
         GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
-        // Create and add
-        Model mg = gm.createModel("exampleGlobal");
-
-        // This is how you change a "setting" from the code.
         SettingMaster sm = gm.getDefaultSM("exampleGlobal");
-        sm.settings.get("cats").setValue("2");
-        mg.onActualUpdateSettings(sm);
-
-        int size = 32;
-
-        Model[] points = new Model[size];
-        Model[] conns = new Model[size];
-
-        for (int i = 0; i < size; i++) {
-            points[i] = gm.createModel("examplePoint");
-            conns[i] = gm.createModel("exampleConnection");
-        }
-
-        for (int i = 0; i < size; i++) {
-            if (i > 0) {
-                gm.linkModelsWith(points[i - 1], points[i], conns[i - 1]);
-            }
-        }
-        gm.linkModelsWith(points[size - 1], points[0], conns[size - 1]);
-
+        
+        // Create and add
+        Model town1 = gm.createModel("Town");
+        Model town2 = gm.createModel("Town");
+        Model town3 = gm.createModel("Town");
+        Model town4 = gm.createModel("Town");
+        Model town5 = gm.createModel("Town");
+        Model[] towns = new Model[]{town1,town2,town3,town4,town5};
+        Model road12 = gm.createModel("Road");
+        Model road23 = gm.createModel("Road");
+        Model road34 = gm.createModel("Road");
+        Model road45 = gm.createModel("Road");
+        Model road51 = gm.createModel("Road");
+        gm.linkModelsWith(town1, town2, road12);
+        gm.linkModelsWith(town2, town3, road23);
+        gm.linkModelsWith(town3, town4, road34);
+        gm.linkModelsWith(town4, town5, road45);
+        gm.linkModelsWith(town5, town1, road51);
+        
+        Supplies foodTon = new Supplies(0, 1000);
+        
+        while (((PopCenter)town1).storehouse.Store(foodTon) == 0){}
+        
         // Print final data in the end?
         if (!profilingRun) {
             gm.printOnDone = 2;

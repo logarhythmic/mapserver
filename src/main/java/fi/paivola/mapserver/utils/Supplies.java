@@ -22,14 +22,14 @@
  * THE SOFTWARE.
  */
 
-package fi.paivola.mapserver.models;
+package fi.paivola.mapserver.utils;
 
 /**
  *
  * @author Allan Palmu <allan.palmu@gmail.com>
  */
 public class Supplies {
-    double amount;
+    public double amount;
     public int id;
     public boolean edible;
     public boolean flammable;
@@ -37,15 +37,33 @@ public class Supplies {
     
     public Supplies(int id, double amount){
        this.id = id;
+       switch(id){
+           case 0: //uninflammable food
+               edible = true;
+               flammable = false;
+               fuel = false;
+               break;
+           case 1: //inflammable food
+               edible = true;
+               flammable = true;
+               fuel = false;
+               break;
+           case 2: //inflammable fuel
+               edible = false;
+               flammable = true;
+               fuel = true;
+               break;
+           case 3: //inflammable other
+               edible = false;
+               flammable = true;
+               fuel = false;
+               break;
+           default: //other
+               edible = false;
+               flammable = false;
+               fuel = false;
+               break;
+       }
        this.amount = amount;
-    }
-    
-    public Supplies setAmount(double n){
-        amount = n;
-        return this;
-    }
-    
-    public double getAmount(){
-        return amount;
     }
 }
