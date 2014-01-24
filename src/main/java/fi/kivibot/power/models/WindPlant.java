@@ -8,5 +8,6 @@ public class WindPlant extends PowerPlant{
 
     public WindPlant(int id) {
         super(id);
+        this.energy = 100_000;
     }
 }

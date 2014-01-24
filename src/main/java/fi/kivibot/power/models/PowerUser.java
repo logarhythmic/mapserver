@@ -1,5 +1,7 @@
 package fi.kivibot.power.models;
 
+import fi.kivibot.power.misc.PowerSourceInfo;
+import fi.kivibot.power.misc.EU;
 import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;

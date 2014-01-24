@@ -1,4 +1,4 @@
-package fi.kivibot.power.models;
+package fi.kivibot.power.misc;
 
 import fi.paivola.mapserver.core.Model;
 
