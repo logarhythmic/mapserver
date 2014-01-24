@@ -40,6 +40,10 @@ public class Field extends PointModel {
                 addEventTo(e.sender, current, new Event("harvested", Event.Type.DOUBLE,
                             content.harvest((double)e.value)));
                 break;
+            case "flood":
+                if((boolean)e.value)
+                    content.handleEvent(e, current);
+                break;
             default:
                 break;
         }
