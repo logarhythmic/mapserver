@@ -12,6 +12,6 @@ public class Wind {
 
     public static double getWind(Calendar date) {
         System.out.println("asd");
-        return 18 + Math.random() * 5;
+        return 8 + Math.random() * 3;
     }
 }
