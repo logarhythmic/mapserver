@@ -5,7 +5,6 @@ import fi.paivola.mapserver.utils.Supplies;
 import fi.paivola.mapserver.utils.Color;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
-import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
@@ -20,9 +19,12 @@ import java.util.ArrayList;
 public class PopCenter extends PointModel {
 
     public boolean DebugFoodSource;
+    private int requestsReceivedThisTick = 0;
+    private int requestsServedThisTick = 0;
     
     ArrayList<Event> outgoing;
     public TownStorage storehouse;
+    ArrayList<PopCenter> otherTowns;
     
     public PopCenter(int id){
         super(id);
@@ -30,22 +32,28 @@ public class PopCenter extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        if(storehouse.countFood() < 100){
-                requestSupplies(new Supplies(0, Math.min(50, 100 - storehouse.countFood())), current);
+        if(storehouse.countFood() < 3000){
+                requestSuppliesFromAll(new Supplies(0, Math.min(50, 3000 - storehouse.countFood())), current);
         }
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
             storehouse.Store(retrieved);
         }
+        outgoing.clear();
+        this.saveInt("Shipments sent", requestsServedThisTick);
+        requestsServedThisTick = 0;
+        this.saveInt("Shipments requested", requestsReceivedThisTick);
+        requestsReceivedThisTick = 0;
     }
 
     @Override
     public void onEvent(Event e, DataFrame d) {
-        if (e.name.equals("request_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
+        if (e.name.equals("request_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
+            requestsReceivedThisTick ++;
             outgoing.add(e);
         }
         
-        if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
+        if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
             Supplies received = (Supplies) e.value;
             storehouse.Store(received);
         }
@@ -60,14 +68,14 @@ public class PopCenter extends PointModel {
     public void requestSuppliesFrom(Supplies s, PopCenter target, DataFrame d){
         Event request = new Event("request_supplies", Event.Type.OBJECT, s);
         request.sender = this;
-        target.answerToRequest(request, d);
+        this.addEventTo(target, d, request);
     }
     
-    public void requestSupplies(Supplies s, DataFrame d){
-        s.amount = s.amount / this.connections.size();
-        Event request = new Event("request_supplies", Event.Type.OBJECT, s);
-        request.sender = this;
-        this.addEventToAll(d, request);
+    public void requestSuppliesFromAll(Supplies s, DataFrame d){
+        for(PopCenter p : otherTowns){
+            if (p.storehouse.currentCapacity > 0)
+                requestSuppliesFrom(s, p, d);
+        }
     }
     
     /**
@@ -77,8 +85,7 @@ public class PopCenter extends PointModel {
      * @return Supplies sent back from delivery due to failure to deliver
      */
     public Supplies answerToRequest(Event e, DataFrame d){
-        Supplies sent = (Supplies) e.value;
-        sent = storehouse.Take(sent.id, sent.amount);
+        Supplies sent = storehouse.Take(((Supplies)e.value).id, ((Supplies)e.value).amount);
         return sendSupplies(sent, (PopCenter) e.sender, d);
     }
     
@@ -88,7 +95,7 @@ public class PopCenter extends PointModel {
         for (Model m : this.connections){
             if (m.getClass().equals(RoadModel.class)) {
                 RoadModel mr = (RoadModel)m;
-                if(mr.remainingCapacityThisTick >= s.amount){
+                if(mr.remainingCapacityThisTick > 0){
                     primary.add(mr);
                 }
             }
@@ -102,7 +109,7 @@ public class PopCenter extends PointModel {
                     for(Model mm : t.connections){
                         if (mm.getClass().equals(RoadModel.class)) {
                             RoadModel mmr = (RoadModel)mm;
-                            if(mmr.remainingCapacityThisTick >= s.amount){
+                            if(mmr.remainingCapacityThisTick > 0){
                                 for (Model tt : mmr.connections){
                                     if (tt.id == target.id){
                                         routes.add(new RoadModel[] {mr, mmr});
@@ -145,7 +152,7 @@ public class PopCenter extends PointModel {
      */
     public Supplies sendSupplies(Supplies s, PopCenter target, DataFrame d){
         RoadModel[] route = getRouteTo(target, s);
-        if (route == null)
+        if (route == null || s.amount == 0)
             return s;
         Supplies destroyed = new Supplies(s.id, 0);
         Supplies delivered = new Supplies(s.id, s.amount);
@@ -157,7 +164,8 @@ public class PopCenter extends PointModel {
         Event e = new Event("receive_supplies", Event.Type.OBJECT, delivered);
         e.sender = this;
         addEventTo(target, d, e);
-        return new Supplies(s.id, s.amount - destroyed.amount);
+        requestsServedThisTick ++;
+        return new Supplies(s.id, s.amount - destroyed.amount - delivered.amount);
     }
     
     
@@ -171,6 +179,33 @@ public class PopCenter extends PointModel {
     @Override
     public void onGenerateDefaults(DataFrame df) {
         outgoing = new ArrayList<>();
+        otherTowns = new ArrayList<>();
+        findOthers();
+    }
+    
+    void findOthers(){
+        ArrayList<Model> connectedModels = new ArrayList<>();
+        connectedModels.add(this);
+        while(true){
+            int amount = connectedModels.size();
+            ArrayList<Model> newConns = new ArrayList<>();
+            for(Model m : connectedModels){
+                for(Model mm: m.connections){
+                    if (!connectedModels.contains(mm) && !newConns.contains(mm)){
+                        newConns.add(mm);
+                    }
+                }
+            }
+            connectedModels.addAll(newConns);
+            if (connectedModels.size() != amount)
+                continue;
+            break;
+        }
+        connectedModels.remove(this);
+        for (Model m : connectedModels){
+            if (m.getClass().equals(this.getClass()))
+                otherTowns.add((PopCenter)m);
+        }
     }
 
     @Override

@@ -83,7 +83,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 1));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 100));
         GameManager gm = one.game;
 
         SettingMaster sm = gm.getDefaultSM("exampleGlobal");
@@ -95,6 +95,7 @@ public class App {
         Model town4 = gm.createModel("PopCenter");
         Model town5 = gm.createModel("PopCenter");
         
+        Model[] towns = new Model[]{town1,town2,town3,town4,town5};
         Model road12 = gm.createModel("Road");
         Model road23 = gm.createModel("Road");
         Model road34 = gm.createModel("Road");
@@ -105,6 +106,12 @@ public class App {
         gm.linkModelsWith(town3, town4, road34);
         gm.linkModelsWith(town4, town5, road45);
         gm.linkModelsWith(town5, town1, road51);
+        
+        for(int i = 0; i < 5; i++){
+            for(int j = i+1; j<5;j++){
+                gm.linkModelsWith(towns[i], towns[j], gm.createModel("PhoneLine"));
+            }
+        }
         
         ((PopCenter)town1).DebugFoodSource = true;
         
