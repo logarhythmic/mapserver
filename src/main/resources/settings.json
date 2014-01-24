@@ -1,5 +1,5 @@
 {
-    "default_ticks": 10,
+    "default_ticks": 20,
     "websocket_port": 8080,
     "csv_seperator": ",\t",
     "models": [
@@ -19,9 +19,25 @@
             "name": "exampleGlobal",
             "class": "fi.paivola.mapserver.models.ExampleGlobal"
         },
-		{
-			"name": "populationExtender",
-			"class": "fi.paivola.population.PopulationExtender"
-		}
+        {
+            "name": "Lake",
+            "class": "fi.paivola.water.Lake"
+        },
+        {
+            "name": "River",
+            "class": "fi.paivola.water.River"
+        },
+        {
+            "name": "Weather",
+            "class": "fi.weathermodel.Weather"
+        },
+        {
+            "name": "Sea",
+            "class": "fi.paivola.water.Sea"
+        },
+        {
+            "name": "populationExtender",
+            "class": "fi.paivola.population.PopulationExtender"
+        }
     ]
 }

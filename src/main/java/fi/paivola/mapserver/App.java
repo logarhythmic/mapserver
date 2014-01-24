@@ -106,7 +106,21 @@ public class App {
         }
         gm.linkModelsWith(points[size - 1], points[0], conns[size - 1]);
 
-        // Print final data in the end?
+        // Create and add
+        Model l1 = gm.createModel("Lake");
+        Model l2 = gm.createModel("Lake");
+        Model r1 = gm.createModel("River");
+        Model r2 = gm.createModel("River");
+        Model l3 = gm.createModel("Lake");
+        Model r3 = gm.createModel("River");
+        Model s1 = gm.createModel("Sea");
+        
+        Model weather = gm.createModel("Weather");
+        
+        gm.linkModelsWith(l1, l3, r1);
+        gm.linkModelsWith(l2, l3, r2);
+        gm.linkModelsWith(l3, s1, r3);
+
         if (!profilingRun) {
             gm.printOnDone = 2;
         }
