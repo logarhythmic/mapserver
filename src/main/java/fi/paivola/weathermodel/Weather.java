@@ -22,6 +22,7 @@ public class Weather extends GlobalModel {
     	current.saveGlobalData("rain", getRain(current.getDate()));
     	current.saveGlobalData("temperature", getTemperature(current.getDate()));
     	current.saveGlobalData("sunlight", getSunlight(current.getDate()));
+    	current.saveGlobalData("wind", getWind(current.getDate()));
     }
 
     @Override
@@ -39,6 +40,7 @@ public class Weather extends GlobalModel {
     	df.saveGlobalData("rain", getRain(df.getDate()));
     	df.saveGlobalData("temperature", getTemperature(df.getDate()));
     	df.saveGlobalData("sunlight", getSunlight(df.getDate()));
+    	df.saveGlobalData("wind", getWind(df.getDate()));
     }
 
     public void onUpdateSettings(SettingMaster sm) {
@@ -54,5 +56,9 @@ public class Weather extends GlobalModel {
 
     public static double getSunlight(Calendar date) {
         return Sunlight.getSunlight(date);
+    }
+
+    public static double getWind(Calendar date) {
+        return Wind.getWind(date);
     }
 }

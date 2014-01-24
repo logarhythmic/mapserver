@@ -1,6 +1,7 @@
 package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
+import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.*;
 import fi.paivola.weathermodel.Weather;
@@ -102,6 +103,15 @@ public abstract class Crop extends Edible {
         }
         /* XXX: constant multiplier */
         return currentStoredFood * 3;
+    }
+
+    @Override
+    public void handleEvent(Event e, DataFrame current) {
+        switch(e.name) {
+            case "flood":
+                resetCrop();
+                break;
+        }
     }
    
     public double harvest(double max) {

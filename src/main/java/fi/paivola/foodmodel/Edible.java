@@ -1,6 +1,7 @@
 package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
+import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.setting.*;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ public abstract class Edible {
         this.area = area;
     }
     
+    abstract void handleEvent(Event e, DataFrame current);
     abstract double onTick(DataFrame last, DataFrame current);
     abstract double harvest(double max);
 
