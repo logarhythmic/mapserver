@@ -4,6 +4,22 @@
     "csv_seperator": ",\t",
     "models": [
         {
+            "name": "Power plant",
+            "class": "fi.kivibot.power.models.PowerPlant"
+        },
+        {
+            "name": "Power connection",
+            "class": "fi.kivibot.power.models.PowerConnection"
+        },
+        {
+            "name": "Power user",
+            "class": "fi.kivibot.power.models.PowerUser"
+        },
+        {
+            "name": "Power node",
+            "class": "fi.kivibot.power.models.PowerNode"
+        },
+        {
             "name": "examplePoint",
             "class": "fi.paivola.mapserver.models.ExamplePoint"
         },
