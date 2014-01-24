@@ -48,6 +48,10 @@
             "class": "fi.paivola.water.Sea"
         },
         {
+            "name": "Groundwater",
+            "class": "fi.paivola.water.Groundwater"
+        },
+        {
             "name": "populationExtender",
             "class": "fi.paivola.population.PopulationExtender"
         },

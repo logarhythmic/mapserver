@@ -22,14 +22,14 @@ import java.util.*;
  */
 public class River extends ConnectionModel {
 
-    //CSVWriter writer;
+    // CSVWriter writer;
     // General (dimensions and stuff
     float waterAmount = 0;              //  m^3
     float width = 50;                   //  m
     float length = 50000;               //  m
+    float floodDepth = 10;
     float slope = 90;
-    boolean flood = false;
-
+    
     public River(int id) {
         super(id);
         this.maxConnections = 2;
@@ -42,7 +42,6 @@ public class River extends ConnectionModel {
         float flow = 0;
         if (waterAmount > 0) {
             float currentDepth = waterAmount/(width*length);
-            this.saveString("depth", ""+currentDepth);
             float C = (float) (1 / 0.035f * Math.pow(currentDepth, 1 / 6));
             float flowSpeed = (float) (C * Math.sqrt(currentDepth * slope));
             flow = width * currentDepth * flowSpeed;
@@ -61,6 +60,13 @@ public class River extends ConnectionModel {
             } else {
                 waterAmount -= flow;
             }
+            Event e;
+            if(waterAmount > width*length*floodDepth)
+            {
+                Boolean flood = true;
+                e = new Event("Flood",Event.Type.OBJECT, flood);
+                this.addEventToAll(current, e);
+            }
         }
         /*
         String[] entries = (waterAmount/1000000000 + "#" + flow/1000000000).split("#");
@@ -70,6 +76,8 @@ public class River extends ConnectionModel {
         if (writer != null) {
             writer.writeNext(entries);
         }*/
+        this.saveData("waterAmount",waterAmount);
+        //this.saveData("flooding",flood);
     }
 
     @Override
