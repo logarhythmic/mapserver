@@ -8,6 +8,10 @@
             "class": "fi.kivibot.power.models.PowerPlant"
         },
         {
+            "name": "Solar plant",
+            "class": "fi.kivibot.power.models.SolarPlant"
+        },
+        {
             "name": "Power connection",
             "class": "fi.kivibot.power.models.PowerConnection"
         },
