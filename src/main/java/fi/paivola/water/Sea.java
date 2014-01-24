@@ -17,6 +17,8 @@ import fi.paivola.mapserver.utils.RangeInt;
  */
 public class Sea extends GlobalModel
 {
+    int order = 0;
+    
     public Sea(int id){
         super(id);
         this.type = "Sea";
@@ -24,7 +26,11 @@ public class Sea extends GlobalModel
     
     @Override
     public void onUpdateSettings(SettingMaster sm){
-        
+        if(Integer.parseInt(sm.settings.get("order").getValue()) != this.order)
+        {
+            this.order = Integer.parseInt(sm.settings.get("order").getValue());
+            this.saveInt("order", order);
+        }
     }
     
     @Override
@@ -34,7 +40,7 @@ public class Sea extends GlobalModel
     
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm){
-        
+        sm.settings.put("order", new SettingInt("Position in the hydrodynamic chain", 0, new RangeInt(0, 100)));
     }
     
     @Override

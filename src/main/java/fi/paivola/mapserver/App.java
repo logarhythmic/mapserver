@@ -74,21 +74,48 @@ public class App {
     /**
      * This function can be used for testing your own models. Please modify
      * this!
-     */
+     */ 
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(2000));
+        GameThread one = new GameThread(1000);
         GameManager gm = one.game;
 
         // Create and add
         Model l1 = gm.createModel("Lake");
+        SettingMaster sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("1");
+        l1.onActualUpdateSettings(sm);
+        
         Model l2 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("1");
+        l2.onActualUpdateSettings(sm);
+        
         Model r1 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("2");
+        r1.onActualUpdateSettings(sm);
+        
         Model r2 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("2");
+        r2.onActualUpdateSettings(sm);
+        
         Model l3 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("3");
+        l3.onActualUpdateSettings(sm);
+        
         Model r3 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("4");
+        r3.onActualUpdateSettings(sm);
+        
         Model s1 = gm.createModel("Sea");
+        sm = gm.getDefaultSM("Sea");
+        sm.settings.get("order").setValue("5");
+        s1.onActualUpdateSettings(sm);
         
         Model weather = gm.createModel("Weather");
         
