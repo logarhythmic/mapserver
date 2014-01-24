@@ -14,11 +14,11 @@ public class SolarPlant extends PowerPlant {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        String sunstr = (String) last.getGlobalData("sunlight");
+        Object sunstr = last.getGlobalData("sunlight");
         if (sunstr == null) {
             super.onTick(last, current);
         } else {
-            EU eu = new EU(Double.parseDouble(sunstr));
+            EU eu = new EU((Double) sunstr);
             this.saveString("production", eu.toString());
             EU.saveEU(current, this, eu);
         }
