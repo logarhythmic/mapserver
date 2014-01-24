@@ -85,7 +85,7 @@ public class App {
         gm.createModel("Weather");
 
         SettingMaster sm = one.game.getDefaultSM("Field");
-        sm.settings.get("content").setValue("maize");
+        sm.settings.get("content").setValue("cow");
         // Create and add
         Model m = gm.createModel("Field");
         

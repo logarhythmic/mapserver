@@ -58,6 +58,7 @@ public class Field extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        System.out.println("asd");
         setContents(contentString);
         content.setArea(this.area);
     }
@@ -83,6 +84,9 @@ public class Field extends PointModel {
                 break;
             case "sorghum":
                 content = new Sorghum();
+                break;
+            case "cow":
+                content = new Cow();
                 break;
             default:
                 // Should this fail or not?
