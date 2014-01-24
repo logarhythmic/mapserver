@@ -28,16 +28,20 @@
             "class": "fi.paivola.water.River"
         },
         {
-            "name": "Weather",
-            "class": "fi.weathermodel.Weather"
-        },
-        {
             "name": "Sea",
             "class": "fi.paivola.water.Sea"
         },
         {
             "name": "populationExtender",
             "class": "fi.paivola.population.PopulationExtender"
+        },
+        {
+            "name": "Field",
+            "class": "fi.paivola.foodmodel.Field"
+        },
+        {
+            "name": "Weather",
+            "class": "fi.paivola.weathermodel.Weather"
         }
     ]
 }

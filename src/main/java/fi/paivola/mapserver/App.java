@@ -5,7 +5,8 @@ import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
-import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.LatLng;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -80,14 +81,20 @@ public class App {
         // How many ticks? Each one is a week.
         GameThread one = new GameThread((int) Math.floor(52.177457 * 10)); // ten years
         GameManager gm = one.game;
+        
+        gm.createModel("Weather");
 
+        SettingMaster sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        Model m = gm.createModel("Field");
         // Create and add
+
         Model mg = gm.createModel("exampleGlobal");
 
         // This is how you change a "setting" from the code.
-        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
-        sm.settings.get("cats").setValue("2");
-        mg.onActualUpdateSettings(sm);
+        SettingMaster sm2 = gm.getDefaultSM("exampleGlobal");
+        sm2.settings.get("cats").setValue("2");
+        mg.onActualUpdateSettings(sm2);
 
         int size = 30;
 
@@ -114,9 +121,7 @@ public class App {
         Model l3 = gm.createModel("Lake");
         Model r3 = gm.createModel("River");
         Model s1 = gm.createModel("Sea");
-        
-        Model weather = gm.createModel("Weather");
-        
+
         gm.linkModelsWith(l1, l3, r1);
         gm.linkModelsWith(l2, l3, r2);
         gm.linkModelsWith(l3, s1, r3);
