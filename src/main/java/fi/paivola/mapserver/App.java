@@ -1,6 +1,7 @@
 package fi.paivola.mapserver;
 
 import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
@@ -88,11 +89,22 @@ public class App {
         SettingMaster sm = gm.getDefaultSM("exampleGlobal");
         
         // Create and add
-        Model town1 = gm.createModel("Town");
-        Model town2 = gm.createModel("Town");
-        Model town3 = gm.createModel("Town");
-        Model town4 = gm.createModel("Town");
-        Model town5 = gm.createModel("Town");
+        Model town1 = gm.createModel("PopCenter");
+        ExtensionModel s1 = (ExtensionModel) gm.createModel("TownStorage");
+        town1.addExtension("storehouse", s1);
+        Model town2 = gm.createModel("PopCenter");
+        ExtensionModel s2 = (ExtensionModel) gm.createModel("TownStorage");
+        town2.addExtension("storehouse", s2);
+        Model town3 = gm.createModel("PopCenter");
+        ExtensionModel s3 = (ExtensionModel) gm.createModel("TownStorage");
+        town3.addExtension("storehouse", s3);
+        Model town4 = gm.createModel("PopCenter");
+        ExtensionModel s4 = (ExtensionModel) gm.createModel("TownStorage");
+        town4.addExtension("storehouse", s4);
+        Model town5 = gm.createModel("PopCenter");
+        ExtensionModel s5 = (ExtensionModel) gm.createModel("TownStorage");
+        town5.addExtension("storehouse", s5);
+        
         Model[] towns = new Model[]{town1,town2,town3,town4,town5};
         Model road12 = gm.createModel("Road");
         Model road23 = gm.createModel("Road");
@@ -105,9 +117,7 @@ public class App {
         gm.linkModelsWith(town4, town5, road45);
         gm.linkModelsWith(town5, town1, road51);
         
-        Supplies foodTon = new Supplies(0, 1000);
-        
-        while (((PopCenter)town1).storehouse.Store(foodTon) == 0){}
+        ((PopCenter)town1).DebugFoodSource = true;
         
         // Print final data in the end?
         if (!profilingRun) {

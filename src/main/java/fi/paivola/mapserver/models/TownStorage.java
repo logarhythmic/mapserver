@@ -168,7 +168,7 @@ public class TownStorage extends ExtensionModel {
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.name = "townStorage";
-        sm.exts = "popCenter";
+        sm.exts = "PopCenter";
         sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 10000, new RangeDouble(1, 1000000000)));
     }
 

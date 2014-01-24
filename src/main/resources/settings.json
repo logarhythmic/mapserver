@@ -24,7 +24,7 @@
             "class": "fi.paivola.mapserver.models.RoadModel"
         },
         {
-            "name": "Town",
+            "name": "PopCenter",
             "class": "fi.paivola.mapserver.models.PopCenter"
         },
         {

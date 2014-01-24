@@ -75,7 +75,6 @@ public class RoadModel extends ConnectionModel {
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
-        stolenGoods = new ArrayList<>();
         sm.name = "roadModel";
         sm.color = new Color(0,0,0);
         sm.settings.put("roadLength", new SettingDouble("This is how long the road is in km", 10, new RangeDouble(0.001, 3000)));
@@ -88,7 +87,7 @@ public class RoadModel extends ConnectionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        
+        stolenGoods = new ArrayList<>();
     }
 
     private double calcSpeed() {

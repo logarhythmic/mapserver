@@ -20,6 +20,8 @@ import java.util.HashMap;
  */
 public class PopCenter extends PointModel {
 
+    public boolean DebugFoodSource;
+    
     ArrayList<Event> outgoing;
     public TownStorage storehouse;
     
@@ -159,16 +161,16 @@ public class PopCenter extends PointModel {
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.setIcon(Icon.TOWN);
         sm.color = new Color(255, 128, 64);
-        sm.name = "popCenter";
-        ExtensionModel m = (ExtensionModel) gm.createModel("TownStorage");
-        this.addExtension("storehouse", m);
-        storehouse = (TownStorage) this.extensions.get("storehouse");
-        outgoing = new ArrayList<>();
+        sm.name = "PopCenter";
     }
     
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        //idk lol
+        storehouse = (TownStorage) this.extensions.get("storehouse");
+        if (DebugFoodSource){
+            while(storehouse.Store(new Supplies(0,1000)) == 0){}
+        }
+        outgoing = new ArrayList<>();
     }
 
     @Override
