@@ -8,6 +8,7 @@ import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GlobalModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import java.util.Random;
 /**
  *
  * @author Shaqqy
@@ -15,14 +16,11 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
 public class DevelopmentAid extends GlobalModel{
 public DevelopmentAid(int id){
     super (id);
-    
-    public double getAid(int week){
-        return (double) Math.round(kehitysapu(i)); // i viikon numero
-    }
+
 }
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-         //To change body of generated methods, choose Tools | Templates.
+         current.saveGlobalData("Kehitysapu", Kehitysapu.KehitysAvunLaskenta(current.index));
     }
 
     @Override
@@ -37,12 +35,81 @@ public DevelopmentAid(int id){
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-         //To change body of generated methods, choose Tools | Templates.
+         df.saveGlobalData("Kehitysapu", 662000000);
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
          //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    private static class Kehitysapu {
+
+            public static Object KehitysAvunLaskenta(int index){
+                Random random=new Random();
+                
+		double kehitysapu = 662000000;
+		double xx = 0;
+		double x = 0.5;
+		int onnettomuudet = 0;
+		double inflaatio = 2.0;
+		int konflikti = 2;
+		int kesto = 0;
+		double ilmastonmuutos = 0.01/52;
+		double nalanhata = 0.001/52;
+		double z = 0.9/52;
+		double bktkasvukerroin = 0.00001913/52;
+		double bktlaskukerroin = 0.00001838/52;
+		
+		for(int i=0;i<index;i++) {
+			double randomi = random.nextDouble();			
+			if ((konflikti == 1) && (z > randomi)){
+				kehitysapu = kehitysapu + ((kehitysapu*2)/52);
+				onnettomuudet = onnettomuudet + 1;
+				konflikti = 2;
+				z = 0.6/52;
+				kesto = kesto + 1;
+				}
+			else if (konflikti == 2){
+				if (randomi > z){
+					konflikti = 1;
+					kehitysapu = kehitysapu-(kehitysapu / (2*52));
+					z = 0.1/52;
+					}
+				}
+			if (x >= randomi){
+				kehitysapu = kehitysapu + ((kehitysapu*bktkasvukerroin)/52);
+				xx = x;
+				x = x - 0.1;
+				}	
+			else if (x < randomi){
+				kehitysapu = kehitysapu - (kehitysapu*bktlaskukerroin)/52;
+				xx = x;
+				x = x + 0.1;
+				}	
+			if (inflaatio > 2.0){				
+				inflaatio = inflaatio * randomi;
+				kehitysapu = kehitysapu - (kehitysapu*0.01*inflaatio)/52;
+				}	
+			else if (inflaatio <= 2.0){
+				inflaatio = inflaatio + randomi;
+				}
+			else if(true){
+				nalanhata = nalanhata + ilmastonmuutos;
+				if (nalanhata > randomi){
+					kehitysapu = kehitysapu + ((kehitysapu*0.2)/52);
+					}
+				}
+			//else if(1==0){
+//				bktkasvukerroin = bktkasvukerroin - taloudenmuutoskerroin;
+//				bktlaskukerroin = bktlaskukerroin - taloudenmuutoskerrroin;
+//				taloudenmuutoskerroin = Math.pow(taloudenmuutoskerroin, (1+taloudenmuutoskerroin));
+		
+                
+		}
+                System.out.println(kehitysapu);
+                return (kehitysapu);
+    }
+    }
 }
+    
