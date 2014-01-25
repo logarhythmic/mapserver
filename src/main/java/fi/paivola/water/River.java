@@ -36,7 +36,7 @@ public class River extends ConnectionModel {
     
     public River(int id) {
         super(id);
-        this.maxConnections = 2;
+        this.maxConnections = 20;
         this.type = "River";
         this.passthrough = false;
     }

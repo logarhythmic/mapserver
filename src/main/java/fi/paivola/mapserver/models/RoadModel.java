@@ -10,6 +10,7 @@ import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
+import fi.paivola.mapserver.core.GlobalModel;
 import fi.paivola.mapserver.core.setting.SettingDouble;
 import fi.paivola.mapserver.core.setting.SettingInt;
 import fi.paivola.mapserver.core.setting.SettingMaster;
@@ -43,7 +44,7 @@ public class RoadModel extends ConnectionModel {
     public ArrayList<Supplies> stolenGoods;
     
     boolean roadBlocked;
-    boolean raining;
+    double rain;
     
     public RoadModel(int id) {
         super(id);
@@ -51,8 +52,8 @@ public class RoadModel extends ConnectionModel {
 
     @Override
     public void onTickStart(DataFrame last, DataFrame current){
-        raining = false;
         roadBlocked = false;
+        rain = (double) current.getGlobalData("rain");
         super.onTickStart(last, current);
         remainingCapacityThisTick = calcMaxStuff(calcTrips(calcTime(calcSpeed())));
     }
@@ -67,9 +68,6 @@ public class RoadModel extends ConnectionModel {
     public void onEvent(Event e, DataFrame current) {
         if (e.name.equals("Flood") && (boolean)e.value == true){
             roadBlocked = true;
-        }
-        if (false/*REPLACE FALSE WITH RAIN EVENT CHECK*/){
-            raining = true;
         }
     }
 
@@ -92,9 +90,7 @@ public class RoadModel extends ConnectionModel {
 
     private double calcSpeed() {
         double road = RT_MOD[road_type];
-        if (raining) {
-            road += this.RAIN_MOD;
-        }
+        road += this.RAIN_MOD * rain / 280;
         return BASE_SPEED * (road + TT_MOD[transport_type])/2;
     }
 
