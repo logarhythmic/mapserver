@@ -4,6 +4,26 @@
     "csv_seperator": ",\t",
     "models": [
         {
+            "name": "examplePoint",
+            "class": "fi.paivola.mapserver.models.ExamplePoint"
+        },
+        {
+            "name": "exampleExtender",
+            "class": "fi.paivola.mapserver.models.ExampleExtender"
+        },
+        {
+            "name": "exampleConnection",
+            "class": "fi.paivola.mapserver.models.ExampleConnection"
+        },
+        {
+            "name": "exampleGlobal",
+            "class": "fi.paivola.mapserver.models.ExampleGlobal"
+        },
+        {
+            "name": "Aggregate",
+            "class": "fi.kivibot.power.models.Aggregate"
+        },
+        {
             "name": "Solar plant",
             "class": "fi.kivibot.power.models.SolarPlant"
         },
@@ -12,13 +32,10 @@
             "class": "fi.kivibot.power.models.WindPlant"
         },
         {
-            "name": "Aggregate",
-            "class": "fi.kivibot.power.models.Aggregate"
-        },
-        {
             "name": "Power connection",
             "class": "fi.kivibot.power.models.PowerConnection"
         },
+
         {
             "name": "Power node",
             "class": "fi.kivibot.power.models.PowerNode"
@@ -26,14 +43,6 @@
         {
             "name": "Lake",
             "class": "fi.paivola.water.Lake"
-        },
-        {
-            "name": "Factory",
-            "class": "fi.kivibot.power.models.Factory"
-        },
-        {
-            "name": "examplePoint",
-            "class": "fi.paivola.mapserver.models.ExamplePoint"
         },
         {
             "name": "River",
