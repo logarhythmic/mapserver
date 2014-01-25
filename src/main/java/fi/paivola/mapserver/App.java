@@ -176,14 +176,12 @@ public class App {
         sm.settings.get("order").setValue("5");
         s1.onActualUpdateSettings(sm);
         
-        Model weather = gm.createModel("Weather");
-        
         gm.linkModelsWith(l1, l3, r1);
         gm.linkModelsWith(l2, l3, r2);
         gm.linkModelsWith(l3, s1, r3);
 
         if (!profilingRun) {
-            gm.printOnDone = 0;
+            gm.printOnDone = 2;
         }
 
         // Start the gamethread
