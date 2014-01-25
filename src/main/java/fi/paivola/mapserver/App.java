@@ -104,14 +104,6 @@ public class App {
         Model Road2 = gm.createModel("Road");
         gm.linkModelsWith(Field1, Town1, Road2);
 
-        // power
-        Model PP1 = gm.createModel("Power plant");
-        Model PC1 = gm.createModel("Power connection");
-        Model PU1 = gm.createModel("Power user");
-        PP1.setLatLng(1, 0);
-        PU1.setLatLng(1, 3);
-        gm.linkModelsWith(PP1, PU1, PC1);
-
         // water
         Model l1 = gm.createModel("Lake");
         sm = gm.getDefaultSM("Lake");

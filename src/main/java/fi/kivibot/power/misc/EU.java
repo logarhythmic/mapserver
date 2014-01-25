@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package fi.kivibot.power.models;
+package fi.kivibot.power.misc;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Model;
@@ -15,7 +10,7 @@ import java.util.HashMap;
  */
 public class EU {
 
-    private static HashMap<DataFrame, HashMap<Model, EU>> hm = new HashMap<>();
+    private static final HashMap<DataFrame, HashMap<Model, EU>> hm = new HashMap<>();
     private double asd;
 
     public EU(double e) {
