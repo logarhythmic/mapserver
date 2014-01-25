@@ -64,24 +64,51 @@ public class PopCenter extends PointModel {
 
     @Override
     public void onEvent(Event e, DataFrame d) {
-        if (e.name.equals("request_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
-            requestsReceivedThisTick ++;
-            outgoing.add(e);
+        if (e.sender == this)
+            return;
+        switch (e.name){
+            case "request_supplies":
+                requestsReceivedThisTick ++;
+                outgoing.add(e);
+                break;
+            case "harvested":
+            case "receive_supplies":
+                Supplies received = (Supplies) e.value;
+                Store(received);
+                break;
+            case "cropReady":
+                if (QuerySpace() >= (double)e.value)
+                    addEventTo(e.sender, d, new Event("gather", Event.Type.DOUBLE, QuerySpace()));
+                break;
+            case "consumeFood":
+                eatFood(e, d);
+                break;
         }
-        
-        else if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
-            Supplies received = (Supplies) e.value;
-            Store(received);
-        }
-        
-        else if (e.name.equals("cropReady") && e.type == Event.Type.DOUBLE){
-            if (QuerySpace() >= (double)e.value)
-                addEventTo(e.sender, d, new Event("gather", Event.Type.DOUBLE, QuerySpace()));
-        }
-        
-        else if (e.name.equals("harvested") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
-            Supplies received = (Supplies) e.value;
-            Store(received);
+    }
+    
+    void eatFood(Event e, DataFrame current){
+        double toEat = (double) e.value;
+        double availableMilk = findSupplies(0).amount;
+        double availableGrain = findSupplies(1).amount;
+        boolean outOfMilk = availableMilk < toEat/2;
+        boolean outOfGrain = availableGrain < toEat/2;
+        outOfMilk = outOfGrain?toEat-availableGrain>availableMilk:outOfMilk;
+        outOfGrain = outOfMilk?toEat-availableMilk>availableGrain:outOfGrain;
+        if(outOfMilk && outOfGrain){
+            Event starvation = new Event("outOfFood", Event.Type.DOUBLE, toEat-availableMilk - availableGrain);
+            Take(0, availableMilk);
+            Take(1, availableGrain);
+            starvation.sender = this;
+            addEventTo(e.sender, current, starvation);
+        } else if (outOfMilk){
+            Take(0,availableMilk);
+            Take(1, toEat - availableMilk);
+        } else if (outOfGrain){
+            Take(1,availableGrain);
+            Take(0, toEat - availableGrain);
+        } else {
+            Take(0,toEat/2);
+            Take(1,toEat/2);
         }
     }
     
