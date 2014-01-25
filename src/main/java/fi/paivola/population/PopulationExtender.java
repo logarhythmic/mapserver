@@ -48,20 +48,21 @@ public class PopulationExtender extends ExtensionModel {
         if (foodShortage > 0) {
             // % of people not fed properly, assuming greedy-distribution
             double severity = (foodShortage*1000*7) / populationByAge.total();
-            foodShortage = 0;
+            mortalityModel.setFoodShortage(severity);
         }
         
         // update demographics
         populationByAge.step( 1 );
 
         // notify amount eaten
-        this.addEventTo(parent, current, new Event("consumeFood", Event.Type.DOUBLE, 1000*7*populationByAge.total()));
+        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, 1000*7*populationByAge.total());
+        addEventTo(parent, current, consumeFoodEvent);
         
-        double[] quantities = populationByAge.getQuantities();
-        // save population data to dataframe
-        for (int i = 0; i != quantities.length; ++i) {
-            this.saveData("populationByAge" + i, quantities[i]);
-        }
+        saveData( "totalPopulation", populationByAge.total() );
+        
+        // reset for next frame
+        foodShortage = 0;
+        mortalityModel.setFoodShortage(0);
     }
 
     @Override
@@ -75,14 +76,12 @@ public class PopulationExtender extends ExtensionModel {
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.name = "populationExtender";
         sm.exts = "PopCenter";
+        // settings / input variables here
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        double[] quantities = populationByAge.getQuantities();
-        for (int i = 0; i != quantities.length; ++i) {
-            this.saveData("populationByAge" + i, quantities[i]);
-        }
+        this.saveData( "totalPopulation", populationByAge.total() );
     }
 
     @Override
