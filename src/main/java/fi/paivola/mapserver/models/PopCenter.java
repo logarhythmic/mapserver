@@ -21,7 +21,7 @@ public class PopCenter extends PointModel {
 
     double STORAGE_RAT_RAVENOUSNESS;
     
-    ArrayList<Supplies> storage;
+    private ArrayList<Supplies> storage;
     double maxStorageCapacity;
     double currentStorageCapacity;
     
@@ -38,8 +38,9 @@ public class PopCenter extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        if(countFood() < 300){
-            requestSuppliesFromAll(new Supplies(0, Math.min(50, 3000 - countFood())), current);
+        if(countFood() < 1000){
+            requestSuppliesFromAll(new Supplies(0, Math.min(50, 1000 - countFood())), current);
+            requestSuppliesFromAll(new Supplies(1, Math.min(50, 1000 - countFood())), current);
         }
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
@@ -63,14 +64,55 @@ public class PopCenter extends PointModel {
 
     @Override
     public void onEvent(Event e, DataFrame d) {
-        if (e.name.equals("request_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
-            requestsReceivedThisTick ++;
-            outgoing.add(e);
+        if (e.sender == this)
+            return;
+        switch (e.name){
+            case "request_supplies":
+                requestsReceivedThisTick ++;
+                outgoing.add(e);
+                break;
+            case "harvested":
+            case "receive_supplies":
+                Supplies received = (Supplies) e.value;
+                Store(received);
+                break;
+            case "cropReady":
+                if (QuerySpace() >= (double)e.value)
+                    addEventTo(e.sender, d, new Event("gather", Event.Type.DOUBLE, QuerySpace()));
+                break;
+            case "consumeFood":
+                eatFood(e, d);
+                break;
         }
-        
-        if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
-            Supplies received = (Supplies) e.value;
-            Store(received);
+    }
+    
+    void eatFood(Event e, DataFrame current){
+        double toEat = (double) e.value;
+        double availableMilk = 0;
+        if (findSupplies(0) != null)
+            availableMilk = findSupplies(0).amount;
+        double availableGrain = 0;
+        if (findSupplies(1) != null)
+            availableGrain = findSupplies(1).amount;
+        boolean outOfMilk = availableMilk < toEat/2;
+        boolean outOfGrain = availableGrain < toEat/2;
+        outOfMilk = outOfGrain?toEat-availableGrain>availableMilk:outOfMilk;
+        outOfGrain = outOfMilk?toEat-availableMilk>availableGrain:outOfGrain;
+        if(outOfMilk && outOfGrain){
+            Event starvation = new Event("outOfFood", Event.Type.DOUBLE, toEat-availableMilk - availableGrain);
+            Take(0, availableMilk);
+            Take(1, availableGrain);
+            starvation.sender = this;
+            addEventTo(e.sender, current, starvation);
+        } else if (outOfMilk){
+            Take(0,availableMilk);
+            Take(1, toEat - availableMilk);
+        } else if (outOfGrain){
+            Take(1,availableGrain);
+            Take(0, toEat - availableGrain);
+        } else {
+            Take(0,toEat/2);
+            Take(1,toEat/2);
         }
     }
     
@@ -139,6 +181,8 @@ public class PopCenter extends PointModel {
         if (routes.isEmpty()){
             return null;
         }
+        if (routes.size() == 1)
+            return routes.get(0);
         RoadModel[] bestRoute = routes.get(0);
         double highestLowestCapacity = 0;
         for (RoadModel r : bestRoute){
@@ -189,13 +233,12 @@ public class PopCenter extends PointModel {
         sm.setIcon(Icon.TOWN);
         sm.color = new Color(255, 128, 64);
         sm.name = "PopCenter";
-        sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 10000, new RangeDouble(1, 1000000000)));
-        sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0, new RangeDouble(0, 1)));
+        sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 100000, new RangeDouble(1, 1000000000)));
+        sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0.023, new RangeDouble(0, 1)));
     }
     
     @Override
     public void onGenerateDefaults(DataFrame df) {
-//        System.out.println("OGD called on village "+this.id+" at "+df.index);
         storage = new ArrayList<>();
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
