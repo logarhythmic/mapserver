@@ -60,6 +60,11 @@ public class PopulationExtender extends ExtensionModel {
         
         saveData( "totalPopulation", populationByAge.total() );
         
+        // do random sanitychecks
+        if (populationByAge.total() < 0) {
+            throw new java.lang.IllegalStateException("Population was negative!");
+        }
+        
         // reset for next frame
         foodShortage = 0;
         mortalityModel.setFoodShortage(0);
