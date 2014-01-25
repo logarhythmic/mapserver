@@ -72,8 +72,8 @@
             "class": "fi.paivola.mapserver.models.PopCenter"
         },
         {
-            "name": "PhoneLine",
-            "class": "fi.paivola.mapserver.models.PhoneLine"
+            "name": "GenericConnection",
+            "class": "fi.paivola.mapserver.models.GenericConnection"
         }
     ]
 }

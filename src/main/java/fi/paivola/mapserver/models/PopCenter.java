@@ -21,7 +21,7 @@ public class PopCenter extends PointModel {
 
     double STORAGE_RAT_RAVENOUSNESS;
     
-    ArrayList<Supplies> storage;
+    private ArrayList<Supplies> storage;
     double maxStorageCapacity;
     double currentStorageCapacity;
     
@@ -39,7 +39,8 @@ public class PopCenter extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         if(countFood() < 300){
-            requestSuppliesFromAll(new Supplies(0, Math.min(50, 3000 - countFood())), current);
+            requestSuppliesFromAll(new Supplies(0, Math.min(50, 300 - countFood())), current);
+            requestSuppliesFromAll(new Supplies(1, Math.min(50, 300 - countFood())), current);
         }
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
@@ -68,7 +69,17 @@ public class PopCenter extends PointModel {
             outgoing.add(e);
         }
         
-        if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
+        else if (e.name.equals("receive_supplies") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class && e.sender != this){
+            Supplies received = (Supplies) e.value;
+            Store(received);
+        }
+        
+        else if (e.name.equals("cropReady") && e.type == Event.Type.DOUBLE){
+            if (QuerySpace() >= (double)e.value)
+                addEventTo(e.sender, d, new Event("gather", Event.Type.DOUBLE, QuerySpace()));
+        }
+        
+        else if (e.name.equals("harvested") && e.type == Event.Type.OBJECT && e.value.getClass() == Supplies.class){
             Supplies received = (Supplies) e.value;
             Store(received);
         }
@@ -139,6 +150,8 @@ public class PopCenter extends PointModel {
         if (routes.isEmpty()){
             return null;
         }
+        if (routes.size() == 1)
+            return routes.get(0);
         RoadModel[] bestRoute = routes.get(0);
         double highestLowestCapacity = 0;
         for (RoadModel r : bestRoute){
@@ -190,7 +203,7 @@ public class PopCenter extends PointModel {
         sm.color = new Color(255, 128, 64);
         sm.name = "PopCenter";
         sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 10000, new RangeDouble(1, 1000000000)));
-        sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0, new RangeDouble(0, 1)));
+        sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0.023, new RangeDouble(0, 1)));
     }
     
     @Override

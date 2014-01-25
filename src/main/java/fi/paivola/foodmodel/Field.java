@@ -37,7 +37,7 @@ public class Field extends PointModel {
     public void onEvent(Event e, DataFrame current) {
         switch(e.name) {
             case "gather":
-                addEventTo(e.sender, current, new Event("harvested", Event.Type.DOUBLE,
+                addEventTo(e.sender, current, new Event("harvested", Event.Type.OBJECT,
                             content.harvest((double)e.value)));
                 break;
             case "flood":

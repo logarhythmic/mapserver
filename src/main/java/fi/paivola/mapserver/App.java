@@ -98,11 +98,10 @@ public class App {
         Model Town2 = gm.createModel("PopCenter");
         Model Road1 = gm.createModel("Road");
         gm.linkModelsWith(Town1, Town2, Road1);
-        gm.linkModelsWith(Town1, Town2, gm.createModel("PhoneLine"));
 
         // ruoka x kaupungit
         Model Road2 = gm.createModel("Road");
-        gm.linkModelsWith(Field1, Town1, Road2);
+        gm.linkModelsWith(Field1, Town1, gm.createModel("GenericConnection"));
 
         // power
         Model PP1 = gm.createModel("Power plant");
