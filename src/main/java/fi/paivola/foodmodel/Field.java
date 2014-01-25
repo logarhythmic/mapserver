@@ -58,7 +58,7 @@ public class Field extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        System.out.println("asd");
+//        System.out.println("asd");
         setContents(contentString);
         content.setArea(this.area);
     }
