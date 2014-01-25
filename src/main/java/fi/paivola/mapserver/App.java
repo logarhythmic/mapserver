@@ -1,6 +1,7 @@
 package fi.paivola.mapserver;
 
 import fi.kivibot.power.utils.CSVDumper;
+import fi.kivibot.power.utils.PowerUtils;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
@@ -82,49 +83,53 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 3));
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
         GameManager gm = one.game;
 
-        Model mp0 = gm.createModel("Aggregate");
-        Model mc0 = gm.createModel("Power connection");
-        Model mu0 = gm.createModel("Factory");
-        Model mc1 = gm.createModel("Power connection");
+        PowerUtils.createNetwork(gm);
+        
+        /*
+         Model mp0 = gm.createModel("Wind plant");
+         Model mc0 = gm.createModel("Power connection");
+         Model mu0 = gm.createModel("Factory");
+         Model mc1 = gm.createModel("Power connection");
 
-        Model mn0 = gm.createModel("Power node");
+         Model mn0 = gm.createModel("Power node");
 
-        mn0.setLatLng(1, 0);
+         mn0.setLatLng(1, 0);
 
-        mp0.setLatLng(1, 3);
+         mp0.setLatLng(1, 3);
 
-        Model mc2 = gm.createModel("Power connection");
-        Model mp1 = gm.createModel("Aggregate");
+         Model mc2 = gm.createModel("Power connection");
+         Model mp1 = gm.createModel("Aggregate");
 
-        Model mu1 = gm.createModel("Factory");
-        Model mc3 = gm.createModel("Power connection");
+         Model mu1 = gm.createModel("Factory");
+         Model mc3 = gm.createModel("Power connection");
 
-        gm.linkModelsWith(mu0, mn0, mc0);
-        gm.linkModelsWith(mp0, mn0, mc1);
-        gm.linkModelsWith(mp1, mn0, mc2);
-        gm.linkModelsWith(mu1, mn0, mc3);
+         gm.linkModelsWith(mu0, mn0, mc0);
+         gm.linkModelsWith(mp0, mn0, mc1);
+         gm.linkModelsWith(mp1, mn0, mc2);
+         gm.linkModelsWith(mu1, mn0, mc3);
 
+         */
         if (!profilingRun) {
-            gm.printOnDone = 2;
+            gm.printOnDone = 0;
         }
 
         // Start the gamethread
         one.start();
-        
-        while(!gm.isReady()){
+
+        while (!gm.isReady()) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1);
             } catch (InterruptedException ex) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         CSVDumper d = new CSVDumper();
-        d.add(mp0, "production");
-        d.add(mu0, "power");
+        //d.add(mp0, "production");
+        //d.add(mu0, "power");
         d.save(gm);
     }
 }
