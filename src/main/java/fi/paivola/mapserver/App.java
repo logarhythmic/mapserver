@@ -21,6 +21,7 @@ import org.json.simple.parser.ParseException;
 public class App {
 
     static final boolean profilingRun = false;
+    static DiagnosticsWrapper dw; // for the wrapping of stupid debug stuff
 
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException {
 
@@ -55,6 +56,7 @@ public class App {
                     case "test":
                         ws.stop();
                         runTest();
+                        dw.printDiagnostics();
                         break mainloop;
                     case "h":
                     case "help":
@@ -80,6 +82,7 @@ public class App {
      * this!
      */ 
     static void runTest() {
+        dw = new DiagnosticsWrapper();
 
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);
@@ -87,6 +90,8 @@ public class App {
         boolean printFrameData = false;
         GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
+        
+        dw.addGameThread(one); // for debugging purposes
 
         // globalit
         gm.createModel("Weather");

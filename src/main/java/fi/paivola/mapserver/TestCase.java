@@ -28,7 +28,7 @@ public class TestCase {
     /**
      * Connects two models with a connection of the specified type
      * @param connectionType Check from settings.csv
-     * @param modelA
+     * @param modelA 
      * @param modelB 
      */
     public void addConnection(String connectionType, String modelA, String modelB) {
