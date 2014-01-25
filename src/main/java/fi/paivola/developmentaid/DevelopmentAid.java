@@ -20,7 +20,7 @@ public DevelopmentAid(int id){
 }
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-         current.saveGlobalData("Kehitysapu", Kehitysapu.KehitysAvunLaskenta(current.index));
+         current.saveGlobalData("Kehitysapu", Kehitysapu.KehitysAvunLaskenta(current.index,662000000));
     }
 
     @Override
@@ -45,10 +45,10 @@ public DevelopmentAid(int id){
 
     private static class Kehitysapu {
 
-            public static Object KehitysAvunLaskenta(int index){
+            public static Object KehitysAvunLaskenta(int index,double alkuApu ){
                 Random random=new Random();
                 
-		double kehitysapu = 662000000;
+		double kehitysapu = alkuApu;
 		double xx = 0;
 		double x = 0.5;
 		int onnettomuudet = 0;
