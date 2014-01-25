@@ -57,7 +57,8 @@ public class GameManager {
     /**
      * Should we print final data when done?
      */
-    public int printOnDone = 0;
+    public int              printOnDone = 0;
+    private boolean         printFrameData;
 
     private final static Logger log = Logger.getLogger("mapserver");
 
@@ -68,13 +69,17 @@ public class GameManager {
      */
     boolean ready = false;
 
-    public GameManager(int tick_amount, InputStream settings_file) {
+    /*
+     * @param printFrameData Do we want to print all data stored this frame?
+     */
+    public GameManager(int tick_amount, InputStream settings_file, boolean printFrameData) {
         this.tick_amount = tick_amount;
         this.tick_current = 0;
         this.frames = new ArrayList<>();
         this.active_models = new HashMap<>();
         this.waiting_extensions = new ArrayList<>();
         this.current_id = 0;
+        this.printFrameData = printFrameData;
 
         log.setLevel(Level.FINE);
 
@@ -93,8 +98,11 @@ public class GameManager {
         runRegisterations();
     }
 
-    public GameManager(int tick_amount) {
-        this(tick_amount, null);
+    /*
+     * @param printFrameData Do we want to print all data stored this frame?
+     */
+    public GameManager(int tick_amount, boolean printFrameData) {
+        this(tick_amount, null, printFrameData);
     }
 
     /**
@@ -338,8 +346,10 @@ public class GameManager {
             if (this.printOnDone == 2) {
                 String[] tmparr = this.frames.get(this.tick_current - 1).getATonOfStrings();
                 System.out.println("TICK: " + (this.tick_current - 1));
-                for (String s : tmparr) {
-                    System.out.println(s);
+                if (printFrameData) {
+                    for (String s : tmparr) {
+                        System.out.println(s);
+                    }
                 }
             }
         }
@@ -352,8 +362,10 @@ public class GameManager {
         if (this.printOnDone == 1) {
             for (Entry<String, String[]> e : this.getData().entrySet()) {
                 System.out.println("TICK: " + e.getKey());
-                for (String s : e.getValue()) {
-                    System.out.println(s);
+                if (printFrameData) {
+                    for (String s : e.getValue()) {
+                        System.out.println(s);
+                    }
                 }
             }
         }

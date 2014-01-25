@@ -14,9 +14,9 @@ public class GameThread extends Thread {
     public Thread thread;
     public static int threads = 0;
 
-    public GameThread(int ticks) {
+    public GameThread(int ticks, boolean printFrameData) {
         log.log(Level.INFO, "GameThread init @{0}", Thread.currentThread().getName());
-        this.game = new GameManager(ticks);
+        this.game = new GameManager(ticks, printFrameData);
         this.thread = new Thread(this, "thread#" + (threads++));
     }
 

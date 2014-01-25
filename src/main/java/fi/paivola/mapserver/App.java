@@ -82,7 +82,10 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 20));
+        int simulationDurationTicks = (int) Math.floor(52.177457 * 20);
+        // print debug-info on all parameters moving between models
+        boolean printFrameData = false;
+        GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
 
         // globalit
