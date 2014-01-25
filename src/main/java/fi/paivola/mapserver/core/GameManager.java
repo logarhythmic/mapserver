@@ -137,6 +137,7 @@ public class GameManager {
         }
         for (CCs c : this.waiting_extensions) {
             SettingMaster sl = this.getDefaultSM(c.cls);
+            this.models.get(c.misc).clss.put(sl.name, c.cls);
             this.models.get(c.misc).sm.settings.putAll(sl.settings);
         }
     }

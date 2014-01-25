@@ -152,7 +152,6 @@ public abstract class Model {
                     .onTickStart(last, current);
             data = ((ExtensionModel) pairs.getValue()).data;
         }
-
         this.dumpToDataFrame(current);
     }
 

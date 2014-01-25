@@ -186,7 +186,7 @@ public class App {
         gm.linkModelsWith(l3, s1, r3);
 
         if (!profilingRun) {
-            gm.printOnDone = 2;
+            gm.printOnDone = 0;
         }
 
         // Start the gamethread
