@@ -12,6 +12,8 @@ import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingInt;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.core.Model;
+import fi.paivola.mapserver.core.setting.SettingDouble;
+import fi.paivola.mapserver.utils.RangeDouble;
 import fi.paivola.mapserver.utils.RangeInt;
 
 import java.io.*;
@@ -33,7 +35,7 @@ public class Lake extends PointModel {
     double daytimeLength = 1;                // x/12h
 
     // Lake dimensions and water amount 
-    double surfaceArea = 256120000f;         // m^2
+    double surfaceArea = 256120000.0;         // m^2
     double depth = 14.1f;                    // m       flood water level
     double waterAmount = 0;                 // m^3
 
@@ -44,7 +46,7 @@ public class Lake extends PointModel {
     double C;                                // Chezy variable  
 
     // Rain
-    double basinArea = 7642000000f;           // m^2
+    double basinArea = 7642000000.0;           // m^2
     double rainfall = 0;                      // m^3
     double terrainCoefficient = 0.5f;         // unitless, how much of the rainfall ends up to the lake
 
@@ -146,6 +148,13 @@ public class Lake extends PointModel {
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.settings.put("order", new SettingInt("Position in the hydrodynamic chain", 0, new RangeInt(0, 100)));
+        sm.settings.put("k", new SettingDouble("Hamon coefficient", 1, new RangeDouble(0, 10)));
+        sm.settings.put("surfaceArea", new SettingDouble("sufraceArea", 256120000.0, new RangeDouble(0, Double.MAX_VALUE)));
+        sm.settings.put("depth", new SettingDouble("Flood depth", 14.1, new RangeDouble(0, Double.MAX_VALUE)));
+        sm.settings.put("startAmount", new SettingDouble("Start water depth", 0.5, new RangeDouble(0, 1)));
+        sm.settings.put("flowAmount", new SettingDouble("Flowing starts water depth", 0.501, new RangeDouble(0, 1)));
+        sm.settings.put("basinArea", new SettingDouble("Drainage basin area", 7642000000.0, new RangeDouble(0, Double.MAX_VALUE)));
+        sm.settings.put("terrainCoefficient", new SettingDouble("Terrain flow coefficient", 0.5, new RangeDouble(0, Double.MAX_VALUE)));
         sm.color = new Color(0, 0, 255);
         sm.name = "Lake";
         sm.type = "Lake";
@@ -158,10 +167,23 @@ public class Lake extends PointModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        if (Integer.parseInt(sm.settings.get("order").getValue()) != this.order) {
             this.order = Integer.parseInt(sm.settings.get("order").getValue());
+            this.k = Double.parseDouble(sm.settings.get("k").getValue());
+            this.surfaceArea = Double.parseDouble(sm.settings.get("surfaceArea").getValue());
+            this.depth = Double.parseDouble(sm.settings.get("depth").getValue());
+            this.startAmount = Double.parseDouble(sm.settings.get("startAmount").getValue());
+            this.flowAmount = Double.parseDouble(sm.settings.get("flowAmount").getValue());
+            this.basinArea = Double.parseDouble(sm.settings.get("basinArea").getValue());
+            this.terrainCoefficient = Double.parseDouble(sm.settings.get("terrainCoefficient").getValue());   
             this.saveInt("order", order);
-        }/*
+            this.saveDouble("k",k);
+            this.saveDouble("surfaceArea",surfaceArea);
+            this.saveDouble("depth",k);
+            this.saveDouble("startAmount",k);
+            this.saveDouble("flowAmount",k);
+            this.saveDouble("basinArea",k);
+            this.saveDouble("terrainCoefficient",k);
+        /*
          if (writer == null) {
          try {
          writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
