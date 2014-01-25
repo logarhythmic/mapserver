@@ -47,9 +47,9 @@ public class PopCenter extends PointModel {
             Store(retrieved);
         }
         outgoing.clear();
-        this.saveInt("Shipments sent", requestsServedThisTick);
+        this.saveInt("sentShipments", requestsServedThisTick);
         requestsServedThisTick = 0;
-        this.saveInt("Shipments requested", requestsReceivedThisTick);
+        this.saveInt("shipmentRequestsReceived", requestsReceivedThisTick);
         requestsReceivedThisTick = 0;
         ArrayList<Supplies> scopy = new ArrayList<>(storage);
         for (int i = 0; i < scopy.size(); i++){
@@ -57,7 +57,7 @@ public class PopCenter extends PointModel {
                 storage.get(i).amount*=(1 - STORAGE_RAT_RAVENOUSNESS);  //our highly advanced rat algorithm
         }
         UpdateStorage();
-        this.saveDouble("Food in storage", this.countFood());
+        this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
@@ -67,12 +67,12 @@ public class PopCenter extends PointModel {
         if (e.sender == this)
             return;
         switch (e.name){
-            case "request_supplies":
+            case "requestSupplies":
                 requestsReceivedThisTick ++;
                 outgoing.add(e);
                 break;
             case "harvested":
-            case "receive_supplies":
+            case "receiveSupplies":
                 Supplies received = (Supplies) e.value;
                 Store(received);
                 break;
@@ -103,7 +103,7 @@ public class PopCenter extends PointModel {
             Take(0, availableMilk);
             Take(1, availableGrain);
             starvation.sender = this;
-            addEventTo(e.sender, current, starvation);
+            addEventTo(this, current, starvation);
         } else if (outOfMilk){
             Take(0,availableMilk);
             Take(1, toEat - availableMilk);
@@ -123,7 +123,7 @@ public class PopCenter extends PointModel {
      * @param d the dataframe for the event
      */
     public void requestSuppliesFrom(Supplies s, PopCenter target, DataFrame d){
-        Event request = new Event("request_supplies", Event.Type.OBJECT, s);
+        Event request = new Event("requestSupplies", Event.Type.OBJECT, s);
         request.sender = this;
         this.addEventTo(target, d, request);
     }
@@ -220,7 +220,7 @@ public class PopCenter extends PointModel {
             destroyed.amount += destroyed_and_delivered[0].amount;
             delivered = destroyed_and_delivered[1];
         }
-        Event e = new Event("receive_supplies", Event.Type.OBJECT, delivered);
+        Event e = new Event("receiveSupplies", Event.Type.OBJECT, delivered);
         e.sender = this;
         addEventTo(target, d, e);
         requestsServedThisTick ++;
@@ -246,7 +246,7 @@ public class PopCenter extends PointModel {
         if (DebugFoodSource){
             while(Store(new Supplies(0,1000)) == 0){}
         }
-        this.saveDouble("Food in storage", this.countFood());
+        this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }

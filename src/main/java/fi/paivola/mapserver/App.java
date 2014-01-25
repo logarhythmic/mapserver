@@ -98,7 +98,6 @@ public class App {
         // ruoka
         SettingMaster sm = one.game.getDefaultSM("Field");
         sm.settings.get("content").setValue("maize");
-        Model Field1 = gm.createModel("Field");
 
         // kaupungit
         Model Town1 = gm.createModel("PopCenter");
@@ -107,7 +106,12 @@ public class App {
         gm.linkModelsWith(Town1, Town2, Road1);
 
         // ruoka x kaupungit
-        gm.linkModelsWith(Field1, Town1, gm.createModel("GenericConnection"));
+        
+        Model[] fields = new Model[5];
+        for(int i = 0; i < 5; i++){
+            fields[i] = gm.createModel("Field");
+            gm.linkModelsWith(fields[i], Town1, gm.createModel("GenericConnection"));
+        }
 
         // water
         Model l1 = gm.createModel("Lake");
