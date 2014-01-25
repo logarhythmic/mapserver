@@ -121,7 +121,7 @@ public class WSServer extends WebSocketServer {
         } else {
             ticks = Integer.parseInt(SettingsParser.settings.get("default_ticks").toString());
         }
-        GameThread newthread = new GameThread(ticks);
+        GameThread newthread = new GameThread(ticks, false);
         this.threads.put("" + this.threads.size(), newthread);
         out.put("manager_id", "" + (this.threads.size() - 1));
         success(out);
