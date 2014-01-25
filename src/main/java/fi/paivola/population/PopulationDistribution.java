@@ -103,6 +103,16 @@ public class PopulationDistribution  {
                 - newDeaths[lastIndex]; // new deaths
         this.quantities = newQuantities;
         this.deaths = newDeaths;
+        
+        // TODO: fixme, less than 0 populations should not happen
+        for (double d : quantities) {
+            if (d < 0) d = 0;
+        }
+        
+        // do random sanitychecks
+//        for (double d : quantities) {
+//            if (d < 0) throw new java.lang.IllegalStateException("age-group-population was negative");
+//        }
     }
     
     public double[] getQuantities() {

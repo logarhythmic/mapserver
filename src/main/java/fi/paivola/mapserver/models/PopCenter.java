@@ -367,10 +367,10 @@ public class PopCenter extends PointModel {
         }
         
         if (currentStorageCapacity > maxStorageCapacity){
-            throw new UnsupportedOperationException( "Wrong usage of PopCenter" );
-//            System.out.println("Storage had more goods than could fit inside. "
-//                              +"This should not happen. "
-//                              +"Please use the Store method to store items.");
+//            throw new UnsupportedOperationException( "Wrong usage of PopCenter" );
+            System.out.println("Storage had more goods than could fit inside. "
+                              +"This should not happen. "
+                              +"Please use the Store method to store items.");
         }
     }
 
