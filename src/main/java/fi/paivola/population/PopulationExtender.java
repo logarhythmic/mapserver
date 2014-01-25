@@ -1,6 +1,7 @@
 package fi.paivola.population;
 
 import au.com.bytecode.opencsv.CSVReader;
+import fi.paivola.mapserver.DiagnosticsWrapper;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.ExtensionModel;
@@ -20,10 +21,12 @@ import java.util.logging.Logger;
 public class PopulationExtender extends ExtensionModel {
     private MortalityModel          mortalityModel;
     private PopulationDistribution  populationByAge;
+    private double                  foodShortage;
     
     public PopulationExtender(int id) {
         super(id);
         this.mortalityModel = new MortalityModel();
+        this.foodShortage = 0;
         
         // Parse initial age-structure from file
         double[] ageGroups = new double[Constants.NUM_AGE_GROUPS];
@@ -33,29 +36,39 @@ public class PopulationExtender extends ExtensionModel {
         // 20% of people age 5 years annually 
         this.populationByAge.setAnnualFlowPc(0.2);
         this.populationByAge.setBirthsPc(0.047492154); // from births_population.ods
+
         // check that the data is conformant
         assert(this.populationByAge.getQuantities().length == Constants.NUM_AGE_GROUPS);
+        
     }
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
+        // calculate effects of food shortage
+        if (foodShortage > 0) {
+            // % of people not fed properly, assuming greedy-distribution
+            double severity = (foodShortage*1000*7) / populationByAge.total();
+            foodShortage = 0;
+        }
+        
+        // update demographics
         populationByAge.step( 1 );
+
+        // notify amount eaten
+        this.addEventTo(parent, current, new Event("consumeFood", Event.Type.DOUBLE, 1000*7*populationByAge.total()));
+        
         double[] quantities = populationByAge.getQuantities();
+        // save population data to dataframe
         for (int i = 0; i != quantities.length; ++i) {
             this.saveData("populationByAge" + i, quantities[i]);
         }
-        /*
-        System.out.println( "AGES_0TO4:\t" + (long)populationByAge.getQuantities()[0] );
-        System.out.println( "AGES_5TO9:\t" + (long)populationByAge.getQuantities()[1] );
-        System.out.println( "AGES_10TO14:\t" + (long)populationByAge.getQuantities()[2] );
-        System.out.println( "Total:\t\t" + (long)populationByAge.total() );
-        System.out.println( "Mode:\t"
-                + "**\t" + populationByAge.mode() );
-        */
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
+        if (e.name == "outOfFood") {
+            foodShortage = (double)e.value;
+        }
     }
 
     @Override
