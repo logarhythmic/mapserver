@@ -13,6 +13,7 @@ import fi.paivola.mapserver.core.setting.SettingList;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.utils.Icon;
 import fi.paivola.mapserver.utils.RangeInt;
+import fi.paivola.mapserver.utils.RangeDouble;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -94,6 +95,12 @@ public class River extends ConnectionModel {
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.settings.put("order", new SettingInt("Position in the hydrodynamic chain", 0, new RangeInt(0, 100)));
+        sm.settings.put("width", new SettingDouble("Width of the river", 100, new RangeDouble(0,Double.MAX_VALUE)));
+        sm.settings.put("length", new SettingDouble("Length of the river", 10000, new RangeDouble(0,Double.MAX_VALUE)));
+        sm.settings.put("startDepth", new SettingDouble("Start water depth", 0.1, new RangeDouble(0,1)));
+        sm.settings.put("floodDepth", new SettingDouble("Flood water depth", 10, new RangeDouble(0,Double.MAX_VALUE)));
+        sm.settings.put("flowDepth", new SettingDouble("River starts to flow when over this", 0.5, new RangeDouble(0,1)));
+        sm.settings.put("slope", new SettingDouble("Width of the river", 20, new RangeDouble(0,90)));
         sm.color = new Color(0, 0, 255);
         sm.name = "River";
     }
@@ -105,11 +112,21 @@ public class River extends ConnectionModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        if(Integer.parseInt(sm.settings.get("order").getValue()) != this.order)
-        {
             this.order = Integer.parseInt(sm.settings.get("order").getValue());
+            this.width = Double.parseDouble(sm.settings.get("width").getValue());
+            this.length = Double.parseDouble(sm.settings.get("length").getValue());
+            this.startDepth = Double.parseDouble(sm.settings.get("startDepth").getValue());
+            this.floodDepth = Double.parseDouble(sm.settings.get("floodDepth").getValue());
+            this.flowDepth = Double.parseDouble(sm.settings.get("flowDepth").getValue());
+            this.slope = Double.parseDouble(sm.settings.get("slope").getValue());
             this.saveInt("order", order);
-        }/*
+            this.saveDouble("width",width);
+            this.saveDouble("length",length);
+            this.saveDouble("startDepth",startDepth);
+            this.saveDouble("floodDepth",floodDepth);
+            this.saveDouble("flowDepth",flowDepth);
+            this.saveDouble("slope",slope);
+        /*
         if (writer == null) {
             try {
                 writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');

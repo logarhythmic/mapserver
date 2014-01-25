@@ -85,31 +85,67 @@ public class App {
         Model l1 = gm.createModel("Lake");
         SettingMaster sm = gm.getDefaultSM("Lake");
         sm.settings.get("order").setValue("1");
+        sm.settings.get("k").setValue("1");
+        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("depth").setValue("14.1");
+        sm.settings.get("startAmount").setValue("0.9");
+        sm.settings.get("flowAmount").setValue("0.91");
+        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("terrainCoefficient").setValue("0.5f");
         l1.onActualUpdateSettings(sm);
         
         Model l2 = gm.createModel("Lake");
         sm = gm.getDefaultSM("Lake");
         sm.settings.get("order").setValue("1");
+        sm.settings.get("k").setValue("1");
+        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("depth").setValue("14.1");
+        sm.settings.get("startAmount").setValue("0.9");
+        sm.settings.get("flowAmount").setValue("0.91");
+        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("terrainCoefficient").setValue("0.5f");
         l2.onActualUpdateSettings(sm);
         
         Model r1 = gm.createModel("River");
         sm = gm.getDefaultSM("River");
         sm.settings.get("order").setValue("2");
+        sm.settings.get("width").setValue("100");
+        sm.settings.get("length").setValue("100000");
+        sm.settings.get("startDepth").setValue("0");
+        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("flowDepth").setValue("0.5");
         r1.onActualUpdateSettings(sm);
         
         Model r2 = gm.createModel("River");
         sm = gm.getDefaultSM("River");
         sm.settings.get("order").setValue("2");
+        sm.settings.get("width").setValue("100");
+        sm.settings.get("length").setValue("100000");
+        sm.settings.get("startDepth").setValue("0");
+        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("flowDepth").setValue("0.5");
         r2.onActualUpdateSettings(sm);
         
         Model l3 = gm.createModel("Lake");
         sm = gm.getDefaultSM("Lake");
         sm.settings.get("order").setValue("3");
+        sm.settings.get("k").setValue("1");
+        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("depth").setValue("14.1");
+        sm.settings.get("startAmount").setValue("0.9");
+        sm.settings.get("flowAmount").setValue("0.91");
+        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("terrainCoefficient").setValue("0.5f");
         l3.onActualUpdateSettings(sm);
         
         Model r3 = gm.createModel("River");
         sm = gm.getDefaultSM("River");
         sm.settings.get("order").setValue("4");
+        sm.settings.get("width").setValue("100");
+        sm.settings.get("length").setValue("100000");
+        sm.settings.get("startDepth").setValue("0");
+        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("flowDepth").setValue("0.5");
         r3.onActualUpdateSettings(sm);
         
         Model s1 = gm.createModel("Sea");
@@ -125,7 +161,7 @@ public class App {
 
         
         if (!profilingRun) {
-            gm.printOnDone = 2;
+            gm.printOnDone = 0;
         }
 
         // Start the gamethread
