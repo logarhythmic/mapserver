@@ -57,7 +57,8 @@ public class PopCenter extends PointModel {
                 storage.get(i).amount*=(1 - STORAGE_RAT_RAVENOUSNESS);  //our highly advanced rat algorithm
         }
         UpdateStorage();
-        this.saveDouble("availableFood", this.countFood());
+        if (this.countFood() > 1)
+            this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
@@ -243,10 +244,11 @@ public class PopCenter extends PointModel {
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
         findOthers();
-        if (DebugFoodSource){
+        if (DebugFoodSource){ // this is a debug
             while(Store(new Supplies(0,1000)) == 0){}
         }
-        this.saveDouble("availableFood", this.countFood());
+        if (this.countFood() > 1)
+            this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
@@ -294,22 +296,24 @@ public class PopCenter extends PointModel {
     
     /**
      * Stores the given supplies item into the storage
-     * @param in what to store
+     * @param inS what to store
      * @return if the storage filled up, this is how much was left of the item
      */
-    public double Store(Supplies in){
-        if (in == null)
+    public double Store(Supplies inS){
+        if (inS == null)
             return 0;
+        Supplies in = new Supplies(inS.id, inS.amount);
+        double overflow = currentStorageCapacity+in.amount-maxStorageCapacity;
         Supplies found = findSupplies(in.id);
         if (found == null){
-            storage.add(new Supplies(in.id, in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount));
-            currentStorageCapacity += in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount;
+            in.amount = (in.amount+currentStorageCapacity>maxStorageCapacity)?maxStorageCapacity-currentStorageCapacity:in.amount;
+            storage.add(in);
         } else {
-            found.amount = (found.amount+(in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount));
-            currentStorageCapacity += (in.amount+currentStorageCapacity>maxStorageCapacity?maxStorageCapacity-currentStorageCapacity:in.amount);
+            in.amount = (in.amount+currentStorageCapacity>maxStorageCapacity)?maxStorageCapacity-currentStorageCapacity:in.amount;
+            found.amount += in.amount;
         }
-        double overflow = currentStorageCapacity+in.amount-maxStorageCapacity;
         overflow = overflow<0?0:overflow;
+        currentStorageCapacity += in.amount;
         return overflow;
     }
     
@@ -344,6 +348,8 @@ public class PopCenter extends PointModel {
      * @return the created Supplies item
      */
     public Supplies Take(int id, double amount){
+        if (amount < 0)
+            return null;
         Supplies found = findSupplies(id);
         if (found == null){
             return new Supplies(id, 0);
@@ -356,21 +362,21 @@ public class PopCenter extends PointModel {
     
     void UpdateStorage(){
         currentStorageCapacity = 0;
-        ArrayList<Supplies> scopy = new ArrayList<>(storage);
-        for (int i = scopy.size()-1; i >= 0; i--){
-            if (scopy.get(i) != null ){
-                if (scopy.get(i).amount == 0){
-                    storage.remove(scopy.get(i));
+        
+        for (int i = storage.size()-1; i >= 0; i--){
+            if (storage.get(i) != null ){
+                if (storage.get(i).amount == 0){
+                    storage.remove(storage.get(i));
                 }
-                currentStorageCapacity += scopy.get(i).amount;
             }
+        }
+        
+        for(Supplies s : storage){
+            currentStorageCapacity += s.amount;
         }
         
         if (currentStorageCapacity > maxStorageCapacity){
             throw new UnsupportedOperationException( "Wrong usage of PopCenter" );
-//            System.out.println("Storage had more goods than could fit inside. "
-//                              +"This should not happen. "
-//                              +"Please use the Store method to store items.");
         }
     }
 
