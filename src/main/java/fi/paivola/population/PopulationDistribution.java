@@ -104,7 +104,6 @@ public class PopulationDistribution  {
         this.quantities = newQuantities;
         this.deaths = newDeaths;
         
-        // TODO: fixme, less than 0 populations should not happen
         for (double d : quantities) {
             if (d < 0) d = 0;
         }
@@ -123,6 +122,10 @@ public class PopulationDistribution  {
         return this.quantities[index];
     }
     
+    /**
+     * 
+     * @return Total population / 1000
+     */
     public double total()
     {
         double total = 0;

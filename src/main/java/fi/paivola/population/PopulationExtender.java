@@ -44,10 +44,12 @@ public class PopulationExtender extends ExtensionModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
+        double population = populationByAge.total() * 1000;
+        
         // calculate effects of food shortage
         if (foodShortage > 0) {
             // % of people not fed properly, assuming greedy-distribution
-            double severity = (foodShortage*1000*7) / populationByAge.total();
+            double severity = foodShortage / (population*7);
             mortalityModel.setFoodShortage(severity);
         }
         
@@ -55,10 +57,10 @@ public class PopulationExtender extends ExtensionModel {
         populationByAge.step( 1 );
 
         // notify amount eaten
-        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, 1000*7*populationByAge.total());
+        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, population*7);
         addEventTo(parent, current, consumeFoodEvent);
         
-        saveData( "totalPopulation", populationByAge.total() );
+        saveData( "totalPopulation", population );
                 
         // reset for next frame
         foodShortage = 0;
@@ -81,7 +83,7 @@ public class PopulationExtender extends ExtensionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        this.saveData( "totalPopulation", populationByAge.total() );
+        this.saveData( "totalPopulation", populationByAge.total()*1000 );
     }
 
     @Override
