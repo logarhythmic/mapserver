@@ -1,22 +1,17 @@
 package fi.paivola.mapserver;
 
-import fi.kivibot.power.utils.CSVDumper;
 import fi.kivibot.power.utils.PowerUtils;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
-import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
-import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Integer.parseInt;
 import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.Logger;
 import org.json.simple.parser.ParseException;
 
 public class App {
@@ -87,7 +82,7 @@ public class App {
         GameManager gm = one.game;
 
         PowerUtils.createNetwork(gm);
-        
+
         /*
          Model mp0 = gm.createModel("Wind plant");
          Model mc0 = gm.createModel("Power connection");
@@ -119,17 +114,9 @@ public class App {
         // Start the gamethread
         one.start();
 
-        while (!gm.isReady()) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        CSVDumper d = new CSVDumper();
-        //d.add(mp0, "production");
-        //d.add(mu0, "power");
-        d.save(gm);
+        CSVDumper csv = new CSVDumper();
+        //csv.add(mp0, "production");
+        //csv.add(mu0, "power");
+        csv.save(gm, true);
     }
 }
