@@ -83,7 +83,7 @@ public class PopulationExtender extends ExtensionModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        this.saveData( "totalPopulation", populationByAge.total()*1000 );
+        saveData( "totalPopulation", populationByAge.total()*1000 );
     }
 
     @Override

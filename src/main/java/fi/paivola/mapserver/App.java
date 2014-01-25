@@ -107,10 +107,8 @@ public class App {
 
         // ruoka x kaupungit
         
-        Model[] fields = new Model[5];
-        for(int i = 0; i < 5; i++){
-            fields[i] = gm.createModel("Field");
-            gm.linkModelsWith(fields[i], Town1, gm.createModel("GenericConnection"));
+        for(int i = 0; i < 500; i++){
+            gm.linkModelsWith(gm.createModel("Field"), Town1, gm.createModel("GenericConnection"));
         }
 
         // water
