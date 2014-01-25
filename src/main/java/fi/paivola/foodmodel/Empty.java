@@ -3,6 +3,7 @@ package fi.paivola.foodmodel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.Supplies;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public class Empty extends Edible {
 
     }
 
-    double harvest(double max) {
-        return 0;
+    Supplies harvest(double max) {
+        return new Supplies(0,0);
     }
 }

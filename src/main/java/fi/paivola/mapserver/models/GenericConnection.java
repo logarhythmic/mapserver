@@ -16,9 +16,9 @@ import fi.paivola.mapserver.core.setting.SettingMaster;
  *
  * @author Allan Palmu <allan.palmu@gmail.com>
  */
-public class PhoneLine extends ConnectionModel {
+public class GenericConnection extends ConnectionModel {
 
-    public PhoneLine(int id){
+    public GenericConnection(int id){
         super(id);
     }
 

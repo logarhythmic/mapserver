@@ -3,6 +3,7 @@ package fi.paivola.foodmodel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.Supplies;
 import java.util.Map;
 
 /**
@@ -42,13 +43,14 @@ public class Cow extends Edible {
 
     }
 
-    double harvest(double max) {
-        double d = storedMilk;
-        if(d < max) {
+    Supplies harvest(double max) {
+        Supplies d = new Supplies (0, storedMilk);
+        if(d.amount < max) {
             storedMilk = 0;
             return d;
         }
         storedMilk -= max;
-        return max;
+        d.amount = max;
+        return d;
     }
 }

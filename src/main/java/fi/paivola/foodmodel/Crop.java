@@ -114,14 +114,15 @@ public abstract class Crop extends Edible {
         }
     }
    
-    public double harvest(double max) {
-        double ret = getCurrentStoredFood();
-        if(max < 0 || max > ret) {
+    public Supplies harvest(double max) {
+        Supplies ret = new Supplies (1, getCurrentStoredFood() * 1000);
+        if(max < 0 || max > ret.amount) {
             currentStoredFood = 0;
             return ret;
         }
-        currentStoredFood -= max;
-        return ret - currentStoredFood;
+        currentStoredFood -= max / 1000;
+        ret.amount = max;
+        return ret;
     }
 
     public double getCurrentStoredFood() {

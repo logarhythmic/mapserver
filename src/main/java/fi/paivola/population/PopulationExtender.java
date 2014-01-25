@@ -55,7 +55,8 @@ public class PopulationExtender extends ExtensionModel {
         populationByAge.step( 1 );
 
         // notify amount eaten
-        addEventTo(parent, current, new Event("consumeFood", Event.Type.DOUBLE, 1000*7*populationByAge.total()));
+        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, 1000*7*populationByAge.total());
+        addEventTo(parent, current, consumeFoodEvent);
         
         saveData( "totalPopulation", populationByAge.total() );
         
@@ -75,15 +76,12 @@ public class PopulationExtender extends ExtensionModel {
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.name = "populationExtender";
         sm.exts = "PopCenter";
+        // settings / input variables here
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
         this.saveData( "totalPopulation", populationByAge.total() );
-//        double[] quantities = populationByAge.getQuantities();
-//        for (int i = 0; i != quantities.length; ++i) {
-//            this.saveData("populationByAge" + i, quantities[i]);
-//        }
     }
 
     @Override

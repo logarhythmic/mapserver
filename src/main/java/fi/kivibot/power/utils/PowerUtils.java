@@ -24,7 +24,7 @@ public class PowerUtils {
     public static void createNetwork(GameManager gm) {
         List<PowerNode> nodes = new ArrayList<>();
 
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 500; i++) {
             Model pn = gm.createModel("Power node");
             pn.setLatLng(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0);
             nodes.add((PowerNode) pn);
@@ -34,10 +34,10 @@ public class PowerUtils {
             gm.linkModelsWith(nodes.get(i), nodes.get(i + 1), pc);
         }
 
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 50; i++) {
             Factory f = (Factory) gm.createModel("Factory");
             PowerConnection pc = (PowerConnection) gm.createModel("Power connection");
-            gm.linkModelsWith(nodes.get((int) (5000.0 * Math.random())), f, pc);
+            gm.linkModelsWith(nodes.get((int) (500.0 * Math.random())), f, pc);
         }
 
     
