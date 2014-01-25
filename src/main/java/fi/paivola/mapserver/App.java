@@ -10,6 +10,7 @@ import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -159,5 +160,11 @@ public class App {
 
         // Start the gamethread
         one.start();
+
+        //Save cats to a csv file
+        CSVDumper csv = new CSVDumper();
+        csv.add("cats"); //global
+        csv.add(points[0], "catsSeen"); //local
+        csv.save(gm, true);
     }
 }
