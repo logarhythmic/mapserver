@@ -53,7 +53,8 @@ public class RoadModel extends ConnectionModel {
     @Override
     public void onTickStart(DataFrame last, DataFrame current){
         roadBlocked = false;
-        rain = (double) current.getGlobalData("rain");
+        if (current.getGlobalData("rain")!= null)
+            rain = (double) current.getGlobalData("rain");
         super.onTickStart(last, current);
         remainingCapacityThisTick = calcMaxStuff(calcTrips(calcTime(calcSpeed())));
     }

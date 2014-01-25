@@ -429,8 +429,8 @@ public class GameManager {
     /**
      * @return Are we done?
      */
-    public boolean isReady(){
+    public boolean isReady() {
         return this.ready;
     }
-    
+
 }

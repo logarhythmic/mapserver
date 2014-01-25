@@ -1,10 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package fi.kivibot.power.models;
+package fi.kivibot.power.models.base;
 
+import fi.kivibot.power.misc.EU;
+import fi.kivibot.power.misc.PowerSourceInfo;
+import fi.kivibot.power.models.PowerConnection;
 import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
@@ -12,18 +10,21 @@ import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.utils.StringPair;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  *
  * @author kivi
  */
-public class PowerUser extends PointModel {
+public abstract class PowerUser extends PointModel {
 
     public PowerUser(int id) {
         super(id);
@@ -33,10 +34,7 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        getPower(this.findSources(), last, this);
-        if (this.getDouble("power") == 0) {
-            System.exit(id);
-        }
+        getPower(sort_loss(this.findSources()), last, this);
     }
 
     @Override
@@ -49,6 +47,7 @@ public class PowerUser extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        this.saveDouble("power", 0);
     }
 
     @Override
@@ -62,7 +61,6 @@ public class PowerUser extends PointModel {
      */
     private static synchronized void getPower(List<PowerSourceInfo> l, DataFrame df, Model th) {
         double ce = 0;
-        l = sort_loss(l);
 
         for (PowerSourceInfo psi : l) {
             if (ce >= th.getDouble("usage")) {
@@ -103,13 +101,13 @@ public class PowerUser extends PointModel {
 
     private List<PowerSourceInfo> findSources() {
         List<PowerSourceInfo> sources = new LinkedList<>();
-        List<Model> visited = new LinkedList<>();
+        Set<Model> visited = new HashSet<>();
         Queue<PowerSourceInfo> next = new LinkedList<>();
 
         for (Model m : this.connections) {
             if (m.name.equals("Power connection")) {
                 Model mo = getOther((ConnectionModel) m, this);
-                double d = this.distanceTo(mo);
+                double d = ((PowerConnection) m).lenC();
                 next.add(new PowerSourceInfo(mo, d, d * m.getDouble("losspkm")));
             }
         }
@@ -124,8 +122,9 @@ public class PowerUser extends PointModel {
                     for (Model m2 : m.connections) {
                         if (m2.name.equals("Power connection")) {
                             Model mo = getOther((ConnectionModel) m2, m);
-                            double d = m.distanceTo(mo);
-                            next.add(new PowerSourceInfo(mo, psi.getDist() + d, psi.getLoss() + (d * m2.getDouble("losspkm"))));
+                            double d = ((PowerConnection) m2).lenC();
+                            double l = ((PowerConnection) m2).lossC();
+                            next.add(new PowerSourceInfo(mo, psi.getDist() + d, psi.getLoss() + l));
                         }
                     }
                 }

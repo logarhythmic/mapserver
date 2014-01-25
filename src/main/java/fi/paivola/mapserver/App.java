@@ -2,6 +2,7 @@ package fi.paivola.mapserver;
 
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.ExtensionModel;
+import fi.kivibot.power.utils.PowerUtils;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
@@ -108,7 +109,6 @@ public class App {
         gm.linkModelsWith(Town1, Town2, Road1);
 
         // ruoka x kaupungit
-        Model Road2 = gm.createModel("Road");
         gm.linkModelsWith(Field1, Town1, gm.createModel("GenericConnection"));
 
         // water
@@ -183,23 +183,46 @@ public class App {
         sm.settings.get("order").setValue("5");
         s1.onActualUpdateSettings(sm);
         
-        Model weather = gm.createModel("Weather");
-        
         gm.linkModelsWith(l1, l3, r1);
         gm.linkModelsWith(l2, l3, r2);
         gm.linkModelsWith(l3, s1, r3);
 
+        PowerUtils.createNetwork(gm);
+
+        /*
+         Model mp0 = gm.createModel("Wind plant");
+         Model mc0 = gm.createModel("Power connection");
+         Model mu0 = gm.createModel("Factory");
+         Model mc1 = gm.createModel("Power connection");
+
+         Model mn0 = gm.createModel("Power node");
+
+         mn0.setLatLng(1, 0);
+
+         mp0.setLatLng(1, 3);
+
+         Model mc2 = gm.createModel("Power connection");
+         Model mp1 = gm.createModel("Aggregate");
+
+         Model mu1 = gm.createModel("Factory");
+         Model mc3 = gm.createModel("Power connection");
+
+         gm.linkModelsWith(mu0, mn0, mc0);
+         gm.linkModelsWith(mp0, mn0, mc1);
+         gm.linkModelsWith(mp1, mn0, mc2);
+         gm.linkModelsWith(mu1, mn0, mc3);
+
+         */
         if (!profilingRun) {
-            gm.printOnDone = 0;
+            gm.printOnDone = 2;
         }
 
         // Start the gamethread
         one.start();
 
-        //Save cats to a csv file
         CSVDumper csv = new CSVDumper();
-        csv.add("cats"); //global
-        csv.add(points[0], "catsSeen"); //local
+        //csv.add(mp0, "production");
+        //csv.add(mu0, "power");
         csv.save(gm, true);
     }
 }
