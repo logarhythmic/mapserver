@@ -195,7 +195,7 @@ public class PopCenter extends PointModel {
     
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        System.out.println("OGD called on village "+this.id+" at "+df.index);
+//        System.out.println("OGD called on village "+this.id+" at "+df.index);
         storage = new ArrayList<>();
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
@@ -222,7 +222,7 @@ public class PopCenter extends PointModel {
                 }
             }
             connectedModels.addAll(newConns);
-            if (connectedModels.size() != amount)
+           if (connectedModels.size() != amount)
                 continue;
             break;
         }
@@ -324,9 +324,10 @@ public class PopCenter extends PointModel {
         }
         
         if (currentStorageCapacity > maxStorageCapacity){
-            System.out.println("Storage had more goods than could fit inside. "
-                              +"This should not happen. "
-                              +"Please use the Store method to store items.");
+            throw new UnsupportedOperationException( "Wrong usage of PopCenter" );
+//            System.out.println("Storage had more goods than could fit inside. "
+//                              +"This should not happen. "
+//                              +"Please use the Store method to store items.");
         }
     }
 

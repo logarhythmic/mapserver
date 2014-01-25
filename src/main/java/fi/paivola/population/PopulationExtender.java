@@ -61,7 +61,7 @@ public class PopulationExtender extends ExtensionModel {
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.name = "populationExtender";
-        sm.exts = "examplePoint";
+        sm.exts = "PopCenter";
     }
 
     @Override
