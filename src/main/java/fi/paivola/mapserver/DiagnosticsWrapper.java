@@ -4,14 +4,22 @@ import fi.paivola.mapserver.core.GameThread;
 import java.util.ArrayList;
 
 /**
- * Wrapper-class for making simulation-/model-diagnostics easier to use.
+ * Wrapper-singleton for making simulation-/model-diagnostics easier to use.
  * @author hegza
  */
 public class DiagnosticsWrapper {
-    private int                     tbi = -1; // thread being inspected
-    private ArrayList<GameThread>   gameThreads; // gamethreads with diagnostics
-    public DiagnosticsWrapper() {
-        gameThreads = new ArrayList<GameThread>();
+    private static DiagnosticsWrapper   instance = null;
+    private int                         tbi = -1; // thread being inspected
+    private ArrayList<GameThread>       gameThreads = new ArrayList<GameThread>(); // gamethreads with diagnostics
+
+    protected DiagnosticsWrapper() {
+    }
+    
+    public static DiagnosticsWrapper getInstance() {
+        if(instance == null) {
+            instance = new DiagnosticsWrapper();
+        }
+        return instance;
     }
     
     public void addGameThread(GameThread gameThread) {

@@ -56,7 +56,6 @@ public class App {
                     case "test":
                         ws.stop();
                         runTest();
-                        dw.printDiagnostics();
                         break mainloop;
                     case "h":
                     case "help":
@@ -82,7 +81,7 @@ public class App {
      * this!
      */ 
     static void runTest() {
-        dw = new DiagnosticsWrapper();
+        dw = DiagnosticsWrapper.getInstance();
 
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);

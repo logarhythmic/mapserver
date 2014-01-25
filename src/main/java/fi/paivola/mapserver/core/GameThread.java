@@ -1,5 +1,6 @@
 package fi.paivola.mapserver.core;
 
+import fi.paivola.mapserver.DiagnosticsWrapper;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +20,7 @@ public class GameThread extends Thread {
         this.game = new GameManager(ticks, printFrameData);
         this.thread = new Thread(this, "thread#" + (threads++));
     }
-
+    
     @Override
     public void start() {
         this.thread.start();
@@ -30,6 +31,7 @@ public class GameThread extends Thread {
         log.log(Level.INFO, "GameThread starting run @{0}", Thread.currentThread().getName());
         long startTime = System.nanoTime();
         this.game.stepTrough();
+        DiagnosticsWrapper.getInstance().printDiagnostics();
         long endTime = System.nanoTime();
         log.log(Level.INFO, "GameThread ended run @{0} in {1} seconds", new String[]{Thread.currentThread().getName(), "" + (endTime - startTime) / 1000000000.0});
     }
