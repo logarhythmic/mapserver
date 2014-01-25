@@ -20,21 +20,22 @@
             "class": "fi.paivola.mapserver.models.ExampleGlobal"
         },
         {
-            "name": "Power plant",
-            "class": "fi.kivibot.power.models.PowerPlant"
+            "name": "Aggregate",
+            "class": "fi.kivibot.power.models.Aggregate"
         },
         {
             "name": "Solar plant",
             "class": "fi.kivibot.power.models.SolarPlant"
         },
         {
+            "name": "Wind plant",
+            "class": "fi.kivibot.power.models.WindPlant"
+        },
+        {
             "name": "Power connection",
             "class": "fi.kivibot.power.models.PowerConnection"
         },
-        {
-            "name": "Power user",
-            "class": "fi.kivibot.power.models.PowerUser"
-        },
+
         {
             "name": "Power node",
             "class": "fi.kivibot.power.models.PowerNode"
