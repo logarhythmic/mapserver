@@ -67,6 +67,10 @@ public class PopulationDistribution  {
         this.birthsPc = birthsPerPopulation;
     }
     
+    public double getBirthsPc() {
+        return birthsPc;
+    }
+    
     /**
      * Causes quantities to flow forwards in the arrays.
      * @param dt Time-step in weeks
