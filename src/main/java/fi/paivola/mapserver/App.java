@@ -102,12 +102,12 @@ public class App {
      */ 
     static void runTest() {
         dw = DiagnosticsWrapper.getInstance();
-        dw.setDebugOutput( true );
+        dw.setDebugOutput( false );
 
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);
         // print debug-info on all parameters moving between models
-        boolean printFrameData = false;
+        boolean printFrameData = true;
         GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
         
