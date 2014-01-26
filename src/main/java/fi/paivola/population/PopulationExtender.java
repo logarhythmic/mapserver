@@ -53,7 +53,7 @@ public class PopulationExtender extends ExtensionModel {
         // calculate effects of food shortage
         if (foodShortage > 0) {
             // % of people not fed properly, assuming greedy-distribution
-            double severity = java.lang.Math.min(foodShortage / (population*7), 1.0);
+            double severity = foodShortage;
             mortalityModel.setFoodShortage(severity);
         }
         
