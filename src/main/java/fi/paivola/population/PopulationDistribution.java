@@ -1,6 +1,5 @@
 package fi.paivola.population;
 
-import com.sun.corba.se.impl.orbutil.closure.Constant;
 import fi.paivola.population.CsvUtil;
 import fi.paivola.population.Constants;
 
@@ -56,6 +55,10 @@ public class PopulationDistribution  {
         assert(annualFlowPc >= 0.0);
         assert(annualFlowPc <= 1.0);
         this.annualFlowPc = annualFlowPc;
+    }
+    
+    public void setQuantities(double[] quantities) {
+        this.quantities = quantities;
     }
     
     /**

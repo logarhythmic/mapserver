@@ -236,7 +236,6 @@ public class PopCenter extends PointModel {
     public Supplies sendSupplies(Supplies s, RoadModel[] route, PopCenter target, DataFrame d){
         if (route == null || s.amount == 0 || vehiclesUsed >= vehicles )
             return s;
-        System.out.println("sent some "+s.id);
         Supplies destroyed = new Supplies(s.id, 0);
         Supplies delivered = new Supplies(s.id, s.amount);
         for (RoadModel r : route){
