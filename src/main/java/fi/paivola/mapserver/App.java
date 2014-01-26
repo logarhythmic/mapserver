@@ -101,7 +101,7 @@ public class App {
      */ 
     static void runTest() {
         dw = DiagnosticsWrapper.getInstance();
-        dw.setDebugOutput( false );
+        dw.setDebugOutput( true );
 
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);

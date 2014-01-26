@@ -79,7 +79,7 @@ public class MortalityModel  {
         if (shortagePerPopulation >= 0 && shortagePerPopulation <= 1) {
             foodShortage = shortagePerPopulation;
         } else {
-            DiagnosticsWrapper.getInstance().println("Illegal value for food shortage");
+            DiagnosticsWrapper.getInstance().println("Illegal value for food shortage: " + shortagePerPopulation);
         }
     }
 }
