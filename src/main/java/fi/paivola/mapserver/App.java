@@ -120,15 +120,15 @@ public class App {
         sm.settings.get("content").setValue("maize");
 
         // kaupungit
-        Model Town1 = gm.createModel("PopCenter");
-        Model Town2 = gm.createModel("PopCenter");
-        Model Road1 = gm.createModel("Road");
-        gm.linkModelsWith(Town1, Town2, Road1);
+        Model town1 = gm.createModel("PopCenter");
+        Model town2 = gm.createModel("PopCenter");
+        Model road1 = gm.createModel("Road");
+        gm.linkModelsWith(town1, town2, road1);
 
         // ruoka x kaupungit
         
         for(int i = 0; i < 500; i++){
-            gm.linkModelsWith(gm.createModel("Field"), Town1, gm.createModel("GenericConnection"));
+            gm.linkModelsWith(gm.createModel("Field"), town1, gm.createModel("GenericConnection"));
         }
 
         // water
@@ -216,7 +216,7 @@ public class App {
         
         //Save population to a csv file
         CSVDumper csv = new CSVDumper();
-        csv.add(Town1, "totalPopulation"); //local
+        csv.add(town1, "totalPopulation"); //local
         csv.save(gm, true);
     }
 }
