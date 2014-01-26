@@ -91,7 +91,7 @@ public abstract class Crop extends Edible {
 
         if(currentGrowTime == growTime) {
             currentStoredFood += currentIndexMultiplier /
-                    growTime * getArea() * maxYield;
+                    growTime * getArea() * maxYield * (Math.random() / 10 + 0.5);
             resetCrop();
         }
         else {
