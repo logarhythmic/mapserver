@@ -54,6 +54,14 @@ public class Field extends PointModel {
         sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
         sm.settings.put("content", new SettingString("content", "empty"));
+        sm.settings.put("MaissiVesi", new SettingDouble("MaissiVesi", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        sm.settings.put("MaissiLämpö", new SettingDouble("MaissiLämpö", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        sm.settings.put("DurraVesi", new SettingDouble("DurraVesi", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        sm.settings.put("DurraLämpö", new SettingDouble("DurraLämpö", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
     }
 
     @Override
@@ -90,8 +98,8 @@ public class Field extends PointModel {
                 content = new Cow();
                 break;
             default:
-                // Should this fail or not?
-                throw new UnsupportedOperationException();
+                content = new Maize();
+                break;
         }
     }
 }

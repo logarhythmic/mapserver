@@ -159,34 +159,23 @@ public abstract class Crop extends Edible {
     }
     
     @Override
-    void onRegisteration(GameManager gm, SettingMaster sm) {
-        String s;
-        if(this.name.equals("maize"))
-            s = "Maize";
-        else
-            s = "Sorghum";
-        sm.settings.put(s + "Water", new SettingDouble(
-                "waterOptimal", waterOptimal, new RangeDouble(1.5, 3.5)));
-        sm.settings.put(s + "Temp", new SettingDouble(
-                "tempOptimal", temperatureOptimal, new RangeDouble(30, 40)));
-    }
-    
-    @Override
     void onUpdateSettings(SettingMaster sm) {
         String s;
         if(this.name.equals("maize"))
-            s = "Maize";
+            s = "Maissi";
         else
-            s = "Sorghum";
+            s = "Durra";
         if(sm.settings.get(s + "Water") == null)
             onRegisteration(null, sm);
         
         this.waterOptimal = Double.parseDouble(
-                sm.settings.get(s + "Water").getValue());
-        this.waterDistribution = new Distribution(waterOptimal * 0.5, waterOptimal, waterOptimal * 1.5);
+                sm.settings.get(s + "Vesi").getValue());
+        this.waterDistribution = new Distribution(waterOptimal * 0.5,
+                waterOptimal, waterOptimal * 1.5);
         this.temperatureOptimal = Double.parseDouble(
-                sm.settings.get(s + "Temp").getValue());
+                sm.settings.get(s + "Lämpö").getValue());
         this.temperatureDistribution = new Distribution(
-                temperatureOptimal * 0.5, temperatureOptimal, temperatureOptimal * 1.5);
+                temperatureOptimal * 0.5, temperatureOptimal,
+                temperatureOptimal * 1.5);
     }
 }
