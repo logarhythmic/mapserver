@@ -11,6 +11,7 @@ import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,7 +105,7 @@ public class App {
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);
         // print debug-info on all parameters moving between models
-        boolean printFrameData = true;
+        boolean printFrameData = false;
         GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
         
@@ -211,5 +212,10 @@ public class App {
 
         // Start the gamethread
         one.start();
+        
+        //Save population to a csv file
+        CSVDumper csv = new CSVDumper();
+        csv.add(Town1, "totalPopulation"); //local
+        csv.save(gm, true);
     }
 }
