@@ -1,5 +1,6 @@
 package fi.paivola.population;
 
+import fi.paivola.mapserver.DiagnosticsWrapper;
 import fi.paivola.population.Constants;
 
 /**
@@ -78,7 +79,7 @@ public class MortalityModel  {
         if (shortagePerPopulation >= 0 && shortagePerPopulation <= 1) {
             foodShortage = shortagePerPopulation;
         } else {
-            System.out.println("Illegal value for food shortage: "+shortagePerPopulation);
+            DiagnosticsWrapper.getInstance().println("Illegal value for food shortage: " + shortagePerPopulation);
         }
     }
 }
