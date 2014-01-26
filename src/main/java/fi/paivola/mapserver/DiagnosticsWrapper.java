@@ -13,6 +13,7 @@ public class DiagnosticsWrapper {
     private int                         tbi = -1; // thread being inspected
     private ArrayList<GameThread>       gameThreads = new ArrayList<GameThread>(); // gamethreads with diagnostics
     private HashMap<String, Double>     watchValues = new HashMap<String, Double>() {};
+    private boolean                     debugOutput = false;
     
     protected DiagnosticsWrapper() {
     }
@@ -53,6 +54,14 @@ public class DiagnosticsWrapper {
         }
     }
     
+    public void println(String line) {
+        if (debugOutput) System.out.println(line);
+    }
+    
+    public void setDebugOutput(boolean on) {
+        debugOutput = on;
+    }
+            
     private boolean usable() {
         return (tbi != -1) && (gameThreads.size() != 0);
     }
