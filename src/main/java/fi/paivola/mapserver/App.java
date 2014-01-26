@@ -101,12 +101,12 @@ public class App {
      */ 
     static void runTest() {
         dw = DiagnosticsWrapper.getInstance();
-        dw.setDebugOutput( false );
+        dw.setDebugOutput( true );
 
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);
         // print debug-info on all parameters moving between models
-        boolean printFrameData = true;
+        boolean printFrameData = false;
         GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
         
@@ -120,10 +120,12 @@ public class App {
         sm.settings.get("content").setValue("maize");
 
         // kaupungit
-        sm = gm.getDefaultSM("populationExtender");
-        sm.settings.get("births%").setValue("5.047492154");
         Model town1 = gm.createModel("PopCenter");
+        sm = gm.getDefaultSM("PopCenter");
+        sm.settings.get("births%").setValue("0.047492154");
         Model town2 = gm.createModel("PopCenter");
+        sm = gm.getDefaultSM("PopCenter");
+        sm.settings.get("births%").setValue("0.047492154");
         Model road1 = gm.createModel("Road");
         gm.linkModelsWith(town1, town2, road1);
 
