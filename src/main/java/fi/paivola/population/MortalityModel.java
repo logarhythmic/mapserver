@@ -75,10 +75,10 @@ public class MortalityModel  {
      * @param shortagePerPerson aka. severity
      */
     public void setFoodShortage(double shortagePerPopulation) {
-        if (foodShortage >= 0 && foodShortage <= 1) {
+        if (shortagePerPopulation >= 0 && shortagePerPopulation <= 1) {
             foodShortage = shortagePerPopulation;
         } else {
-            System.out.println("Illegal value for food shortage");
+            System.out.println("Illegal value for food shortage: "+shortagePerPopulation);
         }
     }
 }

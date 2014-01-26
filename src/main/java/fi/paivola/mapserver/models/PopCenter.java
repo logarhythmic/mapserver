@@ -11,6 +11,7 @@ import fi.paivola.mapserver.core.PointModel;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.Icon;
 import fi.paivola.mapserver.utils.RangeDouble;
+import fi.paivola.mapserver.utils.RangeInt;
 import java.util.ArrayList;
 
 /**
@@ -32,16 +33,22 @@ public class PopCenter extends PointModel {
     ArrayList<Event> outgoing;
     ArrayList<PopCenter> otherTowns;
     
+    private int vehicles;
+    private int vehiclesUsed;
+    
+    private double foodNeededLastTick;
+    
     public PopCenter(int id){
         super(id);
     }
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        if(countFood() < 1000){
-            requestSuppliesFromAll(new Supplies(0, Math.min(50, 1000 - countFood())), current);
-            requestSuppliesFromAll(new Supplies(1, Math.min(50, 1000 - countFood())), current);
+        if(countFood() < foodNeededLastTick*3){
+            requestSuppliesFromAll(new Supplies(0, Math.min(50, foodNeededLastTick*3 - countFood())), current);
+            requestSuppliesFromAll(new Supplies(1, Math.min(50, foodNeededLastTick*3 - countFood())), current);
         }
+        vehiclesUsed = 0;
         for (Event e : outgoing){
             Supplies retrieved = answerToRequest(e, current);
             Store(retrieved);
@@ -57,8 +64,7 @@ public class PopCenter extends PointModel {
                 storage.get(i).amount*=(1 - STORAGE_RAT_RAVENOUSNESS);  //our highly advanced rat algorithm
         }
         UpdateStorage();
-        if (this.countFood() > 1)
-            this.saveDouble("availableFood", this.countFood());
+        this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
@@ -89,6 +95,7 @@ public class PopCenter extends PointModel {
     
     void eatFood(Event e, DataFrame current){
         double toEat = (double) e.value;
+        foodNeededLastTick = toEat;
         double availableMilk = 0;
         if (findSupplies(0) != null)
             availableMilk = findSupplies(0).amount;
@@ -100,7 +107,8 @@ public class PopCenter extends PointModel {
         outOfMilk = outOfGrain?toEat-availableGrain>availableMilk:outOfMilk;
         outOfGrain = outOfMilk?toEat-availableMilk>availableGrain:outOfGrain;
         if(outOfMilk && outOfGrain){
-            Event starvation = new Event("outOfFood", Event.Type.DOUBLE, toEat-availableMilk - availableGrain);
+            Event starvation = new Event("outOfFood", Event.Type.DOUBLE, (toEat - availableMilk - availableGrain) / toEat);
+            System.out.println("Town "+this.id+" is starving! Needed food = "+toEat+". Available foods: "+availableGrain+" grain, "+availableMilk+" milk.");
             Take(0, availableMilk);
             Take(1, availableGrain);
             starvation.sender = this;
@@ -143,8 +151,23 @@ public class PopCenter extends PointModel {
      * @return Supplies sent back from delivery due to failure to deliver
      */
     public Supplies answerToRequest(Event e, DataFrame d){
-        Supplies sent = Take(((Supplies)e.value).id, ((Supplies)e.value).amount);
-        return sendSupplies(sent, (PopCenter) e.sender, d);
+        Supplies s = new Supplies(((Supplies)e.value).id, 0);
+        while(true){
+            RoadModel[] route = getRouteTo((PointModel)e.sender, s);
+            if (route == null)
+                break;
+            double shipmentSize = Double.MAX_VALUE;
+            for(RoadModel r : route){
+                if (r.getVehicleCap() < shipmentSize)
+                    shipmentSize = r.getVehicleCap();
+            }
+            Supplies sent = Take(((Supplies)e.value).id, shipmentSize);
+            Supplies back = sendSupplies(sent, route, (PopCenter) e.sender, d);
+            s.amount += back.amount;
+            if (back.amount == shipmentSize || sent.amount == 0)
+                break;
+        }
+        return s;
     }
     
     private RoadModel[] getRouteTo(PointModel target, Supplies s){
@@ -210,10 +233,10 @@ public class PopCenter extends PointModel {
      * @param d the dataframe for the event
      * @return Supplies sent back from delivery due to failure to deliver
      */
-    public Supplies sendSupplies(Supplies s, PopCenter target, DataFrame d){
-        RoadModel[] route = getRouteTo(target, s);
-        if (route == null || s.amount == 0)
+    public Supplies sendSupplies(Supplies s, RoadModel[] route, PopCenter target, DataFrame d){
+        if (route == null || s.amount == 0 || vehiclesUsed >= vehicles )
             return s;
+        System.out.println("sent some "+s.id);
         Supplies destroyed = new Supplies(s.id, 0);
         Supplies delivered = new Supplies(s.id, s.amount);
         for (RoadModel r : route){
@@ -225,6 +248,7 @@ public class PopCenter extends PointModel {
         e.sender = this;
         addEventTo(target, d, e);
         requestsServedThisTick ++;
+        vehiclesUsed ++;
         return new Supplies(s.id, s.amount - destroyed.amount - delivered.amount);
     }
     
@@ -234,8 +258,9 @@ public class PopCenter extends PointModel {
         sm.setIcon(Icon.TOWN);
         sm.color = new Color(255, 128, 64);
         sm.name = "PopCenter";
-        sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", 100000, new RangeDouble(1, 1000000000)));
+        sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", Integer.MAX_VALUE, new RangeDouble(1, Double.MAX_VALUE)));
         sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0.023, new RangeDouble(0, 1)));
+        sm.settings.put("vehicles", new SettingInt("How many vehicles this model has available for sending supplies", 1, new RangeInt(0, 10000)));
     }
     
     @Override
@@ -245,10 +270,9 @@ public class PopCenter extends PointModel {
         otherTowns = new ArrayList<>();
         findOthers();
         if (DebugFoodSource){ // this is a debug
-            while(Store(new Supplies(0,1000)) == 0){}
+            while(Store(new Supplies(0,100000000)) == 0){}
         }
-        if (this.countFood() > 1)
-            this.saveDouble("availableFood", this.countFood());
+        this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
@@ -282,6 +306,7 @@ public class PopCenter extends PointModel {
     public void onUpdateSettings(SettingMaster sm) {
         this.maxStorageCapacity = Double.parseDouble(sm.settings.get("maxCap").getValue());
         this.STORAGE_RAT_RAVENOUSNESS = Double.parseDouble(sm.settings.get("ratRavenousness").getValue());
+        this.vehicles = Integer.parseInt(sm.settings.get("vehicles").getValue());
     }
     
     Supplies findSupplies(int id){
@@ -390,6 +415,4 @@ public class PopCenter extends PointModel {
         
         return ret;
     }
-    
-    
 }

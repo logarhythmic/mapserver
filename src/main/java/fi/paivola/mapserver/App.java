@@ -10,6 +10,7 @@ import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.models.PopCenter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -98,18 +99,21 @@ public class App {
         // ruoka
         SettingMaster sm = one.game.getDefaultSM("Field");
         sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("1000000");
 
         // kaupungit
+        sm = gm.getDefaultSM("PopCenter");
+        sm.settings.get("vehicles").setValue("1000");
         Model Town1 = gm.createModel("PopCenter");
+        ((PopCenter)Town1).DebugFoodSource = true;
         Model Town2 = gm.createModel("PopCenter");
         Model Road1 = gm.createModel("Road");
         gm.linkModelsWith(Town1, Town2, Road1);
 
         // ruoka x kaupungit
         
-        for(int i = 0; i < 500; i++){
-            gm.linkModelsWith(gm.createModel("Field"), Town1, gm.createModel("GenericConnection"));
-        }
+        gm.linkModelsWith(gm.createModel("Field"), Town1, gm.createModel("GenericConnection"));
+        
 
         // water
         Model l1 = gm.createModel("Lake");
