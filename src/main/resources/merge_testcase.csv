@@ -1,10 +1,13 @@
 command, argument1, argument2, argument3
 model, PopCenter,,
+model, Field
+model, Road,,
+link, 2, 3, 4
 ,,,
 set, ticks, 100,
 set, runs, 2,
 set, name, full_model_test,
 ,,,
 dump, population,,
-waste, 8, 2, population,
+waste, 11, 2, population,
 
