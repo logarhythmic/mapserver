@@ -36,7 +36,7 @@ public class App {
             TestcaseRunner tr = new TestcaseRunner(stream);
             return;
         } else {
-            stream = App.class.getClassLoader().getResourceAsStream("default_testcase.csv");
+            stream = App.class.getClassLoader().getResourceAsStream("merge_testcase.csv");
         }
 
         SettingsParser.parse();
