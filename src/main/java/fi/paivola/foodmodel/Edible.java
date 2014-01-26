@@ -2,6 +2,7 @@ package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.Supplies;
 import java.util.Map;
@@ -48,5 +49,11 @@ public abstract class Edible {
     abstract void handleEvent(Event e, DataFrame current);
     abstract double onTick(DataFrame last, DataFrame current);
     abstract Supplies harvest(double max);
+
+    void onUpdateSettings(SettingMaster sm) {
+    }
+
+    void onRegisteration(GameManager gm, SettingMaster sm) {
+    }
 
 }

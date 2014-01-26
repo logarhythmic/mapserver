@@ -2,6 +2,7 @@ package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.*;
 import fi.paivola.weathermodel.Weather;
@@ -15,10 +16,10 @@ import java.util.Calendar;
 public abstract class Crop extends Edible {
 
     private double waterMinimum;
-    private double waterOptimal;
+    private double waterOptimal = 2;
     private double waterMaximum;
     private double temperatureMinimum;
-    private double temperatureOptimal;
+    private double temperatureOptimal = 30;
     private double temperatureMaximum;
     private double sunlightMinimum;
     private double sunlightOptimal;
@@ -43,9 +44,6 @@ public abstract class Crop extends Edible {
             double smax, double phmin, double phopt, double phmax, int gtime,
             double yield) {
         super(name);
-        
-        RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
-        RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
         
         this.name = name;
         waterMinimum = wmin;
@@ -77,6 +75,7 @@ public abstract class Crop extends Edible {
         this.pHDistribution = new Distribution(pHMinimum,
                                                   pHOptimal,
                                                   pHMaximum);
+        
     }
 
     public void resetCrop() {
@@ -157,5 +156,35 @@ public abstract class Crop extends Edible {
     private double getPHIndex(DataFrame last) {
         return 1;
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    void onRegisteration(GameManager gm, SettingMaster sm) {
+        String s;
+        if(this.name.equals("maize"))
+            s = "Maize";
+        else
+            s = "Sorghum";
+        sm.settings.put(s + "Water", new SettingDouble(
+                "waterOptimal", waterOptimal, new RangeDouble(1.5, 3.5)));
+        sm.settings.put(s + "Temp", new SettingDouble(
+                "tempOptimal", temperatureOptimal, new RangeDouble(30, 40)));
+    }
+    
+    @Override
+    void onUpdateSettings(SettingMaster sm) {
+        String s;
+        
+        if(this.name.equals("maize"))
+            s = "Maize";
+        else
+            s = "Sorghum";
+        this.waterOptimal = Double.parseDouble(
+                sm.settings.get(s + "Water").getValue());
+        this.waterDistribution = new Distribution(waterOptimal * 0.5, waterOptimal, waterOptimal * 1.5);
+        this.temperatureOptimal = Double.parseDouble(
+                sm.settings.get(s + "Temp").getValue());
+        this.temperatureDistribution = new Distribution(
+                temperatureOptimal * 0.5, temperatureOptimal, temperatureOptimal * 1.5);
     }
 }

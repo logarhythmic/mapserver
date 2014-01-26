@@ -54,6 +54,7 @@ public class Field extends PointModel {
         sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
         sm.settings.put("content", new SettingString("content", "empty"));
+        content.onRegisteration(gm, sm);
     }
 
     @Override
@@ -67,6 +68,7 @@ public class Field extends PointModel {
     public void onUpdateSettings(SettingMaster sm) {
         setContents(sm.settings.get("content").getValue().toLowerCase());
         this.area = Double.parseDouble(sm.settings.get("area").getValue());
+        this.content.onUpdateSettings(sm);
         this.content.setArea(this.area);
     }
 
