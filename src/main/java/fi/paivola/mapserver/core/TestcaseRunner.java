@@ -194,7 +194,7 @@ public class TestcaseRunner {
     }
 
     private void run() throws Exception {
-        GameThread one = new GameThread(ticks);
+        GameThread one = new GameThread(ticks, true);
         GameManager gm = one.game;
 
         ArrayList<ModelA> models = new ArrayList<>();

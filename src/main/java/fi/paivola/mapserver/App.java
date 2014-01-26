@@ -1,14 +1,16 @@
 package fi.paivola.mapserver;
 
+import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.TestcaseRunner;
 import fi.paivola.mapserver.core.WSServer;
+import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.models.ExampleGlobal;
-import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +25,7 @@ import org.json.simple.parser.ParseException;
 public class App {
 
     static final boolean profilingRun = false;
+    static DiagnosticsWrapper dw; // for the wrapping of stupid debug stuff
 
     public static void main(String[] args) throws UnknownHostException, IOException, ParseException, InterruptedException, Exception {
         InputStream stream = null;
@@ -94,50 +97,119 @@ public class App {
     /**
      * This function can be used for testing your own models. Please modify
      * this!
-     */
+     */ 
     static void runTest() {
+        dw = DiagnosticsWrapper.getInstance();
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread((int) Math.floor(52.177457 * 10)); // ten years
+        int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);
+        // print debug-info on all parameters moving between models
+        boolean printFrameData = true;
+        GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
+        
+        dw.addGameThread(one); // for debugging purposes
 
-        // Create and add
-        Model mg = gm.createModel("exampleGlobal");
+        // globalit
+        gm.createModel("Weather");
 
-        // This is how you change a "setting" from the code.
-        SettingMaster sm = gm.getDefaultSM("exampleGlobal");
-        sm.settings.get("cats").setValue("2");
-        mg.onActualUpdateSettings(sm);
+        // ruoka
+        SettingMaster sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
 
-        int size = 30;
+        // kaupungit
+        Model Town1 = gm.createModel("PopCenter");
+        Model Town2 = gm.createModel("PopCenter");
+        Model Road1 = gm.createModel("Road");
+        gm.linkModelsWith(Town1, Town2, Road1);
 
-        Model[] points = new Model[size];
-        Model[] conns = new Model[size];
-
-        for (int i = 0; i < size; i++) {
-            points[i] = gm.createModel("examplePoint");
-            conns[i] = gm.createModel("exampleConnection");
+        // ruoka x kaupungit
+        
+        for(int i = 0; i < 500; i++){
+            gm.linkModelsWith(gm.createModel("Field"), Town1, gm.createModel("GenericConnection"));
         }
 
-        for (int i = 0; i < size; i++) {
-            if (i > 0) {
-                gm.linkModelsWith(points[i - 1], points[i], conns[i - 1]);
-            }
-        }
-        gm.linkModelsWith(points[size - 1], points[0], conns[size - 1]);
+        // water
+        Model l1 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("1");
+        sm.settings.get("k").setValue("1");
+        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("depth").setValue("14.1");
+        sm.settings.get("startAmount").setValue("0.9");
+        sm.settings.get("flowAmount").setValue("0.91");
+        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("terrainCoefficient").setValue("0.5f");
+        l1.onActualUpdateSettings(sm);
+        
+        Model l2 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("1");
+        sm.settings.get("k").setValue("1");
+        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("depth").setValue("14.1");
+        sm.settings.get("startAmount").setValue("0.9");
+        sm.settings.get("flowAmount").setValue("0.91");
+        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("terrainCoefficient").setValue("0.5f");
+        l2.onActualUpdateSettings(sm);
+        
+        Model r1 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("2");
+        sm.settings.get("width").setValue("100");
+        sm.settings.get("length").setValue("100000");
+        sm.settings.get("startDepth").setValue("0");
+        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("flowDepth").setValue("0.5");
+        r1.onActualUpdateSettings(sm);
+        
+        Model r2 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("2");
+        sm.settings.get("width").setValue("100");
+        sm.settings.get("length").setValue("100000");
+        sm.settings.get("startDepth").setValue("0");
+        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("flowDepth").setValue("0.5");
+        r2.onActualUpdateSettings(sm);
+        
+        Model l3 = gm.createModel("Lake");
+        sm = gm.getDefaultSM("Lake");
+        sm.settings.get("order").setValue("3");
+        sm.settings.get("k").setValue("1");
+        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("depth").setValue("14.1");
+        sm.settings.get("startAmount").setValue("0.9");
+        sm.settings.get("flowAmount").setValue("0.91");
+        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("terrainCoefficient").setValue("0.5f");
+        l3.onActualUpdateSettings(sm);
+        
+        Model r3 = gm.createModel("River");
+        sm = gm.getDefaultSM("River");
+        sm.settings.get("order").setValue("4");
+        sm.settings.get("width").setValue("100");
+        sm.settings.get("length").setValue("100000");
+        sm.settings.get("startDepth").setValue("0");
+        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("flowDepth").setValue("0.5");
+        r3.onActualUpdateSettings(sm);
+        
+        Model s1 = gm.createModel("Sea");
+        sm = gm.getDefaultSM("Sea");
+        sm.settings.get("order").setValue("5");
+        s1.onActualUpdateSettings(sm);
+        
+        gm.linkModelsWith(l1, l3, r1);
+        gm.linkModelsWith(l2, l3, r2);
+        gm.linkModelsWith(l3, s1, r3);
 
-        // Print final data in the end?
         if (!profilingRun) {
             gm.printOnDone = 2;
         }
 
         // Start the gamethread
         one.start();
-
-        //Save cats to a csv file
-        CSVDumper csv = new CSVDumper();
-        csv.add("cats"); //global
-        csv.add(points[0], "catsSeen"); //local
-        csv.save(gm, true);
     }
 }

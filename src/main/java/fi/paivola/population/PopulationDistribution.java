@@ -103,6 +103,15 @@ public class PopulationDistribution  {
                 - newDeaths[lastIndex]; // new deaths
         this.quantities = newQuantities;
         this.deaths = newDeaths;
+        
+        for (double d : quantities) {
+            if (d < 0) d = 0;
+        }
+        
+        // do random sanitychecks
+//        for (double d : quantities) {
+//            if (d < 0) throw new java.lang.IllegalStateException("age-group-population was negative");
+//        }
     }
     
     public double[] getQuantities() {
@@ -113,6 +122,10 @@ public class PopulationDistribution  {
         return this.quantities[index];
     }
     
+    /**
+     * 
+     * @return Total population / 1000
+     */
     public double total()
     {
         double total = 0;

@@ -1,5 +1,5 @@
 {
-    "default_ticks": 10,
+    "default_ticks": 20,
     "websocket_port": 8080,
     "csv_seperator": ",\t",
     "models": [
@@ -19,9 +19,62 @@
             "name": "exampleGlobal",
             "class": "fi.paivola.mapserver.models.ExampleGlobal"
         },
-		{
-			"name": "populationExtender",
-			"class": "fi.paivola.population.PopulationExtender"
-		}
+        {
+            "name": "Aggregate",
+            "class": "fi.kivibot.power.models.Aggregate"
+        },
+        {
+            "name": "Solar plant",
+            "class": "fi.kivibot.power.models.SolarPlant"
+        },
+        {
+            "name": "Wind plant",
+            "class": "fi.kivibot.power.models.WindPlant"
+        },
+        {
+            "name": "Power connection",
+            "class": "fi.kivibot.power.models.PowerConnection"
+        },
+
+        {
+            "name": "Power node",
+            "class": "fi.kivibot.power.models.PowerNode"
+        },
+        {
+            "name": "Lake",
+            "class": "fi.paivola.water.Lake"
+        },
+        {
+            "name": "River",
+            "class": "fi.paivola.water.River"
+        },
+        {
+            "name": "Sea",
+            "class": "fi.paivola.water.Sea"
+        },
+        {
+            "name": "populationExtender",
+            "class": "fi.paivola.population.PopulationExtender"
+        },
+        {
+            "name": "Field",
+            "class": "fi.paivola.foodmodel.Field"
+        },
+        {
+            "name": "Weather",
+            "class": "fi.paivola.weathermodel.Weather"
+        },
+        {
+            "name": "Road",
+            "class": "fi.paivola.mapserver.models.RoadModel"
+        },
+        {
+            "name": "PopCenter",
+            "class": "fi.paivola.mapserver.models.PopCenter"
+        },
+        {
+            "name": "GenericConnection",
+            "class": "fi.paivola.mapserver.models.GenericConnection"
+        }
     ]
 }

@@ -1,6 +1,7 @@
 package fi.paivola.population;
 
 import au.com.bytecode.opencsv.CSVReader;
+import fi.paivola.mapserver.DiagnosticsWrapper;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.ExtensionModel;
@@ -20,10 +21,12 @@ import java.util.logging.Logger;
 public class PopulationExtender extends ExtensionModel {
     private MortalityModel          mortalityModel;
     private PopulationDistribution  populationByAge;
+    private double                  foodShortage;
     
     public PopulationExtender(int id) {
         super(id);
         this.mortalityModel = new MortalityModel();
+        this.foodShortage = 0;
         
         // Parse initial age-structure from file
         double[] ageGroups = new double[Constants.NUM_AGE_GROUPS];
@@ -33,43 +36,54 @@ public class PopulationExtender extends ExtensionModel {
         // 20% of people age 5 years annually 
         this.populationByAge.setAnnualFlowPc(0.2);
         this.populationByAge.setBirthsPc(0.047492154); // from births_population.ods
+
         // check that the data is conformant
         assert(this.populationByAge.getQuantities().length == Constants.NUM_AGE_GROUPS);
+        
     }
 
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        populationByAge.step( 1 );
-        double[] quantities = populationByAge.getQuantities();
-        for (int i = 0; i != quantities.length; ++i) {
-            this.saveData("populationByAge" + i, quantities[i]);
+        double population = populationByAge.total() * 1000;
+        
+        // calculate effects of food shortage
+        if (foodShortage > 0) {
+            // % of people not fed properly, assuming greedy-distribution
+            double severity = foodShortage / (population*7);
+            mortalityModel.setFoodShortage(severity);
         }
-        /*
-        System.out.println( "AGES_0TO4:\t" + (long)populationByAge.getQuantities()[0] );
-        System.out.println( "AGES_5TO9:\t" + (long)populationByAge.getQuantities()[1] );
-        System.out.println( "AGES_10TO14:\t" + (long)populationByAge.getQuantities()[2] );
-        System.out.println( "Total:\t\t" + (long)populationByAge.total() );
-        System.out.println( "Mode:\t"
-                + "**\t" + populationByAge.mode() );
-        */
+        
+        // update demographics
+        populationByAge.step( 1 );
+
+        // notify amount eaten
+        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, population*7);
+        addEventTo(parent, current, consumeFoodEvent);
+        
+        saveData( "totalPopulation", population );
+                
+        // reset for next frame
+        foodShortage = 0;
+        mortalityModel.setFoodShortage(0);
     }
 
     @Override
     public void onEvent(Event e, DataFrame current) {
+        if (e.name == "outOfFood") {
+            foodShortage = (double)e.value;
+        }
     }
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.name = "populationExtender";
-        sm.exts = "examplePoint";
+        sm.exts = "PopCenter";
+        // settings / input variables here
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        double[] quantities = populationByAge.getQuantities();
-        for (int i = 0; i != quantities.length; ++i) {
-            this.saveData("populationByAge" + i, quantities[i]);
-        }
+        saveData( "totalPopulation", populationByAge.total()*1000 );
     }
 
     @Override
