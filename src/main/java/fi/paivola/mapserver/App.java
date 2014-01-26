@@ -217,8 +217,9 @@ public class App {
         one.start();
         
         //Save population to a csv file
-        CSVDumper csv = new CSVDumper();
+        CSVDumper csv = new CSVDumper("none", "population");
         csv.add(town1, "totalPopulation"); //local
+
         csv.save(gm, true);
     }
 }
