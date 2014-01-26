@@ -6,8 +6,12 @@ import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
+import fi.paivola.mapserver.core.setting.SettingDouble;
+import fi.paivola.mapserver.core.setting.SettingInt;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.models.ExampleGlobal;
+import fi.paivola.mapserver.utils.RangeDouble;
+import fi.paivola.mapserver.utils.RangeInt;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import static java.lang.Double.parseDouble;
@@ -35,8 +39,8 @@ public class PopulationExtender extends ExtensionModel {
         
         // 20% of people age 5 years annually 
         this.populationByAge.setAnnualFlowPc(0.2);
-        this.populationByAge.setBirthsPc(0.047492154); // from births_population.ods
-
+        this.populationByAge.setBirthsPc(0); // from births_population.ods
+        
         // check that the data is conformant
         assert(this.populationByAge.getQuantities().length == Constants.NUM_AGE_GROUPS);
         
@@ -79,6 +83,8 @@ public class PopulationExtender extends ExtensionModel {
         sm.name = "populationExtender";
         sm.exts = "PopCenter";
         // settings / input variables here
+        sm.settings.put( "births%", new SettingDouble("Fraction of population "
+                + "added as annual births", 0, new RangeDouble(0.04, 5.05)) );
     }
 
     @Override
@@ -88,6 +94,8 @@ public class PopulationExtender extends ExtensionModel {
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
+        populationByAge.setBirthsPc( Double.parseDouble(sm.settings.get("births%").getValue()) );
+        this.saveDouble("births%", populationByAge.getBirthsPc());
     }
     
     private void parseInitialAgeStructure(double[] ageGroups, String filename) {

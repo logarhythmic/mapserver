@@ -120,6 +120,8 @@ public class App {
         sm.settings.get("content").setValue("maize");
 
         // kaupungit
+        sm = gm.getDefaultSM("populationExtender");
+        sm.settings.get("births%").setValue("5.047492154");
         Model town1 = gm.createModel("PopCenter");
         Model town2 = gm.createModel("PopCenter");
         Model road1 = gm.createModel("Road");
