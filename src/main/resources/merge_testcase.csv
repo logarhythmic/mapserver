@@ -1,13 +1,20 @@
 command, argument1, argument2, argument3
+model, Weather,,
 model, PopCenter,,
 model, Field
-model, Road,,
-link, 2, 3, 4
+model, GenericConnection,,
+link, 3, 4, 5
 ,,,
-set, ticks, 100,
-set, runs, 2,
+defparam, Field, content, maize
+defparam, Field, area, 1000000
+defparam, PopCenter, vehicles, 1000
+defparam, PopCenter, births%, 0.047492154
+defparam, PopCenter, initialPopulation, 20000
+,,,
+set, ticks, 520,
+set, runs, 1,
 set, name, full_model_test,
 ,,,
 dump, population,,
-waste, 11, 2, population,
+waste, 18, 3, population,
 

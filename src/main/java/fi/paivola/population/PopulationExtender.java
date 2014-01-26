@@ -77,7 +77,7 @@ public class PopulationExtender extends ExtensionModel {
         sm.settings.put( "births%", new SettingDouble("Fraction of population "
                 + "added as annual births", 0.04, new RangeDouble(0.04, 5.05)) );
         sm.settings.put( "initialPopulation", new SettingInt("Initial "
-                + "population in town", 40000, new RangeInt(2000, 200000)));
+                + "population in town", 40000, new RangeInt(0, 20000000)));
     }
 
     @Override
