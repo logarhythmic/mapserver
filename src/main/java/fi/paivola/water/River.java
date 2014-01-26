@@ -9,9 +9,7 @@ import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.setting.SettingDouble;
 import fi.paivola.mapserver.core.setting.SettingInt;
-import fi.paivola.mapserver.core.setting.SettingList;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.utils.Icon;
 import fi.paivola.mapserver.utils.RangeInt;
 import fi.paivola.mapserver.utils.RangeDouble;
 import java.io.FileWriter;
@@ -24,7 +22,7 @@ import java.util.*;
  */
 public class River extends ConnectionModel {
 
-    // CSVWriter writer;
+    //CSVWriter writer;
     // General (dimensions and stuff
     double waterAmount = 0;              //  m^3
     double width = 100;                   //  m
@@ -81,8 +79,7 @@ public class River extends ConnectionModel {
         }
         if (writer != null) {
             writer.writeNext(entries);
-        }
-                */
+        }*/
     }
 
     @Override
@@ -126,7 +123,7 @@ public class River extends ConnectionModel {
             this.saveDouble("floodDepth",floodDepth);
             this.saveDouble("flowDepth",flowDepth);
             this.saveDouble("slope",slope);
-        /*
+            /*
         if (writer == null) {
             try {
                 writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');

@@ -6,7 +6,6 @@ import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,7 +78,7 @@ public class App {
     static void runTest() {
 
         // How many ticks? Each one is a week.
-        GameThread one = new GameThread(1000);
+        GameThread one = new GameThread((int) Math.floor(52.177457 * 11));
         GameManager gm = one.game;
 
         // Create and add
@@ -87,12 +86,12 @@ public class App {
         SettingMaster sm = gm.getDefaultSM("Lake");
         sm.settings.get("order").setValue("1");
         sm.settings.get("k").setValue("1");
-        sm.settings.get("surfaceArea").setValue("256120000f");
+        sm.settings.get("surfaceArea").setValue("256120000.0");
         sm.settings.get("depth").setValue("14.1");
         sm.settings.get("startAmount").setValue("0.9");
-        sm.settings.get("flowAmount").setValue("0.91");
-        sm.settings.get("basinArea").setValue("7642000000f");
-        sm.settings.get("terrainCoefficient").setValue("0.5f");
+        sm.settings.get("flowAmount").setValue("0.91f");
+        sm.settings.get("basinArea").setValue("7642000000.0");
+        sm.settings.get("terrainCoefficient").setValue("0.5");
         l1.onActualUpdateSettings(sm);
         
         Model l2 = gm.createModel("Lake");
@@ -135,7 +134,7 @@ public class App {
         sm.settings.get("depth").setValue("14.1");
         sm.settings.get("startAmount").setValue("0.9");
         sm.settings.get("flowAmount").setValue("0.91");
-        sm.settings.get("basinArea").setValue("7642000000f");
+        sm.settings.get("basinArea").setValue("7642000000.0");
         sm.settings.get("terrainCoefficient").setValue("0.5f");
         l3.onActualUpdateSettings(sm);
         
@@ -167,11 +166,5 @@ public class App {
 
         // Start the gamethread
         one.start();
-
-        //Save cats to a csv file
-        CSVDumper csv = new CSVDumper();
-        csv.add("cats"); //global
-        csv.add(points[0], "catsSeen"); //local
-        csv.save(gm, true);
     }
 }

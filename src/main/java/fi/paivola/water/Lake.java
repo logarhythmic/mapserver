@@ -24,7 +24,7 @@ public class Lake extends PointModel {
     //(Näsijärvi)
 
     // General stuff
-    // CSVWriter writer = null;
+    //CSVWriter writer = null;
     int order = 0;
 
     // PET variables
@@ -35,12 +35,12 @@ public class Lake extends PointModel {
     double daytimeLength = 1;                // x/12h
 
     // Lake dimensions and water amount 
-    double surfaceArea = 256120000.0;         // m^2
-    double depth = 14.1f;                    // m       flood water level
+    double surfaceArea = 256120000.0;       // m^2
+    double depth = 14.1f;                   // m       flood water level
     double waterAmount = 0;                 // m^3
 
-    double startAmount = 0.9;
-    double flowAmount = 0.91;
+    double startAmount = 0.9;               // percent of flood amount in the beginning
+    double flowAmount = 0.91;               // percent of flood amount before starts to flow
 
     // Flows
     double C;                                // Chezy variable  
@@ -59,8 +59,8 @@ public class Lake extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         // make some difference to the temperature
-        temperature = Float.parseFloat(last.getGlobalString("temperature"));
-        daytimeLength = Float.parseFloat(last.getGlobalString("sunlight"));
+        temperature = Double.parseDouble(last.getGlobalString("temperature"));
+        daytimeLength = Double.parseDouble(last.getGlobalString("sunlight"));
 
         // calculate the air humidity and the evapotranspiration for it
         airHumidity = (double) (6.108f * Math.exp((17.27f * temperature) / (temperature + 273.3)));
@@ -75,7 +75,7 @@ public class Lake extends PointModel {
 
         String[] entries;
 
-        rainfall = Float.parseFloat(last.getGlobalString("rain")) / 1000;
+        rainfall = Double.parseDouble(last.getGlobalString("rain")) / 1000;
         double actualRainfall = basinArea * rainfall * terrainCoefficient;
         waterAmount += actualRainfall;
 
@@ -124,10 +124,10 @@ public class Lake extends PointModel {
             e = new Event("Flood", Event.Type.OBJECT, flood);
             this.addEventToAll(current, e);
         }
-        /*
-         entries = (waterAmount/1000000000 + "#" + evapotranspiration/1000000 + "#" + temperature + "#" + actualRainfall/1000000000+ "#" + flow/1000000+"#"+(flood?1:0)).split("#");
         
-         for (int i = 0; i < entries.length; i++) {
+         entries = (waterAmount/1000000000 + "#" + evapotranspiration/1000000 + "#" + temperature + "#" + actualRainfall/basinArea+ "#" + flow/1000000000+"#"+(flood?1:0)).split("#");
+        
+         /*for (int i = 0; i < entries.length; i++) {
          entries[i] = entries[i].trim();
          }
 
@@ -148,11 +148,11 @@ public class Lake extends PointModel {
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.settings.put("order", new SettingInt("Position in the hydrodynamic chain", 0, new RangeInt(0, 100)));
-        sm.settings.put("k", new SettingDouble("Hamon coefficient", 1, new RangeDouble(0, 10)));
+        sm.settings.put("k", new SettingDouble("Hamon coefficient", 1.0, new RangeDouble(0, 10)));
         sm.settings.put("surfaceArea", new SettingDouble("sufraceArea", 256120000.0, new RangeDouble(0, Double.MAX_VALUE)));
         sm.settings.put("depth", new SettingDouble("Flood depth", 14.1, new RangeDouble(0, Double.MAX_VALUE)));
-        sm.settings.put("startAmount", new SettingDouble("Start water depth", 0.5, new RangeDouble(0, 1)));
-        sm.settings.put("flowAmount", new SettingDouble("Flowing starts water depth", 0.501, new RangeDouble(0, 1)));
+        sm.settings.put("startAmount", new SettingDouble("Start water depth", 0.9, new RangeDouble(0.0, 1.0)));
+        sm.settings.put("flowAmount", new SettingDouble("Flowing starts water depth", 0.91, new RangeDouble(0, 1)));
         sm.settings.put("basinArea", new SettingDouble("Drainage basin area", 7642000000.0, new RangeDouble(0, Double.MAX_VALUE)));
         sm.settings.put("terrainCoefficient", new SettingDouble("Terrain flow coefficient", 0.5, new RangeDouble(0, Double.MAX_VALUE)));
         sm.color = new Color(0, 0, 255);
@@ -162,7 +162,6 @@ public class Lake extends PointModel {
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        waterAmount = surfaceArea * startAmount;
     }
 
     @Override
@@ -183,14 +182,15 @@ public class Lake extends PointModel {
             this.saveDouble("flowAmount",k);
             this.saveDouble("basinArea",k);
             this.saveDouble("terrainCoefficient",k);
-        /*
-         if (writer == null) {
+            
+            waterAmount = surfaceArea * startAmount*depth;
+        
+         /*if (writer == null) {
          try {
          writer = new CSVWriter(new FileWriter(this.id + ".csv"), ',');
          } catch (IOException e) {
          System.out.println(e.toString());
          }
          }*/
-
     }
 }
