@@ -54,7 +54,6 @@ public class Field extends PointModel {
         sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
         sm.settings.put("content", new SettingString("content", "empty"));
-        content.onRegisteration(gm, sm);
     }
 
     @Override

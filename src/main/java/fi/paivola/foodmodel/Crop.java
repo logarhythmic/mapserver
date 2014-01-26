@@ -174,11 +174,13 @@ public abstract class Crop extends Edible {
     @Override
     void onUpdateSettings(SettingMaster sm) {
         String s;
-        
         if(this.name.equals("maize"))
             s = "Maize";
         else
             s = "Sorghum";
+        if(sm.settings.get(s + "Water") == null)
+            onRegisteration(null, sm);
+        
         this.waterOptimal = Double.parseDouble(
                 sm.settings.get(s + "Water").getValue());
         this.waterDistribution = new Distribution(waterOptimal * 0.5, waterOptimal, waterOptimal * 1.5);
