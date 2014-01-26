@@ -23,7 +23,7 @@ public class Field extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        double d = this.content.onTick(last, current);
+        double d = this.content.onTick(last, current) * 1000;
         if(d != lastfood) {
             this.saveDouble("avgFood", d/index++);
             lastfood = d;
