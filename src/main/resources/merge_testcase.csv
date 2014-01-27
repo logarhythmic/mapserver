@@ -10,6 +10,8 @@ defparam, Field, area, 20000
 defparam, PopCenter, vehicles, 1000
 defparam, PopCenter, births%, 0.047492154
 defparam, PopCenter, initialPopulation, 20000
+defparam, PopCenter, maxCap, 999999999
+defparam, PopCenter, ratRavenousness, 0.023
 defparam, Lake, order, 1
 defparam, Lake, k, 1
 defparam, Lake, surfaceArea, 256120000
@@ -24,11 +26,19 @@ defparam, River, length, 100000
 defparam, River, startDepth, 0
 defparam, River, floodDepth, 10
 defparam, River, flowDepth, 0.5
+defparam, River, slope, 20
+defparam, Sea, order, 1
+defparam, Road, roadLength, 10
+defparam, Road, baseSpeed, 80
+defparam, Road, tripRest, 1
+defparam, Road, rainMod, 0.1
+defparam, Road, transportType, 1
+defparam, Road, roadType, 1
 ,,,
 set, ticks, 5200,
 set, runs, 1,
 set, name, full_model_test,
 ,,,
 dump, population,,
-waste, 32, 3, totalPopulation,
+waste, 42, 3, totalPopulation,
 
