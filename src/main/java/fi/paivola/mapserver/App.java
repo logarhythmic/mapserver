@@ -116,23 +116,24 @@ public class App {
         // globalit
         gm.createModel("Weather");
 
-        // ruoka
-        SettingMaster sm = one.game.getDefaultSM("Field");
-        sm.settings.get("content").setValue("maize");
-        sm.settings.get("area").setValue("1000000");
-
+        SettingMaster sm;
+        
         // kaupungit
         sm = gm.getDefaultSM("PopCenter");
         sm.settings.get("vehicles").setValue("1000");
-        Model Town1 = gm.createModel("PopCenter");
-        ((PopCenter)Town1).DebugFoodSource = true;
-        Model Town2 = gm.createModel("PopCenter");
+        sm.settings.get("initialFood").setValue("1000000");
+        Model Town1 = gm.createModel("PopCenter", sm);
+        sm = gm.getDefaultSM("PopCenter");
+        Model Town2 = gm.createModel("PopCenter", sm);
         Model Road1 = gm.createModel("Road");
         gm.linkModelsWith(Town1, Town2, Road1);
 
         // ruoka x kaupungit
         
-        gm.linkModelsWith(gm.createModel("Field"), Town1, gm.createModel("GenericConnection"));
+        sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("1000000");
+        gm.linkModelsWith(gm.createModel("Field",sm), Town1, gm.createModel("GenericConnection"));
         
 
         // water
