@@ -75,7 +75,7 @@ public class PopulationExtender extends ExtensionModel {
         sm.exts = "PopCenter";
         // settings / input variables here
         sm.settings.put( "births%", new SettingDouble("Fraction of population "
-                + "added as annual births", 0.04, new RangeDouble(0.04, 5.05)) );
+                + "added as annual births", 0.04, new RangeDouble(0.04, 0.05)) );
         sm.settings.put( "initialPopulation", new SettingInt("Initial "
                 + "population in town", 40000, new RangeInt(0, 20000000)));
     }
@@ -87,7 +87,7 @@ public class PopulationExtender extends ExtensionModel {
         parseInitialAgeStructure(ageGroups, "populationDistribution_2010.csv");
         this.populationByAge = new PopulationDistribution(ageGroups, mortalityModel);
 
-        // 20% of people age 5 years annually 
+        // 20% of people age 5 years annually
         populationByAge.setAnnualFlowPc(0.2);
         populationByAge.setBirthsPc( defaultBirthPc );
         
@@ -99,7 +99,7 @@ public class PopulationExtender extends ExtensionModel {
     @Override
     public void onUpdateSettings(SettingMaster sm) {
         defaultBirthPc = Double.parseDouble(sm.settings.get("births%").getValue());
-        defaultInitialPopulation = Integer.parseInt(sm.settings.get("initialPopulation").getValue() );
+        defaultInitialPopulation = Integer.parseInt( sm.settings.get("initialPopulation").getValue() );
         saveDouble("births%", defaultBirthPc);
     }
     

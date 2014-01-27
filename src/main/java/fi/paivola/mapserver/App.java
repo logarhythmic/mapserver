@@ -168,7 +168,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r1.onActualUpdateSettings(sm);
         
@@ -178,7 +178,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r2.onActualUpdateSettings(sm);
         
@@ -200,7 +200,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r3.onActualUpdateSettings(sm);
         
