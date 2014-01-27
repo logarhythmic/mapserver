@@ -4,7 +4,8 @@ import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GlobalModel;
-import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.core.setting.*;
+import fi.paivola.mapserver.utils.RangeDouble;
 import java.util.Calendar;
 
 /**
@@ -33,6 +34,10 @@ public class Weather extends GlobalModel {
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
         sm.name = "Weather";
+        sm.settings.put("sade", new SettingDouble("sade", 0.0,
+                    new RangeDouble(0, Double.MAX_VALUE)));
+        sm.settings.put("dLämpö", new SettingDouble("dLämpö", 0.0,
+                    new RangeDouble(Double.MIN_VALUE, Double.MAX_VALUE)));
     }
 
     @Override
@@ -44,6 +49,8 @@ public class Weather extends GlobalModel {
     }
 
     public void onUpdateSettings(SettingMaster sm) {
+        Rain.rain = Double.parseDouble(sm.settings.get("sade").getValue());
+        Temperature.dtemp = Double.parseDouble(sm.settings.get("dLämpö").getValue());
     }
 
     public static double getRain(Calendar date) {
