@@ -7,21 +7,35 @@ import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GlobalModel;
+import fi.paivola.mapserver.core.setting.SettingInt;
 import fi.paivola.mapserver.core.setting.SettingMaster;
+import fi.paivola.mapserver.utils.RangeInt;
 import java.util.Random;
+import static java.lang.Integer.parseInt;
 /**
  *
  * @author Shaqqy
  */
 public class DevelopmentAid extends GlobalModel{
+    
+    private int devAid = 0;
+    private int wheatPrice = 0;
 public DevelopmentAid(int id){
     super (id);
 
 }
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-         current.saveGlobalData("Kehitysapu", Kehitysapu.KehitysAvunLaskenta(current.index,662000000));
+         current.saveGlobalData("devAid", getAid(current.index));
+         current.saveGlobalData("wheatPrice", null);
     }
+    
+    public double getAid(int index) {
+        int lastDevAid = 0; //getDouble("lastDevAid");
+        return (double) Kehitysapu.KehitysAvunLaskenta(index, lastDevAid);
+        
+    }
+    
 
     @Override
     public void onEvent(Event e, DataFrame current) {
@@ -30,25 +44,30 @@ public DevelopmentAid(int id){
 
     @Override
     public void onRegisteration(GameManager gm, SettingMaster sm) {
+        sm.name = "devAidStart";
+        sm.name = "wheatPrice";
+        sm.settings.put("devAidStart", new SettingInt("How much aid in beginning?", 662, new RangeInt(0, 1000)));
+        sm.settings.put("wheatPrice", new SettingInt("How much wheat costs?", 270, new RangeInt(0, 1000)));
+        
         //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-         df.saveGlobalData("Kehitysapu", 662000000);
+         df.saveGlobalData("Kehitysapu", getAid(df.index));
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-         //To change body of generated methods, choose Tools | Templates.
+         devAid = parseInt(sm.settings.get("devAidStart").getValue());
+         wheatPrice = parseInt(sm.settings.get("wheatPrice").getValue());
     }
 
     private static class Kehitysapu {
 
-            public static Object KehitysAvunLaskenta(int index,double alkuApu ){
+            public static Object KehitysAvunLaskenta(int index, double kehitysapu){
                 Random random=new Random();
                 
-		double kehitysapu = alkuApu;
 		double xx = 0;
 		double x = 0.5;
 		int onnettomuudet = 0;
@@ -107,9 +126,18 @@ public DevelopmentAid(int id){
 		
                 
 		}
-                System.out.println(kehitysapu);
+                //kehitysapu=muutavehnäksi(kehitysapu);
+                //double d = saveDouble("lastDevAid", kehitysapu);
                 return (kehitysapu);
     }
+            static double muutavehnäksi (double arvo){
+                double vehnä=0;
+                
+                return vehnä;
+            }
+            static double muutarahaksi(double arvo){
+                return arvo;
+            }
     }
 }
     
