@@ -3,3 +3,5 @@ dump.csv
 nbactions.xml
 out/
 *~
+output.png
+octave-core 
