@@ -91,7 +91,7 @@ public abstract class Crop extends Edible {
 
         if(currentGrowTime == growTime) {
             currentStoredFood += currentIndexMultiplier /
-                    growTime * getArea() * maxYield * (Math.random() / 10 + 0.5);
+                    growTime * getArea() * maxYield * (Math.random() / 10 + 0.5) * 1000;
             resetCrop();
         }
         else {
@@ -101,7 +101,7 @@ public abstract class Crop extends Edible {
                 this.getPHIndex(last);
         }
         /* XXX: constant multiplier */
-        return currentStoredFood * 3;
+        return currentStoredFood;
     }
 
     @Override
@@ -114,12 +114,12 @@ public abstract class Crop extends Edible {
     }
    
     public Supplies harvest(double max) {
-        Supplies ret = new Supplies (1, getCurrentStoredFood() * 1000);
+        Supplies ret = new Supplies (1, currentStoredFood);
         if(max < 0 || max > ret.amount) {
             currentStoredFood = 0;
             return ret;
         }
-        currentStoredFood -= max / 1000;
+        currentStoredFood -= max;
         ret.amount = max;
         return ret;
     }
