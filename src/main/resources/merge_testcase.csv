@@ -1,20 +1,96 @@
 command, argument1, argument2, argument3
+# Global weather
 model, Weather,,
+# KISMAYO (satama), pop: 183000
 model, PopCenter,,
-model, Field
+# JILIB, pop: 45000
+model, PopCenter,,
+# AFMADOW, pop: 45000
+model, PopCenter,,
+# Meri: Arabian Sea
+model, Sea,,
+# Jarvi: jv
+model, Lake,,
+# Jarvi: jo
+model, Lake,,
+# Joki: jv-meri
+model, River,,
+# Joki: jo-meri
+model, River,,
+# Tie: Kismayo - Afmadow, length: 115 km
+model, Road,,
+# Tie: Kismayo - Jilib, length: 113 km
+model, Road,,
+# Tie: Jilib - Afmadow, length: 104 km
+model, Road,,
+# Field: JilibField, content: maize, area: 20000
+model, Field,,
+# Field: AfmadowField, content: sorghum, area: 20000
+model, Field,,
+# Jilib-field-conn
 model, GenericConnection,,
-link, 3, 4, 5
+# Afmadow-field-conn
+model, GenericConnection,,
+# jv->kis-afm -conn
+model, GenericConnection,,
+# jo->jil-kis -conn
+model, GenericConnection,,
+,,,
+# Link: Kis-Afm
+link, 5, 9, 21
+# Link: Kis-Jil
+link, 5, 7, 23
+# Link: Jil-Afm
+link, 7, 9, 25
+# Link: jv-meri
+link, 13, 11, 17
+# Link: jo-meri
+link, 15, 11, 19
+# JilibField->Jilib (GenericConnection)
+link, 27, 7, 31
+# AfmadowField->Afmadow (GenericConnection)
+link, 29, 9, 33
+# jv katkaisee Kis-Afm (GenericConnection)
+link, 17, 21, 35
+# jo katkaisee Jil-Kis (GenericConnection)
+link, 19, 23, 37
 ,,,
 defparam, Field, content, maize
-defparam, Field, area, 100
+defparam, Field, area, 20000
 defparam, PopCenter, vehicles, 1000
 defparam, PopCenter, births%, 0.047492154
+defparam, PopCenter, initialFood, 50000000
 defparam, PopCenter, initialPopulation, 20000
+defparam, PopCenter, maxCap, 999999999
+defparam, PopCenter, ratRavenousness, 0.023
+defparam, Lake, order, 1
+defparam, Lake, k, 1
+defparam, Lake, surfaceArea, 256120000
+defparam, Lake, depth, 14.1
+defparam, Lake, startAmount, 0.9
+defparam, Lake, flowAmount, 0.91
+defparam, Lake, basinArea, 7642000000
+defparam, Lake, terrainCoefficient, 0.5
+defparam, River, order, 1
+defparam, River, width, 100
+defparam, River, length, 100000
+defparam, River, startDepth, 0
+defparam, River, floodDepth, 10
+defparam, River, flowDepth, 0.5
+defparam, River, slope, 20
+defparam, Sea, order, 1
+defparam, Road, roadLength, 100
+defparam, Road, baseSpeed, 80
+defparam, Road, tripRest, 1
+defparam, Road, rainMod, 0.1
+defparam, Road, transportType, 1
+defparam, Road, roadType, 1
 ,,,
 set, ticks, 520,
 set, runs, 1,
-set, name, full_model_test,
+set, name, defParamTest_allModels,
 ,,,
 dump, population,,
-waste, 18, 3, totalPopulation,
-
+waste, 93, 5, totalPopulation,
+waste, 93, 7, totalPopulation,
+waste, 93, 9, totalPopulation,

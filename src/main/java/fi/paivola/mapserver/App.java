@@ -12,6 +12,7 @@ import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.models.PopCenter;
+import fi.paivola.mapserver.models.RoadModel;
 import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,8 +34,22 @@ public class App {
         InputStream stream = null;
         if (args.length > 0) {
             File file = new File(args[0]);
-            stream = new FileInputStream(file);
-            TestcaseRunner tr = new TestcaseRunner(stream);
+            if (file.isFile()) {
+                stream = new FileInputStream(file);
+                TestcaseRunner tr = new TestcaseRunner(0, stream);
+            } else if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                for(int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    if(f.isFile()) {
+                        stream = new FileInputStream(f);
+                        TestcaseRunner tr = new TestcaseRunner(i, stream);
+                    }
+                }
+            } else {
+                System.err.println("Argument needs to be a file or a folder");
+                System.exit(-1);
+            }
             return;
         } else {
             stream = App.class.getClassLoader().getResourceAsStream("merge_testcase.csv");
@@ -74,7 +89,7 @@ public class App {
                         break mainloop;
                     case "f":
                         ws.stop();
-                        TestcaseRunner tr = new TestcaseRunner(stream);
+                        TestcaseRunner tr = new TestcaseRunner(0, stream);
                         break mainloop;
                     case "h":
                     case "help":
@@ -116,14 +131,12 @@ public class App {
         // globalit
         gm.createModel("Weather");
 
-        // ruoka
-        SettingMaster sm = one.game.getDefaultSM("Field");
-        sm.settings.get("content").setValue("maize");
-        sm.settings.get("area").setValue("1000000");
-
+        SettingMaster sm;
+        
         // kaupungit
         sm = gm.getDefaultSM("PopCenter");
         sm.settings.get("vehicles").setValue("1000");
+        sm.settings.get("initialFood").setValue("1000000");
         Model town1 = gm.createModel("PopCenter");
         sm = gm.getDefaultSM("PopCenter");
         sm.settings.get("births%").setValue("0.047492154");
@@ -131,11 +144,14 @@ public class App {
         sm = gm.getDefaultSM("PopCenter");
         sm.settings.get("births%").setValue("0.047492154");
         Model road1 = gm.createModel("Road");
-        gm.linkModelsWith(town1, town2, road1);
+        ((RoadModel)road1).setLengthToDistance(sm);
+        sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("1000000");
 
         // ruoka x kaupungit
-        gm.linkModelsWith(gm.createModel("Field"), town1, gm.createModel("GenericConnection"));
-        
+        gm.linkModelsWith(gm.createModel("Field",sm), town1, gm.createModel("GenericConnection"));
+        gm.linkModelsWith(town1, town2, road1);
 
         // water
         Model l1 = gm.createModel("Lake");
@@ -168,7 +184,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r1.onActualUpdateSettings(sm);
         
@@ -178,7 +194,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r2.onActualUpdateSettings(sm);
         
@@ -200,7 +216,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r3.onActualUpdateSettings(sm);
         
