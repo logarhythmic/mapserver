@@ -59,7 +59,7 @@ defparam, Field, content, maize
 defparam, Field, area, 20000
 defparam, PopCenter, vehicles, 1000
 defparam, PopCenter, births%, 0.047492154
-defparam, PopCenter, initialFood, 50000000
+defparam, PopCenter, initialFood, 0
 defparam, PopCenter, initialPopulation, 20000
 defparam, PopCenter, maxCap, 999999999
 defparam, PopCenter, ratRavenousness, 0.023
@@ -85,12 +85,18 @@ defparam, Road, tripRest, 1
 defparam, Road, rainMod, 0.1
 defparam, Road, transportType, 1
 defparam, Road, roadType, 1
+# Kismayo
+param, 5, initialPopulation, 183000
+# Jilib
+param, 7, initialPopulation, 45000
+# Afmadow
+param, 9, initialPopulation, 45000
 ,,,
 set, ticks, 520,
 set, runs, 1,
 set, name, defParamTest_allModels,
 ,,,
 dump, population,,
-waste, 93, 5, totalPopulation,
-waste, 93, 7, totalPopulation,
-waste, 93, 9, totalPopulation,
+waste, 99, 5, totalPopulation,
+waste, 99, 7, totalPopulation,
+waste, 99, 9, totalPopulation,
