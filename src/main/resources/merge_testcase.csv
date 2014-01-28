@@ -23,13 +23,17 @@ model, Road,,
 model, Road,,
 # Tie: Jilib - Afmadow, length: 104 km
 model, Road,,
-# Field: JilibField, content: maize, area: 20000
+# Field: JilibField, content: maize
 model, Field,,
-# Field: AfmadowField, content: sorghum, area: 20000
+# Field: AfmadowField, content: sorghum
+model, Field,,
+# Field: KismayoField, content: maize
 model, Field,,
 # Jilib-field-conn
 model, GenericConnection,,
 # Afmadow-field-conn
+model, GenericConnection,,
+# Kismayo-field-conn
 model, GenericConnection,,
 # jv->kis-afm -conn
 model, GenericConnection,,
@@ -46,14 +50,16 @@ link, 7, 9, 25
 link, 13, 11, 17
 # Link: jo-meri
 link, 15, 11, 19
+# KismayoField->Kismayo (GenericConnection)
+link, 31, 5, 37
 # JilibField->Jilib (GenericConnection)
-link, 27, 7, 31
+link, 27, 7, 33
 # AfmadowField->Afmadow (GenericConnection)
-link, 29, 9, 33
+link, 29, 9, 35
 # jv katkaisee Kis-Afm (GenericConnection)
-link, 17, 21, 35
+link, 17, 21, 39
 # jo katkaisee Jil-Kis (GenericConnection)
-link, 19, 23, 37
+link, 19, 23, 41
 ,,,
 defparam, Field, content, maize
 defparam, Field, area, 20000
@@ -97,14 +103,17 @@ param, 21, roadLength, 115
 param, 23, roadLength, 113
 # Tie: Jilib - Afmadow
 param, 25, roadLength, 104
+# Field: KismayoField
+param, 31, content, maize
+param, 31, area, 183000
 # Field: JilibField
 param, 27, content, maize
-param, 27, area, 20000
+param, 27, area, 45000
 # Field: AfmadowField
 param, 29, content, sorghum
-param, 29, area, 20000
+param, 29, area, 45000
 ,,,
-set, ticks, 520,
+set, ticks, 120,
 set, runs, 1,
 set, name, defParamTest_allModels,
 ,,,
@@ -113,5 +122,7 @@ waste, population, 5, totalPopulation,
 waste, population, 7, totalPopulation,
 waste, population, 9, totalPopulation,
 
-dump, test
-waste, test, 22, 
+dump, food,,
+waste, food, 27, foodAmount
+waste, food, 29, foodAmount
+waste, food, 31, foodAmount
