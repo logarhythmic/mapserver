@@ -12,6 +12,7 @@ import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.models.PopCenter;
+import fi.paivola.mapserver.models.RoadModel;
 import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
 import java.io.File;
@@ -125,8 +126,10 @@ public class App {
         Model Town1 = gm.createModel("PopCenter", sm);
         sm = gm.getDefaultSM("PopCenter");
         Model Town2 = gm.createModel("PopCenter", sm);
-        Model Road1 = gm.createModel("Road");
+        sm = gm.getDefaultSM("RoadModel");
+        Model Road1 = gm.createModel("Road", sm);
         gm.linkModelsWith(Town1, Town2, Road1);
+        ((RoadModel)Road1).setLengthToDistance(sm);
 
         // ruoka x kaupungit
         

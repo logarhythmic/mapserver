@@ -54,10 +54,18 @@ public class RoadModel extends ConnectionModel {
     @Override
     public void onTickStart(DataFrame last, DataFrame current){
         roadBlocked = false;
+        this.maxConnections = 20;
         if (current.getGlobalData("rain")!= null)
             rain = (double) current.getGlobalData("rain");
         super.onTickStart(last, current);
         remainingCapacityThisTick = calcMaxStuff(calcTrips(calcTime(calcSpeed())));
+    }
+    
+    public void setLengthToDistance(SettingMaster sm){
+        this.roadLength = 0;
+        if (connections.size() >= 2)
+            this.roadLength = connections.get(0).distanceTo(connections.get(1));
+        sm.settings.get("roadLength").setValue(this.roadLength+"");
     }
     
     public double getVehicleCap(){
