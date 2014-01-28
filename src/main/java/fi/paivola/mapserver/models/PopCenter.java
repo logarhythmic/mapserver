@@ -116,7 +116,7 @@ public class PopCenter extends PointModel {
         outOfGrain = outOfMilk?toEat-availableMilk>availableGrain:outOfGrain;
         if(outOfMilk && outOfGrain){
             Event starvation = new Event("outOfFood", Event.Type.DOUBLE, (toEat - availableMilk - availableGrain) / toEat);
-            System.out.println("Town "+this.id+" is starving! Needed food = "+toEat+". Available foods: "+availableGrain+" grain, "+availableMilk+" milk.");
+//            System.out.println("Town "+this.id+" is starving! Needed food = "+(long)toEat+". Available foods: "+(long)availableGrain+" grain, "+(long)availableMilk+" milk.");
             Take(0, availableMilk);
             Take(1, availableGrain);
             starvation.sender = this;
@@ -244,7 +244,6 @@ public class PopCenter extends PointModel {
     public Supplies sendSupplies(Supplies s, RoadModel[] route, PopCenter target, DataFrame d){
         if (route == null || s.amount == 0 || vehiclesUsed >= vehicles )
             return s;
-        System.out.println("sent some "+s.id);
         Supplies destroyed = new Supplies(s.id, 0);
         Supplies delivered = new Supplies(s.id, s.amount);
         for (RoadModel r : route){

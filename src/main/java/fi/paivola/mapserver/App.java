@@ -34,11 +34,25 @@ public class App {
         InputStream stream = null;
         if (args.length > 0) {
             File file = new File(args[0]);
-            stream = new FileInputStream(file);
-            TestcaseRunner tr = new TestcaseRunner(stream);
+            if (file.isFile()) {
+                stream = new FileInputStream(file);
+                TestcaseRunner tr = new TestcaseRunner(0, stream);
+            } else if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                for(int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    if(f.isFile()) {
+                        stream = new FileInputStream(f);
+                        TestcaseRunner tr = new TestcaseRunner(i, stream);
+                    }
+                }
+            } else {
+                System.err.println("Argument needs to be a file or a folder");
+                System.exit(-1);
+            }
             return;
         } else {
-            stream = App.class.getClassLoader().getResourceAsStream("default_testcase.csv");
+            stream = App.class.getClassLoader().getResourceAsStream("merge_testcase.csv");
         }
 
         SettingsParser.parse();
@@ -75,7 +89,7 @@ public class App {
                         break mainloop;
                     case "f":
                         ws.stop();
-                        TestcaseRunner tr = new TestcaseRunner(stream);
+                        TestcaseRunner tr = new TestcaseRunner(0, stream);
                         break mainloop;
                     case "h":
                     case "help":
@@ -103,12 +117,12 @@ public class App {
      */ 
     static void runTest() {
         dw = DiagnosticsWrapper.getInstance();
-        dw.setDebugOutput( false );
+        dw.setDebugOutput( true );
 
         // How many ticks? Each one is a week.
         int simulationDurationTicks = (int) Math.floor(Constants.WEEKS_IN_YEAR * 20);
         // print debug-info on all parameters moving between models
-        boolean printFrameData = true;
+        boolean printFrameData = false;
         GameThread one = new GameThread(simulationDurationTicks, printFrameData);
         GameManager gm = one.game;
         
@@ -123,21 +137,21 @@ public class App {
         sm = gm.getDefaultSM("PopCenter");
         sm.settings.get("vehicles").setValue("1000");
         sm.settings.get("initialFood").setValue("1000000");
-        Model Town1 = gm.createModel("PopCenter", sm);
+        Model town1 = gm.createModel("PopCenter");
         sm = gm.getDefaultSM("PopCenter");
-        Model Town2 = gm.createModel("PopCenter", sm);
-        sm = gm.getDefaultSM("RoadModel");
-        Model Road1 = gm.createModel("Road", sm);
-        gm.linkModelsWith(Town1, Town2, Road1);
-        ((RoadModel)Road1).setLengthToDistance(sm);
-
-        // ruoka x kaupungit
-        
+        sm.settings.get("births%").setValue("0.047492154");
+        Model town2 = gm.createModel("PopCenter");
+        sm = gm.getDefaultSM("PopCenter");
+        sm.settings.get("births%").setValue("0.047492154");
+        Model road1 = gm.createModel("Road");
+        ((RoadModel)road1).setLengthToDistance(sm);
         sm = one.game.getDefaultSM("Field");
         sm.settings.get("content").setValue("maize");
         sm.settings.get("area").setValue("1000000");
-        gm.linkModelsWith(gm.createModel("Field",sm), Town1, gm.createModel("GenericConnection"));
-        
+
+        // ruoka x kaupungit
+        gm.linkModelsWith(gm.createModel("Field",sm), town1, gm.createModel("GenericConnection"));
+        gm.linkModelsWith(town1, town2, road1);
 
         // water
         Model l1 = gm.createModel("Lake");
@@ -170,7 +184,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r1.onActualUpdateSettings(sm);
         
@@ -180,7 +194,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r2.onActualUpdateSettings(sm);
         
@@ -202,7 +216,7 @@ public class App {
         sm.settings.get("width").setValue("100");
         sm.settings.get("length").setValue("100000");
         sm.settings.get("startDepth").setValue("0");
-        sm.settings.get("floodDepth").setValue("10");;
+        sm.settings.get("floodDepth").setValue("10");
         sm.settings.get("flowDepth").setValue("0.5");
         r3.onActualUpdateSettings(sm);
         
@@ -223,8 +237,9 @@ public class App {
         one.start();
         
         //Save population to a csv file
-        CSVDumper csv = new CSVDumper();
-        csv.add(Town1, "totalPopulation"); //local
+        CSVDumper csv = new CSVDumper("none", "population");
+        csv.add(town1, "totalPopulation"); //local
+
         csv.save(gm, true);
     }
 }

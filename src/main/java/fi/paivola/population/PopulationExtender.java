@@ -26,24 +26,15 @@ public class PopulationExtender extends ExtensionModel {
     private MortalityModel          mortalityModel;
     private PopulationDistribution  populationByAge;
     private double                  foodShortage;
+    private int                     defaultInitialPopulation;
+    private double                  defaultBirthPc;
     
     public PopulationExtender(int id) {
         super(id);
         this.mortalityModel = new MortalityModel();
         this.foodShortage = 0;
-        
-        // Parse initial age-structure from file
-        double[] ageGroups = new double[Constants.NUM_AGE_GROUPS];
-        parseInitialAgeStructure(ageGroups, "populationByAge_2010.csv");
-        this.populationByAge = new PopulationDistribution(ageGroups, mortalityModel);
-        
-        // 20% of people age 5 years annually 
-        this.populationByAge.setAnnualFlowPc(0.2);
-        this.populationByAge.setBirthsPc(0); // from births_population.ods
-        
-        // check that the data is conformant
-        assert(this.populationByAge.getQuantities().length == Constants.NUM_AGE_GROUPS);
-        
+        this.defaultInitialPopulation = 0;
+        this.defaultBirthPc = 0;
     }
 
     @Override
@@ -84,21 +75,35 @@ public class PopulationExtender extends ExtensionModel {
         sm.exts = "PopCenter";
         // settings / input variables here
         sm.settings.put( "births%", new SettingDouble("Fraction of population "
-                + "added as annual births", 0, new RangeDouble(0.04, 5.05)) );
+                + "added as annual births", 0.04, new RangeDouble(0.04, 0.05)) );
+        sm.settings.put( "initialPopulation", new SettingInt("Initial "
+                + "population in town", 40000, new RangeInt(0, 20000000)));
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
+        // Parse initial age-structure from file
+        double[] ageGroups = new double[Constants.NUM_AGE_GROUPS];
+        parseInitialAgeStructure(ageGroups, "populationDistribution_2010.csv");
+        this.populationByAge = new PopulationDistribution(ageGroups, mortalityModel);
+
+        // 20% of people age 5 years annually
+        populationByAge.setAnnualFlowPc(0.2);
+        populationByAge.setBirthsPc( defaultBirthPc );
+        
         saveData( "totalPopulation", populationByAge.total()*1000 );
+        
+        DiagnosticsWrapper.getInstance().println(id+"-totalPopulation:\t"+(long)populationByAge.total());
     }
 
     @Override
     public void onUpdateSettings(SettingMaster sm) {
-        populationByAge.setBirthsPc( Double.parseDouble(sm.settings.get("births%").getValue()) );
-        this.saveDouble("births%", populationByAge.getBirthsPc());
+        defaultBirthPc = Double.parseDouble(sm.settings.get("births%").getValue());
+        defaultInitialPopulation = Integer.parseInt( sm.settings.get("initialPopulation").getValue() );
+        saveDouble("births%", defaultBirthPc);
     }
     
-    private void parseInitialAgeStructure(double[] ageGroups, String filename) {
+    private void parseInitialPopulation(double[] ageGroups, String filename) {
         try {
             CSVReader reader = new CSVReader(new InputStreamReader(PopulationExtender.class.getClassLoader().getResourceAsStream(filename)));
             String[] nextLine;
@@ -107,6 +112,25 @@ public class PopulationExtender extends ExtensionModel {
                 if (line > 0) {
                     for (int i = 0; i != Constants.NUM_AGE_GROUPS; ++i) {
                         ageGroups[i] = parseDouble(nextLine[i]);
+                    }
+                }
+                line++;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ExampleGlobal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void parseInitialAgeStructure(double[] ageGroups, String filename) {
+        double totalPopulation = (double)(defaultInitialPopulation/1000); // divided by 1000 to save precision
+        try {
+            CSVReader reader = new CSVReader(new InputStreamReader(PopulationExtender.class.getClassLoader().getResourceAsStream(filename)));
+            String[] nextLine;
+            int line = 0;
+            while ((nextLine = reader.readNext()) != null) {
+                if (line > 0) {
+                    for (int i = 0; i != Constants.NUM_AGE_GROUPS; ++i) {
+                        ageGroups[i] = parseDouble(nextLine[i])*totalPopulation;
                     }
                 }
                 line++;
