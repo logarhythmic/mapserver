@@ -91,6 +91,18 @@ param, 5, initialPopulation, 183000
 param, 7, initialPopulation, 45000
 # Afmadow
 param, 9, initialPopulation, 45000
+# Tie: Kismayo - Afmadow
+param, 21, roadLength, 115
+# Tie: Kismayo - Jilib
+param, 23, roadLength, 113
+# Tie: Jilib - Afmadow
+param, 25, roadLength, 104
+# Field: JilibField
+param, 27, content, maize
+param, 27, area, 20000
+# Field: AfmadowField
+param, 29, content, sorghum
+param, 29, area, 20000
 ,,,
 set, ticks, 520,
 set, runs, 1,
@@ -100,3 +112,6 @@ dump, population,,
 waste, population, 5, totalPopulation,
 waste, population, 7, totalPopulation,
 waste, population, 9, totalPopulation,
+
+dump, test
+waste, test, 22, 
