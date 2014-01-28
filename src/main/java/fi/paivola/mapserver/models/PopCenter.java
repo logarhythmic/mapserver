@@ -26,7 +26,8 @@ public class PopCenter extends PointModel {
     double maxStorageCapacity;
     double currentStorageCapacity;
     
-    public boolean DebugFoodSource;
+    private double initialFood;
+    
     private int requestsReceivedThisTick = 0;
     private int requestsServedThisTick = 0;
     
@@ -260,6 +261,7 @@ public class PopCenter extends PointModel {
         sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", Integer.MAX_VALUE, new RangeDouble(1, Double.MAX_VALUE)));
         sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0.023, new RangeDouble(0, 1)));
         sm.settings.put("vehicles", new SettingInt("How many vehicles this model has available for sending supplies", 1, new RangeInt(0, 10000)));
+        sm.settings.put("initialFood", new SettingDouble("How much food this model has in store initially", 10000, new RangeDouble(0,Double.MAX_VALUE)));
     }
     
     @Override
@@ -268,8 +270,8 @@ public class PopCenter extends PointModel {
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
         findOthers();
-        if (DebugFoodSource){ // this is a debug
-            while(Store(new Supplies(0,100000000)) == 0){}
+        if (initialFood > 0){ // this is a debug
+            while(Store(new Supplies(0,initialFood)) == 0){}
         }
         this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
@@ -306,6 +308,7 @@ public class PopCenter extends PointModel {
         this.maxStorageCapacity = Double.parseDouble(sm.settings.get("maxCap").getValue());
         this.STORAGE_RAT_RAVENOUSNESS = Double.parseDouble(sm.settings.get("ratRavenousness").getValue());
         this.vehicles = Integer.parseInt(sm.settings.get("vehicles").getValue());
+        this.initialFood = Double.parseDouble(sm.settings.get("initialFood").getValue());
     }
     
     Supplies findSupplies(int id){
