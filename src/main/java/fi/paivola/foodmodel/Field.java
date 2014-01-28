@@ -23,7 +23,7 @@ public class Field extends PointModel {
     
     @Override
     public void onTick(DataFrame last, DataFrame current) {
-        double d = this.content.onTick(last, current);
+        double d = this.content.onTick(last, current) ;
         if(d != lastfood) {
             this.saveDouble("avgFood", d/index++);
             lastfood = d;
@@ -54,6 +54,14 @@ public class Field extends PointModel {
         sm.settings.put("area", new SettingDouble("area", 1.0,
                 new RangeDouble(0, Integer.MAX_VALUE)));
         sm.settings.put("content", new SettingString("content", "empty"));
+        sm.settings.put("MaissiVesi", new SettingDouble("MaissiVesi", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        sm.settings.put("MaissiLämpö", new SettingDouble("MaissiLämpö", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        sm.settings.put("DurraVesi", new SettingDouble("DurraVesi", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
+        sm.settings.put("DurraLämpö", new SettingDouble("DurraLämpö", 1.0,
+                new RangeDouble(0, Integer.MAX_VALUE)));
     }
 
     @Override
@@ -67,6 +75,7 @@ public class Field extends PointModel {
     public void onUpdateSettings(SettingMaster sm) {
         setContents(sm.settings.get("content").getValue().toLowerCase());
         this.area = Double.parseDouble(sm.settings.get("area").getValue());
+        this.content.onUpdateSettings(sm);
         this.content.setArea(this.area);
     }
 
@@ -89,8 +98,8 @@ public class Field extends PointModel {
                 content = new Cow();
                 break;
             default:
-                // Should this fail or not?
-                throw new UnsupportedOperationException();
+                content = new Maize();
+                break;
         }
     }
 }

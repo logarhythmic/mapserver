@@ -11,6 +11,7 @@ public class Rain {
         1, 0, 9, 58,  56, 82, 58, 40,  23, 27, 36, 9};
     public static final double[] rainProb = {
         0, 0, 3, 17,  23, 43, 42, 32,  17, 13, 13, 6};
+    public static double rain = 0;
 
     // XXX: quick dumb implementation
     private Rain() {}
@@ -22,6 +23,8 @@ public class Rain {
             if(Math.random() * 100 < rainProb[month])
                 r += rainAvrg[month] / date.getActualMaximum(Calendar.DAY_OF_MONTH);
         }
-        return r;
+        if(r + rain <= 0)
+            return 0;
+        return r + rain;
     }
 }
