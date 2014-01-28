@@ -270,9 +270,10 @@ public class PopCenter extends PointModel {
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
         findOthers();
-        if (initialFood > 0){ // this is a debug
-            while(Store(new Supplies(0,initialFood)) == 0){}
-        }
+//        if (initialFood > 0){ // this is a debug
+//            while(Store(new Supplies(0,initialFood)) == 0){}
+//        }
+        Store(new Supplies(0,initialFood));
         this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
         //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
