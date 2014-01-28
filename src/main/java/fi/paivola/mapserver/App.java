@@ -83,6 +83,7 @@ public class App {
 
         // Create and add
         Model mg = gm.createModel("exampleGlobal");
+        Model devaid = gm.createModel("DevelopmentAid");
 
         // This is how you change a "setting" from the code.
         SettingMaster sm = gm.getDefaultSM("exampleGlobal");
