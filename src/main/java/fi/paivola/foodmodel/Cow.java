@@ -14,6 +14,7 @@ public class Cow extends Edible {
     double cowAmount = 1;
     double foodAmount = 1;
     double storedMilk = 0;
+    final double maxCows = 2;
 
     public Cow() {
         super("cow");
@@ -32,7 +33,7 @@ public class Cow extends Edible {
             storedMilk += (0.3375 * (d/cows) + 8.325) * 7 * cows;
         }
         foodAmount += 15 * getArea() * 7;
-        if(cowAmount < 10 * getArea())
+        if(cowAmount < maxCows * getArea())
             cowAmount *= 1.05;
 
         return storedMilk;
