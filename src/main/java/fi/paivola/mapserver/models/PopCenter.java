@@ -52,9 +52,9 @@ public class PopCenter extends PointModel {
             Store(new Supplies(0,aid/2));
             Store(new Supplies(1,aid/2));
         }
-        if(countFood() < foodNeededLastTick*3){
-            requestSuppliesFromAll(new Supplies(0, Math.min(50, foodNeededLastTick*3 - countFood())), current);
-            requestSuppliesFromAll(new Supplies(1, Math.min(50, foodNeededLastTick*3 - countFood())), current);
+        if(countFood() < foodNeededLastTick+5000){
+            requestSuppliesFromAll(new Supplies(0, Math.min(50, foodNeededLastTick+5000 - countFood())), current);
+            requestSuppliesFromAll(new Supplies(1, Math.min(50, foodNeededLastTick+5000 - countFood())), current);
         }
         vehiclesUsed = 0;
         for (Event e : outgoing){
@@ -278,8 +278,8 @@ public class PopCenter extends PointModel {
         outgoing = new ArrayList<>();
         otherTowns = new ArrayList<>();
         findOthers();
-        if (initialFood > 0){ // this is a debug
-            while(Store(new Supplies(0,initialFood)) == 0){}
+        if (initialFood > 0){
+            Store(new Supplies(0,initialFood));
         }
         this.saveDouble("availableFood", this.countFood());
         //this.saveDouble("Items in storage", this.currentStorageCapacity);
