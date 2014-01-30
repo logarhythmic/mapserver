@@ -21,7 +21,6 @@ import java.util.*;
 import java.io.FileWriter;
 
 public class Lake extends PointModel {
-    //(Näsijärvi)
 
     // General stuff
     // CSVWriter writer = null;

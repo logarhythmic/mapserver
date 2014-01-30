@@ -2,6 +2,7 @@ package fi.paivola.foodmodel;
 
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
+import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.setting.*;
 import fi.paivola.mapserver.utils.*;
 import fi.paivola.weathermodel.Weather;
@@ -15,10 +16,10 @@ import java.util.Calendar;
 public abstract class Crop extends Edible {
 
     private double waterMinimum;
-    private double waterOptimal;
+    private double waterOptimal = 2;
     private double waterMaximum;
     private double temperatureMinimum;
-    private double temperatureOptimal;
+    private double temperatureOptimal = 30;
     private double temperatureMaximum;
     private double sunlightMinimum;
     private double sunlightOptimal;
@@ -43,9 +44,6 @@ public abstract class Crop extends Edible {
             double smax, double phmin, double phopt, double phmax, int gtime,
             double yield) {
         super(name);
-        
-        RangeDouble r = new RangeDouble(0, Double.MAX_VALUE);
-        RangeInt i = new RangeInt(0, Integer.MAX_VALUE);
         
         this.name = name;
         waterMinimum = wmin;
@@ -77,6 +75,7 @@ public abstract class Crop extends Edible {
         this.pHDistribution = new Distribution(pHMinimum,
                                                   pHOptimal,
                                                   pHMaximum);
+        
     }
 
     public void resetCrop() {
@@ -92,7 +91,7 @@ public abstract class Crop extends Edible {
 
         if(currentGrowTime == growTime) {
             currentStoredFood += currentIndexMultiplier /
-                    growTime * getArea() * maxYield;
+                    growTime * getArea() * maxYield * (Math.random() / 10 + 0.5) * 1000;
             resetCrop();
         }
         else {
@@ -102,7 +101,7 @@ public abstract class Crop extends Edible {
                 this.getPHIndex(last);
         }
         /* XXX: constant multiplier */
-        return currentStoredFood * 3;
+        return currentStoredFood;
     }
 
     @Override
@@ -115,12 +114,12 @@ public abstract class Crop extends Edible {
     }
    
     public Supplies harvest(double max) {
-        Supplies ret = new Supplies (1, getCurrentStoredFood() * 1000);
+        Supplies ret = new Supplies (1, currentStoredFood);
         if(max < 0 || max > ret.amount) {
             currentStoredFood = 0;
             return ret;
         }
-        currentStoredFood -= max / 1000;
+        currentStoredFood -= max;
         ret.amount = max;
         return ret;
     }
@@ -157,5 +156,26 @@ public abstract class Crop extends Edible {
     private double getPHIndex(DataFrame last) {
         return 1;
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    void onUpdateSettings(SettingMaster sm) {
+        String s;
+        if(this.name.equals("maize"))
+            s = "Maissi";
+        else
+            s = "Durra";
+        if(sm.settings.get(s + "Water") == null)
+            onRegisteration(null, sm);
+        
+        this.waterOptimal = Double.parseDouble(
+                sm.settings.get(s + "Vesi").getValue());
+        this.waterDistribution = new Distribution(waterOptimal * 0.5,
+                waterOptimal, waterOptimal * 1.5);
+        this.temperatureOptimal = Double.parseDouble(
+                sm.settings.get(s + "Lämpö").getValue());
+        this.temperatureDistribution = new Distribution(
+                temperatureOptimal * 0.5, temperatureOptimal,
+                temperatureOptimal * 1.5);
     }
 }

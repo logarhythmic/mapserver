@@ -1,14 +1,112 @@
 command, argument1, argument2, argument3
-model, Weather,,
-model, PopCenter,,
-model, Field,,
-model, GenericConnection,,
-link, 3, 4, 5
-,,,
+
+##########
+# MODELS #
+##########
+
+# Global weather
+model, Weather~weather
+
+# KISMAYO (satama), pop: 183000
+model, PopCenter~kismayo
+
+# JILIB, pop: 45000
+model, PopCenter~jilib
+
+# AFMADOW, pop: 45000
+model, PopCenter~afmadow
+
+# Meri: Arabian Sea
+model, Sea~meri
+
+# Jarvi: jv
+model, Lake~jv
+
+# Jarvi: jo
+model, Lake~jo
+
+# Joki: jv-meri
+model, River~jvmeri
+
+# Joki: jo-meri
+model, River~jomeri
+
+# Tie: Kismayo - Afmadow, length: 115 km
+model, Road~kismayo-afmadow
+
+# Tie: Kismayo - Jilib, length: 113 km
+model, Road~kismayo-jilib
+
+# Tie: Jilib - Afmadow, length: 104 km
+model, Road~jilib-afmadow
+
+# Field: JilibField, content: maize
+model, Field~jilib-field
+
+# Field: Afmadow-Field, content: sorghum
+model, Field~afmadow-field
+
+# Field: Kismayo-Field, content: maize
+model, Field~kismayo-field
+
+# Jilib-field-conn
+model, GenericConnection~jilib-field-conn
+
+# Afmadow-field-conn
+model, GenericConnection~afmadow-field-conn
+
+# Kismayo-field-conn
+model, GenericConnection~kismayo-field-conn
+
+# jv->kis-afm -conn
+model, GenericConnection~jv-kismayo-afmadow
+
+# jo->jil-kis -conn
+model, GenericConnection~jo-jilib-kismayo
+
+###########
+# LINKING #
+###########
+
+# Link: Kis-Afm
+link, kismayo, afmadow, kismayo-afmadow
+
+# Link: Kis-Jil
+link, kismayo, jilib, kismayo-jilib
+
+# Link: Jil-Afm
+link, jilib, afmadow, jilib-afmadow
+
+# Link: jv-meri
+link, jv, meri, jvmeri
+
+# Link: jo-meri
+link, jo, meri, jomeri
+
+# Kismayo-Field->Kismayo (GenericConnection)
+link, kismayo-field, kismayo, kismayo-field-conn
+
+# Jilib-Field->Jilib (GenericConnection)
+link, jilib-field, jilib, jilib-field-conn
+
+# Afmadow-Field->Afmadow (GenericConnection)
+link, afmadow-field, afmadow, afmadow-field-conn
+
+# jv katkaisee Kis-Afm (GenericConnection)
+link, jvmeri, kismayo-afmadow, jv-kismayo-afmadow
+
+# jo katkaisee Jil-Kis (GenericConnection)
+link, jomeri, kismayo-afmadow, jo-jilib-kismayo
+
+##########
+# PARAMS #
+##########
+
 defparam, Field, content, maize
 defparam, Field, area, 20000
 defparam, PopCenter, vehicles, 1000
 defparam, PopCenter, births%, 0.047492154
+defparam, PopCenter, initialFood, 0
 defparam, PopCenter, initialPopulation, 20000
 defparam, PopCenter, maxCap, 999999999
 defparam, PopCenter, ratRavenousness, 0.023
@@ -28,17 +126,57 @@ defparam, River, floodDepth, 10
 defparam, River, flowDepth, 0.5
 defparam, River, slope, 20
 defparam, Sea, order, 1
-defparam, Road, roadLength, 10
+defparam, Road, roadLength, 100
 defparam, Road, baseSpeed, 80
 defparam, Road, tripRest, 1
 defparam, Road, rainMod, 0.1
 defparam, Road, transportType, 1
 defparam, Road, roadType, 1
-,,,
-set, ticks, 5200,
-set, runs, 1,
-set, name, full_model_test,
-,,,
-dump, population,,
-waste, 42, 3, totalPopulation,
 
+# Kismayo
+param, kismayo, initialPopulation, 183000
+
+# Jilib
+param, jilib, initialPopulation, 45000
+
+# Afmadow
+param, afmadow, initialPopulation, 45000
+
+# Tie: Kismayo - Afmadow
+param, kismayo-afmadow, roadLength, 115
+
+# Tie: Kismayo - Jilib
+param, kismayo-jilib, roadLength, 113
+
+# Tie: Jilib - Afmadow
+param, jilib-afmadow, roadLength, 104
+
+# Field: Kismayo-Field
+param, kismayo-field, content, maize
+param, kismayo-field, area, 183000
+
+# Field: Jilib-Field
+param, jilib-field, content, maize
+param, jilib-field, area, 45000
+
+# Field: Afmadow-Field
+param, afmadow-field, content, sorghum
+param, afmadow-field, area, 45000
+
+############
+# SETTINGS #
+############
+
+set, ticks, 120
+set, runs, 1
+set, name, defParamTest_allModels
+
+dump, population
+waste, population, kismayo, totalPopulation
+waste, population, jilib, totalPopulation
+waste, population, afmadow, totalPopulation
+
+dump, food
+waste, food, kismayo-field, foodAmount
+waste, food, jilib-field, foodAmount
+waste, food, afmadow-field, foodAmount

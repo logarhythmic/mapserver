@@ -52,7 +52,7 @@ public class PopulationExtender extends ExtensionModel {
         populationByAge.step( 1 );
 
         // notify amount eaten
-        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, population*7);
+        Event consumeFoodEvent = new Event("consumeFood", Event.Type.DOUBLE, population*7); // 1 kg per day, 7 kg per day
         addEventTo(parent, current, consumeFoodEvent);
         
         saveData( "totalPopulation", population );
