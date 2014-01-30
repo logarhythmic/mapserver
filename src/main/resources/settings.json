@@ -54,6 +54,10 @@
         {
             "name": "GenericConnection",
             "class": "fi.paivola.mapserver.models.GenericConnection"
+        },
+        {
+            "name": "DevelopmentAid",
+            "class": "fi.paivola.developmentaid.DevelopmentAid"
         }
     ]
 }

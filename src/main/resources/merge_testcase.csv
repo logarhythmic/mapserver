@@ -7,6 +7,9 @@ command, argument1, argument2, argument3
 # Global weather
 model, Weather~weather
 
+# Global development aid
+model, DevelopmentAid~devaid
+
 # KISMAYO (satama), pop: 183000
 model, PopCenter~kismayo
 
