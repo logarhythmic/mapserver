@@ -18,8 +18,8 @@ import java.util.logging.Logger;
  */
 public class CSVDumper {
 
-    public static final String csv_separator = ",";
-    public static final String decimal_separator = ".";
+    public static final String csv_separator = ";";
+    public static final String decimal_separator = ",";
 
     private final List<String> lines = new LinkedList<>();
     private PrintWriter out = null;

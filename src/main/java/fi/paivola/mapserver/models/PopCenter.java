@@ -116,7 +116,7 @@ public class PopCenter extends PointModel {
         outOfGrain = outOfMilk?toEat-availableMilk>availableGrain:outOfGrain;
         if(outOfMilk && outOfGrain){
             Event starvation = new Event("outOfFood", Event.Type.DOUBLE, (toEat - availableMilk - availableGrain) / toEat);
-//            System.out.println("Town "+this.id+" is starving! Needed food = "+(long)toEat+". Available foods: "+(long)availableGrain+" grain, "+(long)availableMilk+" milk.");
+            System.out.println("Town "+this.id+" is starving! Needed food = "+(long)toEat+". Available foods: "+(long)availableGrain+" grain, "+(long)availableMilk+" milk.");
             Take(0, availableMilk);
             Take(1, availableGrain);
             starvation.sender = this;
