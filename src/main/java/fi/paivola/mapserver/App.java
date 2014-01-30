@@ -126,29 +126,56 @@ public class App {
 
         // globalit
         gm.createModel("Weather");
+        gm.createModel("DevelopmentAid");
 
         SettingMaster sm;
         
         // kaupungit
         sm = gm.getDefaultSM("PopCenter");
-        sm.settings.get("vehicles").setValue("1000");
+        sm.settings.get("vehicles").setValue("100");
         sm.settings.get("initialFood").setValue("80000000");
         sm.settings.get("births%").setValue("0.047492154");
         Model town1 = gm.createModel("PopCenter");
+        
         sm = gm.getDefaultSM("PopCenter");
-        sm.settings.get("initialFood").setValue("80000000");
+        sm.settings.get("initialFood").setValue("50000000");
         sm.settings.get("births%").setValue("0.047492154");
+        sm.settings.get("isPort").setValue("true");
         Model town2 = gm.createModel("PopCenter");
+        
+        sm = gm.getDefaultSM("PopCenter");
+        sm.settings.get("initialFood").setValue("20000000");
+        sm.settings.get("births%").setValue("0.047492154");
+        Model town3 = gm.createModel("PopCenter");
+        
         sm = gm.getDefaultSM("Road");
-        Model road1 = gm.createModel("Road");
-        ((RoadModel)road1).roadLength = 100;
-        sm = one.game.getDefaultSM("Field");
-        sm.settings.get("content").setValue("maize");
-        sm.settings.get("area").setValue("100000");
+        sm.settings.get("roadLength").setValue("100");
+        Model road12 = gm.createModel("Road");
+        sm.settings.get("roadLength").setValue("50");
+        Model road23 = gm.createModel("Road");
+        sm.settings.get("roadLength").setValue("120");
+        Model road31 = gm.createModel("Road");
+        
 
         // ruoka x kaupungit
+        sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("50000");
         gm.linkModelsWith(gm.createModel("Field",sm), town1, gm.createModel("GenericConnection"));
-        gm.linkModelsWith(town1, town2, road1);
+        
+        sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("30000");
+        gm.linkModelsWith(gm.createModel("Field",sm), town2, gm.createModel("GenericConnection"));
+        
+        sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("500");
+        gm.linkModelsWith(gm.createModel("Field",sm), town3, gm.createModel("GenericConnection"));
+        
+        gm.linkModelsWith(town1, town2, road12);
+        gm.linkModelsWith(town2, town3, road23);
+        gm.linkModelsWith(town3, town1, road31);
         
         // water
         Model l1 = gm.createModel("Lake");
@@ -225,6 +252,11 @@ public class App {
         gm.linkModelsWith(l1, l3, r1);
         gm.linkModelsWith(l2, l3, r2);
         gm.linkModelsWith(l3, s1, r3);
+        
+        gm.linkModelsWith(road12, r1, gm.createModel("GenericConnection"));
+        gm.linkModelsWith(road23, r2, gm.createModel("GenericConnection"));
+        gm.linkModelsWith(road31, r3, gm.createModel("GenericConnection"));
+        
 
         if (!profilingRun) {
             gm.printOnDone = 2;
@@ -235,8 +267,10 @@ public class App {
         
         //Save population to a csv file
         CSVDumper csv = new CSVDumper("none", "population");
-        csv.add(town1, "totalPopulation"); //local
-
+        csv.add(town1, "totalPopulation");
+        csv.add(town2, "totalPopulation"); //local
+        csv.add(town3, "totalPopulation");
+        
         csv.save(gm, true);
     }
 }

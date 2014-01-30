@@ -10,14 +10,13 @@ import fi.paivola.mapserver.core.ConnectionModel;
 import fi.paivola.mapserver.core.DataFrame;
 import fi.paivola.mapserver.core.Event;
 import fi.paivola.mapserver.core.GameManager;
-import fi.paivola.mapserver.core.GlobalModel;
 import fi.paivola.mapserver.core.setting.SettingDouble;
 import fi.paivola.mapserver.core.setting.SettingInt;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.utils.Color;
 import fi.paivola.mapserver.utils.RangeDouble;
 import fi.paivola.mapserver.utils.RangeInt;
-import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -26,13 +25,13 @@ import java.util.ArrayList;
 public class RoadModel extends ConnectionModel {
 
     private double BASE_SPEED = 80; //km/h
-    static private double TICK_TIME = 168; //h
+    private static final double TICK_TIME = 168; //h
     private double TRIP_REST = 1; //h
 
-    static private double[] TT_MOD = new double[]{1, 0.75, 0.8, 1};
-    static private double[] VEHICLE_LENGTH_MOD = new double[]{30, 15, 5, 1};
-    static private double[] RT_MOD = new double[]{1, 0.8, 1};
-    static private double[] A_MOD = new double[]{55000, 10000, 300, 50};
+    private static final double[] TT_MOD = new double[]{1, 0.75, 0.8, 1};
+    private static final double[] VEHICLE_LENGTH_MOD = new double[]{30, 15, 5, 1};
+    private static final double[] RT_MOD = new double[]{1, 0.8, 1};
+    private static final double[] A_MOD = new double[]{55000, 10000, 300, 50};
     private double RAIN_MOD = -0.1;
     
     public double roadLength; // km
@@ -41,14 +40,18 @@ public class RoadModel extends ConnectionModel {
     
     private double deliveredThisTick;
     public double remainingCapacityThisTick;
-    private double stealage = 0; // get from crime team
-    public ArrayList<Supplies> stolenGoods;
+    private double stealChance = 0;
     
     boolean roadBlocked;
     double rain;
     
+    double stolenThisTick;
+    
+    Random random;
+    
     public RoadModel(int id) {
         super(id);
+        random = new Random();
     }
 
     @Override
@@ -68,10 +71,12 @@ public class RoadModel extends ConnectionModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         this.saveDouble("Supplies delivered through this road", deliveredThisTick);
+        this.saveDouble("Supplies stolen on this road", stolenThisTick);
         deliveredThisTick = 0;
+        stolenThisTick = 0;
     }
 
-    @Override
+    @Override 
     public void onEvent(Event e, DataFrame current) {
         if (e.name.equals("Flood") && (boolean)e.value == true){
             roadBlocked = true;
@@ -88,11 +93,11 @@ public class RoadModel extends ConnectionModel {
         sm.settings.put("rainMod", new SettingDouble("This is how much deliveries are slowed down by rain", 0.1, new RangeDouble(0, 1)));
         sm.settings.put("transportType", new SettingInt("Type of transportation vehicles available on this road, 0:truck, 1:small truck, 2:pickup, 3:donkey", 1, new RangeInt(0,3)));
         sm.settings.put("roadType", new SettingInt("Type of this road, 0:paved, 1:unpaved, 2:footpath", 1, new RangeInt(0,2)));
+        sm.settings.put("theftChance", new SettingDouble("Chance of a delivery being hijacked by thieves and lost", 0.1, new RangeDouble(0,1)));
     }
 
     @Override
     public void onGenerateDefaults(DataFrame df) {
-        stolenGoods = new ArrayList<>();
     }
 
     private double calcSpeed() {
@@ -124,8 +129,8 @@ public class RoadModel extends ConnectionModel {
     }
     
     public Supplies[] calcDelivery(Supplies sent){
-        Supplies lost = new Supplies(sent.id, sent.amount * stealage);
-        stolenGoods.add(lost);
+        Supplies lost = new Supplies(sent.id, random.nextDouble()<stealChance?sent.amount:0);
+        stolenThisTick += lost.amount;
         Supplies delivered = new Supplies(sent.id, Math.min(sent.amount - lost.amount, remainingCapacityThisTick));
         remainingCapacityThisTick -= delivered.amount;
         deliveredThisTick += delivered.amount;
@@ -140,5 +145,6 @@ public class RoadModel extends ConnectionModel {
         RAIN_MOD = Double.parseDouble(sm.settings.get("rainMod").getValue());
         transport_type = Integer.parseInt(sm.settings.get("transportType").getValue());
         road_type = Integer.parseInt(sm.settings.get("roadType").getValue());
+        stealChance = Double.parseDouble(sm.settings.get("theftChance").getValue());
     }
 }

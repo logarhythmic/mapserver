@@ -48,9 +48,12 @@ public class PopCenter extends PointModel {
     @Override
     public void onTick(DataFrame last, DataFrame current) {
         if (isPort){
-            double aid = (double)last.getGlobalData("devAid");
-            Store(new Supplies(0,aid/2));
-            Store(new Supplies(1,aid/2));
+            if (last != null && last.getGlobalData("devAid") != null){
+                double aid = (double)last.getGlobalData("devAid");
+                aid *= 20;
+                Store(new Supplies(0,aid/2));
+                Store(new Supplies(1,aid/2));
+            }
         }
         if(countFood() < foodNeededLastTick*3+50000){
             requestSuppliesFromAll(new Supplies(0, Math.min(50, foodNeededLastTick*3+50000 - countFood())), current);
@@ -73,8 +76,6 @@ public class PopCenter extends PointModel {
         }
         UpdateStorage();
         this.saveDouble("availableFood", this.countFood());
-        //this.saveDouble("Items in storage", this.currentStorageCapacity);
-        //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
 
     @Override
@@ -114,10 +115,10 @@ public class PopCenter extends PointModel {
         boolean outOfGrain = availableGrain < toEat/2;
         outOfMilk = outOfGrain?toEat-availableGrain>availableMilk:outOfMilk;
         outOfGrain = outOfMilk?toEat-availableMilk>availableGrain:outOfGrain;
-        System.out.print(this.id + ": Needed food = "+(long)toEat+". Available foods: "+(long)availableGrain+" grain, "+(long)availableMilk+" milk.");
+        //System.out.print(this.id + ": Needed food = "+(long)toEat+". Available foods: "+(long)availableGrain+" grain, "+(long)availableMilk+" milk.");
         if(outOfMilk && outOfGrain){
             Event starvation = new Event("outOfFood", Event.Type.DOUBLE, (toEat - availableMilk - availableGrain) / toEat);
-            System.out.print(" Town "+this.id+" is starving!");
+            //System.out.print(" Town "+this.id+" is starving!");
             Take(0, availableMilk);
             Take(1, availableGrain);
             starvation.sender = this;
@@ -132,7 +133,7 @@ public class PopCenter extends PointModel {
             Take(0,toEat/2);
             Take(1,toEat/2);
         }
-        System.out.println("");
+        //System.out.println("");
     }
     
     /**
@@ -270,7 +271,7 @@ public class PopCenter extends PointModel {
         sm.color = new Color(255, 128, 64);
         sm.name = "PopCenter";
         sm.settings.put("maxCap", new SettingDouble("The volume of the storage unit of this model", Integer.MAX_VALUE, new RangeDouble(1, Double.MAX_VALUE)));
-        sm.settings.put("ratRavenousness", new SettingDouble("How much of stored food will be eaten by rats in a week", 0.023, new RangeDouble(0, 1)));
+        sm.settings.put("spoilingRate", new SettingDouble("How much of stored food will get eaten by rats and/or rot in a week", 0.023, new RangeDouble(0, 1)));
         sm.settings.put("vehicles", new SettingInt("How many vehicles this model has available for sending supplies", 1, new RangeInt(0, 10000)));
         sm.settings.put("initialFood", new SettingDouble("How much food this model has in store initially", 10000, new RangeDouble(0,Double.MAX_VALUE)));
         sm.settings.put("isPort", new SettingBoolean("Does this town receive support packages from abroad?", false));
@@ -286,8 +287,6 @@ public class PopCenter extends PointModel {
             Store(new Supplies(0,initialFood));
         }
         this.saveDouble("availableFood", this.countFood());
-        //this.saveDouble("Items in storage", this.currentStorageCapacity);
-        //this.saveDouble("Storage fullness", this.currentStorageCapacity / this.maxStorageCapacity);
     }
     
     void findOthers(){
@@ -318,7 +317,7 @@ public class PopCenter extends PointModel {
     @Override
     public void onUpdateSettings(SettingMaster sm) {
         this.maxStorageCapacity = Double.parseDouble(sm.settings.get("maxCap").getValue());
-        this.STORAGE_RAT_RAVENOUSNESS = Double.parseDouble(sm.settings.get("ratRavenousness").getValue());
+        this.STORAGE_RAT_RAVENOUSNESS = Double.parseDouble(sm.settings.get("spoilingRate").getValue());
         this.vehicles = Integer.parseInt(sm.settings.get("vehicles").getValue());
         this.initialFood = Double.parseDouble(sm.settings.get("initialFood").getValue());
         this.isPort = Boolean.parseBoolean(sm.settings.get("isPort").getValue());
