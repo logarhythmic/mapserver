@@ -1,16 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package fi.kivibot.power.models;
 
+import fi.kivibot.power.misc.PowerCounter;
 import fi.kivibot.power.models.base.PowerUser;
 import fi.paivola.mapserver.core.DataFrame;
 
 /**
  *
- * @author kivi
+ * @author Nicklas Ahlskog
  */
 public class Factory extends PowerUser {
 
@@ -27,6 +26,7 @@ public class Factory extends PowerUser {
         double profit = this.profit_base * this.getDouble("power");
         profit_gained += profit;
         this.saveDouble("profit_this_week", profit);
+        PowerCounter.addCosts(current, -profit);
     }
 
     @Override
