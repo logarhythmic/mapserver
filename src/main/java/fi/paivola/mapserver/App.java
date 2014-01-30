@@ -1,17 +1,12 @@
 package fi.paivola.mapserver;
 
-import fi.paivola.mapserver.core.Event;
-import fi.paivola.mapserver.core.ExtensionModel;
 import fi.paivola.mapserver.core.GameManager;
 import fi.paivola.mapserver.core.GameThread;
 import fi.paivola.mapserver.core.Model;
 import fi.paivola.mapserver.core.SettingsParser;
 import fi.paivola.mapserver.core.TestcaseRunner;
 import fi.paivola.mapserver.core.WSServer;
-import fi.paivola.mapserver.core.setting.*;
-import fi.paivola.mapserver.utils.LatLng;
 import fi.paivola.mapserver.core.setting.SettingMaster;
-import fi.paivola.mapserver.models.PopCenter;
 import fi.paivola.mapserver.models.RoadModel;
 import fi.paivola.mapserver.utils.CSVDumper;
 import java.io.BufferedReader;
