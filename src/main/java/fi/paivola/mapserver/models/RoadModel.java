@@ -35,7 +35,7 @@ public class RoadModel extends ConnectionModel {
     static private double[] A_MOD = new double[]{55000, 10000, 300, 50};
     private double RAIN_MOD = -0.1;
     
-    private double roadLength;
+    public double roadLength; // km
     
     private int transport_type, road_type;
     
@@ -59,13 +59,6 @@ public class RoadModel extends ConnectionModel {
             rain = (double) current.getGlobalData("rain");
         super.onTickStart(last, current);
         remainingCapacityThisTick = calcMaxStuff(calcTrips(calcTime(calcSpeed())));
-    }
-    
-    public void setLengthToDistance(SettingMaster sm){
-        this.roadLength = 0;
-        if (connections.size() >= 2)
-            this.roadLength = connections.get(0).distanceTo(connections.get(1));
-        sm.settings.get("roadLength").setValue(this.roadLength+"");
     }
     
     public double getVehicleCap(){

@@ -9,6 +9,7 @@ import fi.paivola.mapserver.core.WSServer;
 import fi.paivola.mapserver.core.setting.SettingMaster;
 import fi.paivola.mapserver.models.RoadModel;
 import fi.paivola.mapserver.utils.CSVDumper;
+import fi.paivola.mapserver.utils.LatLng;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -131,23 +132,24 @@ public class App {
         // kaupungit
         sm = gm.getDefaultSM("PopCenter");
         sm.settings.get("vehicles").setValue("1000");
-        sm.settings.get("initialFood").setValue("100000");
+        sm.settings.get("initialFood").setValue("80000000");
+        sm.settings.get("births%").setValue("0.047492154");
         Model town1 = gm.createModel("PopCenter");
         sm = gm.getDefaultSM("PopCenter");
-        sm.settings.get("initialFood").setValue("100000");
+        sm.settings.get("initialFood").setValue("80000000");
         sm.settings.get("births%").setValue("0.047492154");
         Model town2 = gm.createModel("PopCenter");
-        sm = one.game.getDefaultSM("Field");
-        sm.settings.get("content").setValue("maize");
-        sm.settings.get("area").setValue("1000000");
         sm = gm.getDefaultSM("Road");
         Model road1 = gm.createModel("Road");
+        ((RoadModel)road1).roadLength = 100;
+        sm = one.game.getDefaultSM("Field");
+        sm.settings.get("content").setValue("maize");
+        sm.settings.get("area").setValue("100000");
 
         // ruoka x kaupungit
         gm.linkModelsWith(gm.createModel("Field",sm), town1, gm.createModel("GenericConnection"));
         gm.linkModelsWith(town1, town2, road1);
-        ((RoadModel)road1).setLengthToDistance(sm);
-
+        
         // water
         Model l1 = gm.createModel("Lake");
         sm = gm.getDefaultSM("Lake");
