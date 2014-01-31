@@ -40,6 +40,7 @@ public class PopCenter extends PointModel {
     private double foodNeededLastTick;
     
     private boolean isPort;
+    private double allTimeStored;
     
     public PopCenter(int id){
         super(id);
@@ -75,6 +76,7 @@ public class PopCenter extends PointModel {
                 storage.get(i).amount*=(1 - STORAGE_RAT_RAVENOUSNESS);  //our highly advanced rat algorithm
         }
         UpdateStorage();
+        this.saveDouble("allTimeFood", this.allTimeStored);
         this.saveDouble("availableFood", this.countFood());
     }
 
@@ -286,6 +288,7 @@ public class PopCenter extends PointModel {
         if (initialFood > 0){
             Store(new Supplies(0,initialFood));
         }
+        this.saveDouble("allTimeFood", this.allTimeStored);
         this.saveDouble("availableFood", this.countFood());
     }
     
@@ -353,6 +356,7 @@ public class PopCenter extends PointModel {
         }
         overflow = overflow<0?0:overflow;
         currentStorageCapacity += in.amount;
+        allTimeStored += in.amount;
         return overflow;
     }
     
